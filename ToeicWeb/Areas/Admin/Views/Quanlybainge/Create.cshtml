@@ -1,0 +1,66 @@
+﻿
+<div class="card shadow border-0 mt-4">
+    <div class="card-header bg-secondary bg-gradient ml-0 py-3">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2 class="text-white py-2">Thêm bài nge mới</h2>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-4">
+        <form method="post" class="row">
+            <div class="border p-3">
+                @*<div asp-validation-summary="ModelOnly"></div>*@
+                <div class="form-floating py-2 col-12">
+                    <input style="background-color:#fff" class="form-control border-0 shadow" />
+                    <label style="background-color:#fff" class="ms-2">ETS</label>
+                    <span  class="text-danger"></span>
+                </div>
+                <div class="form-floating py-2 col-12">
+                    <input style="background-color:#fff" class="form-control border-0 shadow" />
+                    <label style="background-color:#fff" class="ms-2">TEST</label>
+                    <span class="text-danger"></span>
+                </div>
+
+                <div class="form-floating py-2 col-12">
+                    <input style="background-color:#fff"  class="form-control border-0 shadow" />
+                    <label style ="background-color:#fff" class="ms-2">PART</label>
+                    <span class="text-danger"></span>
+                </div>
+
+                <div class="form-floating py-2 col-12">
+                    <input type="file" name="files" class="form-control border-0 shadow" multiple />
+                    <label class="ms-2">File nge</label>
+                </div>
+
+                  <div class="form-floating py-2 col-12">
+                    <input type="file" name="files" class="form-control border-0 shadow" multiple />
+                    <label class="ms-2">Hình ảnh</label>
+                </div>
+
+
+                <div class="row pt-2">
+                    <div class="col-6 col-md-3">
+                        <button type="submit" class="btn btn-primary form-control">Thêm</button>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a asp-area="Admin" asp-controller="Quanlybainge" asp-action="Index" class="btn btn-outline-primary border  form-control">
+                            Back to List
+                        </a>
+                    </div>
+                </div>
+
+
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}
