@@ -105,6 +105,8 @@ namespace ToeicWeb.Areas.Identity.Pages.Account
             [Compare("Password", ErrorMessage = "Mật khẩu và mật khẩu xác nhận không khớp.")]
             public string ConfirmPassword { get; set; }
 
+            [Required]
+            public string Name { get; set; }
 
             public string? Role {  get; set; }
             [ValidateNever]
@@ -148,6 +150,7 @@ namespace ToeicWeb.Areas.Identity.Pages.Account
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 var result = await _userManager.CreateAsync(user, Input.Password);
+                user.Name = Input.Name;
 
                 if (result.Succeeded)
                 {
