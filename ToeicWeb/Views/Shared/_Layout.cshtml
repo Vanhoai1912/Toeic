@@ -15,7 +15,13 @@
 </head>
 <body>
     <header>
+
         @await Html.PartialAsync("_Navbar")
+        
+        @if (ViewData["NavbarType"] == "_NavbarBack")
+        {
+            @await Html.PartialAsync("_NavbarBack")
+        }
     </header>
     <div class="container">
         <main role="main" class="pb-3">

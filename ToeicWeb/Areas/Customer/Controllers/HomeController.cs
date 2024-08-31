@@ -21,6 +21,7 @@ namespace ToeicWeb.Areas.Customer.Controllers
 
         public IActionResult Details()
         {
+            ViewData["NavbarType"] = "_NavbarBack"; 
             return View();
         }
 

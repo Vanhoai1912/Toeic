@@ -97,7 +97,7 @@
 
                         </li>
                         <li class="nav-item">
-                            <a class=" py-3" asp-area="Customer" asp-controller="Home" asp-action="Index">
+                            <a class="py-3" asp-area="Customer" asp-controller="Home" asp-action="Index">
                                 <i class="bi bi-house-door "></i>
                                 <p>Trang chủ</p>
                             </a>
@@ -176,8 +176,8 @@
                                     </span>
                                 </a>
                                 <ul class="dropdown-menu dropdown-user animated fadeIn">
-                                    <div class="dropdown-user-scroll scrollbar-outer">
-                                        @*  <li>
+                                   @*  <div class="dropdown-user-scroll scrollbar-outer">
+                                         <li>
                                         <div class="user-box">
 
                                         <div class="u-text">
@@ -186,18 +186,18 @@
                                         </div>
                                         </div>
                                         </li> *@
-                                    <li>
+                                  @*   <li>
                                         <div class="dropdown-divider"></div>
                                         <a class="dropdown-item" href="#">My Profile</a>
                                         <div class="dropdown-divider"></div>
                                         <a class="dropdown-item" href="#">Logout</a>
-                                    </li>
-                                   @*  <li>
-                                        <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                                            <button id="logout" type="submit" class="w-100 btn btn-nobackg">Đăng xuất</button>
+                                    </li> *@
+                                    <li>
+                                        <form id="logoutForm" class="form-inline dropdown-item" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                                            <btn id="logout" type="submit" class="w-100 p-2 px-sm-2">Đăng xuất</btn>
                                         </form>
 
-                                    </li> *@
+                                    </li>
                                 </ul>
                             </li>
                         </ul>
@@ -219,7 +219,6 @@
             <div class="title">Settings</div>
             <div class="custom-content">
                 <div class="switcher">
-
                     <div class="switch-block">
                         <h4>Navbar Header</h4>
                         <div class="btnSwitch">
@@ -283,6 +282,9 @@
                             <button type="button"
                                     class="changeSideBarColor"
                                     data-color="dark2"></button>
+                            <button type="button"
+                                    class="changeSideBarColor"
+                                    data-color="red2"></button>
                         </div>
                     </div>
                 </div>
@@ -336,34 +338,7 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script></script>
     <script src="//cdn.datatables.net/2.1.4/js/dataTables.min.js" asp-append-version="true"></script>
 
-    <script>
-        $("#lineChart").sparkline([102, 109, 120, 99, 110, 105, 115], {
-            type: "line",
-            height: "70",
-            width: "100%",
-            lineWidth: "2",
-            lineColor: "#177dff",
-            fillColor: "rgba(23, 125, 255, 0.14)",
-        });
-
-        $("#lineChart2").sparkline([99, 125, 122, 105, 110, 124, 115], {
-            type: "line",
-            height: "70",
-            width: "100%",
-            lineWidth: "2",
-            lineColor: "#f3545d",
-            fillColor: "rgba(243, 84, 93, .14)",
-        });
-
-        $("#lineChart3").sparkline([105, 103, 123, 100, 95, 105, 115], {
-            type: "line",
-            height: "70",
-            width: "100%",
-            lineWidth: "2",
-            lineColor: "#ffa534",
-            fillColor: "rgba(255, 165, 52, .14)",
-        });
-    </script>
+   
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>
