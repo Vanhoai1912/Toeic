@@ -3,164 +3,372 @@
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
 
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>Admin</title>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <meta content="" name="keywords">
-    <meta content="" name="description">
+    <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
+          name="viewport" />
 
-    <!-- Favicon -->
-    <link href="~/admin/~/admin/img/favicon.ico" rel="icon">
 
-    <!-- Google Web Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Roboto:wght@500;700&display=swap" rel="stylesheet">
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="~/admin/assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/admin/assets/css/plugins.min.css" />
+    <link rel="stylesheet" href="~/admin/assets/css/kaiadmin.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <!-- Icon Font Stylesheet -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <!-- CSS Just for demo purpose, don't include it in your project -->
+    <link rel="stylesheet" href="~/admin/assets/css/demo.css" />
+
+
+    <link rel="stylesheet" href="//cdn.datatables.net/2.1.4/css/dataTables.dataTables.min.css" />
+
+    <link rel="stylesheet" href="//cdn.datatables.net/1.13.3/css/jquery.dataTables.min.css" />
+
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" />
+
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
 
-    <!-- Libraries Stylesheet -->
-    <link href="~/admin/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
-    <link href="~/admin/lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css" rel="stylesheet" />
 
-    <!-- Customized Bootstrap Stylesheet -->
-    <link href="~/admin/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Template Stylesheet -->
-    <link href="~/admin/css/style.css" rel="stylesheet">
-    <!-- Thông báo -->
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" />
-    <link rel="stylesheet" href="//cdn.datatables.net/1.13.3/css/jquery.dataTables.min.css" />
 </head>
-
 <body>
-    <div class="container-fluid position-relative d-flex p-0">
-        <!-- Spinner Start -->
-        <div id="spinner" class="show bg-dark position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
-            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
-                <span class="sr-only">Loading...</span>
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <div class="sidebar" data-background-color="dark">
+            <div class="sidebar-logo">
+                <!-- Logo Header -->
+                <a asp-area="Admin" asp-controller="HomeAdmin" asp-action="Index" class="navbar-brand mx-4 mb-3">
+                    <h3 class="text-center text-primary"><i class="bi bi-layout-text-sidebar"></i> Admin </h3>
+                </a>
+
+                <!-- End Logo Header -->
+            </div>
+            <div class="sidebar-wrapper scrollbar scrollbar-inner">
+                <div class="sidebar-content">
+                    <ul class="nav nav-secondary">
+
+                        <li class="nav-section">
+                            <span class="sidebar-mini-icon">
+                                <i class="fa fa-ellipsis-h"></i>
+                            </span>
+                            <h4 class="text-section">Quản lý</h4>
+                        </li>
+                        <li class="nav-item">
+                            <a class=" py-3" asp-area="Admin" asp-controller="Quanlybainge" asp-action="Index">
+                                <i class="bi bi-headset"></i>
+                                <p>Quản lý bài nge</p>
+                            </a>
+
+                        </li>
+                        <li class="nav-item">
+                            <a class=" py-3" asp-area="Customer" asp-controller="Home" asp-action="Index">
+                                <i class="bi bi-pen-fill"></i>
+                                <p>Quản lý bài đọc</p>
+                            </a>
+
+                        </li>
+                        <li class="nav-item">
+                            <a class=" py-3" asp-area="Customer" asp-controller="Home" asp-action="Index">
+                                <i class="bi bi-layout-text-sidebar"></i>
+                                <p>Quản lý đề thi</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class=" py-3" asp-area="Customer" asp-controller="Home" asp-action="Index">
+                                <i class="bi bi-folder2-open"></i>
+                                <p>Quản lý bài từ vựng</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class=" py-3" asp-area="Customer" asp-controller="Home" asp-action="Index">
+                                <i class="bi bi-archive"></i>
+                                <p>Quản lý bài ngữ pháp</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class=" py-3" asp-area="Admin" asp-controller="User" asp-action="Index">
+                                <i class="bi bi-person-bounding-box "></i>
+                                <p>Quản lý tài khoản</p>
+                            </a>
+
+                        </li>
+                        <li class="nav-item">
+                            <a class=" py-3" asp-area="Customer" asp-controller="Home" asp-action="Index">
+                                <i class="bi bi-house-door "></i>
+                                <p>Trang chủ</p>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
-        <!-- Spinner End -->
-        <!-- Sidebar Start -->
-        <div class="sidebar pe-4 pb-3">
-            <nav class="navbar bg-secondary navbar-dark">
-                <a asp-area="Admin" asp-controller="HomeAdmin" asp-action="Index" class="navbar-brand mx-4 mb-3">
-                    <h3 class="text-primary"><i class="fa fa-user-edit me-2"></i>Admin</h3>
-                </a>
-               
-                <div class="navbar-nav w-100">
-                   
-                    <div class="nav-item">
-                        <a class="nav-link " asp-area="Admin" asp-controller="Quanlybainge" asp-action="Index">
-                            <i class="bi bi-headset text-white"></i>Quản lý bài nge
-                        </a>
-                    </div>
+        <!-- End Sidebar -->
 
-                    <div class="nav-item">
-                        <a class="nav-link " asp-area="Customer" asp-controller="Home" asp-action="Index">
-                            <i class="bi bi-pen-fill text-white"></i>Quản lý bài đọc
-                        </a>
-                    </div>
+        <div class="main-panel">
+            <div class="main-header">
+                <div class="main-header-logo">
+                    <!-- Logo Header -->
+                    <div class="logo-header" data-background-color="dark">
 
-                    <div class="nav-item">
-                        <a class="nav-link " asp-area="Customer" asp-controller="Home" asp-action="Index">
-                            <i class="bi bi-layout-text-sidebar text-white"></i>Quản lý đề thi
-                        </a>
+                        <div class="nav-toggle">
+                            <button class="btn btn-toggle toggle-sidebar">
+                                <i class="gg-menu-right"></i>
+                            </button>
+                            <button class="btn btn-toggle sidenav-toggler">
+                                <i class="gg-menu-left"></i>
+                            </button>
+                        </div>
+                        <button class="topbar-toggler more">
+                            <i class="gg-more-vertical-alt"></i>
+                        </button>
                     </div>
-
-                    <div class="nav-item">
-                        <a class="nav-link " asp-area="Customer" asp-controller="Home" asp-action="Index">
-                            <i class="bi bi-archive text-white"></i>Quản lý ngữ pháp
-                        </a>
-                    </div>
-
-                    <div class="nav-item">
-                        <a class="nav-link " asp-area="Customer" asp-controller="Home" asp-action="Index">
-                            <i class="bi bi-folder2-open text-white"></i>Quản lý từ vựng
-                        </a>
-                    </div>
-
-                    <div class="nav-item">
-                        <a class="nav-link" asp-area="Admin" asp-controller="User" asp-action="Index">
-                            <i class="bi bi-person-bounding-box text-white"></i>Quản lý tài khoản
-                        </a>
-                    </div>
-                    <div class="nav-item">
-                        <a class="nav-link " asp-area="Customer" asp-controller="Home" asp-action="Index">
-                            <i class="bi bi-house-door text-white"></i>Trang chủ
-                        </a>
-                    </div>
-
+                    <!-- End Logo Header -->
                 </div>
-            </nav>
+                <!-- Navbar Header -->
+                <nav class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom">
+                    <div class="container-fluid">
+                        <nav class="navbar navbar-header-left navbar-expand-lg navbar-form nav-search p-0 d-none d-lg-flex">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <button type="submit" class="btn btn-search pe-1">
+                                        <i class="fa fa-search search-icon"></i>
+                                    </button>
+                                </div>
+                                <input type="text"
+                                       placeholder="Search ..."
+                                       class="form-control" />
+                            </div>
+                        </nav>
+
+                        <ul class="navbar-nav topbar-nav ms-md-auto align-items-center">
+                            <li class="nav-item topbar-icon dropdown hidden-caret d-flex d-lg-none">
+                                <a class="nav-link dropdown-toggle"
+                                   data-bs-toggle="dropdown"
+                                   href="#"
+                                   role="button"
+                                   aria-expanded="false"
+                                   aria-haspopup="true">
+                                    <i class="fa fa-search"></i>
+                                </a>
+                                <ul class="dropdown-menu dropdown-search animated fadeIn">
+                                    <form class="navbar-left navbar-form nav-search">
+                                        <div class="input-group">
+                                            <input type="text"
+                                                   placeholder="Search ..."
+                                                   class="form-control" />
+                                        </div>
+                                    </form>
+                                </ul>
+                            </li>
+                            <li class="nav-item topbar-user dropdown hidden-caret">
+                                <a class="dropdown-toggle profile-pic"
+                                   data-bs-toggle="dropdown"
+                                   href="#"
+                                   aria-expanded="false">
+
+                                    <span class="profile-username">
+                                        <span class="op-7">Hi,</span>
+                                        <span class="fw-bold">@UserManager.GetUserName(User)!</span>
+                                    </span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-user animated fadeIn">
+                                    <div class="dropdown-user-scroll scrollbar-outer">
+                                        @*  <li>
+                                        <div class="user-box">
+
+                                        <div class="u-text">
+                                        <h4>@UserManager.GetUserName(User)</h4>
+                                        <p class="text-muted">@UserManager.GetUserName(User)!</p>
+                                        </div>
+                                        </div>
+                                        </li> *@
+                                    <li>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" href="#">My Profile</a>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" href="#">Logout</a>
+                                    </li>
+                                   @*  <li>
+                                        <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                                            <button id="logout" type="submit" class="w-100 btn btn-nobackg">Đăng xuất</button>
+                                        </form>
+
+                                    </li> *@
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+                <!-- End Navbar -->
+                <div class="container">
+                    <main role="main" class="pb-3">
+                        @RenderBody()
+                    </main>
+                </div>
+            </div>
+
+
         </div>
-        <!-- Sidebar End -->
-        <!-- Content Start -->
-        <div class="content">
-            <!-- Navbar Start -->
-            <nav class="navbar navbar-expand bg-secondary navbar-dark sticky-top px-4 py-sm-2">
-                <a href="index.html" class="navbar-brand d-flex d-lg-none me-4">
-                    <h2 class="text-primary mb-0"><i class="fa fa-user-edit"></i></h2>
-                </a>
-                <a href="#" class="sidebar-toggler flex-shrink-0">
-                    <i class="fa fa-bars"></i>
-                </a>
-              
-                <div class="navbar-nav align-items-center ms-auto">
-                    <div class="nav-item dropdown">
-                        <a style="cursor:pointer" data-bs-toggle="dropdown" class="nav-link dropdown-toggle" title="Manage"> @UserManager.GetUserName(User)!</a>
-                        <div class="dropdown-menu dropdown-menu-end bg-secondary border-0 rounded-0 rounded-bottom m-0">
-                            @* <a id="manage" class="nav-link " asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage" class="dropdown-item">
-                                Thông tin cá nhân</a> *@
-                            <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                                <button id="logout" type="submit" class="w-100 btn btn-nobackg" >Đăng xuất</button>
-                            </form>
+
+        <!-- Custom template | don't include it in your project! -->
+        <div class="custom-template">
+            <div class="title">Settings</div>
+            <div class="custom-content">
+                <div class="switcher">
+
+                    <div class="switch-block">
+                        <h4>Navbar Header</h4>
+                        <div class="btnSwitch">
+                            <button type="button"
+                                    class="changeTopBarColor"
+                                    data-color="dark"></button>
+                            <button type="button"
+                                    class="changeTopBarColor"
+                                    data-color="blue"></button>
+                            <button type="button"
+                                    class="changeTopBarColor"
+                                    data-color="purple"></button>
+                            <button type="button"
+                                    class="changeTopBarColor"
+                                    data-color="light-blue"></button>
+                            <button type="button"
+                                    class="changeTopBarColor"
+                                    data-color="green"></button>
+                            <button type="button"
+                                    class="changeTopBarColor"
+                                    data-color="orange"></button>
+                            <button type="button"
+                                    class="changeTopBarColor"
+                                    data-color="red"></button>
+                            <button type="button"
+                                    class="selected changeTopBarColor"
+                                    data-color="white"></button>
+                            <br />
+                            <button type="button"
+                                    class="changeTopBarColor"
+                                    data-color="dark2"></button>
+                            <button type="button"
+                                    class="changeTopBarColor"
+                                    data-color="blue2"></button>
+                            <button type="button"
+                                    class="changeTopBarColor"
+                                    data-color="purple2"></button>
+                            <button type="button"
+                                    class="changeTopBarColor"
+                                    data-color="light-blue2"></button>
+                            <button type="button"
+                                    class="changeTopBarColor"
+                                    data-color="green2"></button>
+                            <button type="button"
+                                    class="changeTopBarColor"
+                                    data-color="orange2"></button>
+                            <button type="button"
+                                    class="changeTopBarColor"
+                                    data-color="red2"></button>
+                        </div>
+                    </div>
+                    <div class="switch-block">
+                        <h4>Sidebar</h4>
+                        <div class="btnSwitch">
+                            <button type="button"
+                                    class="changeSideBarColor"
+                                    data-color="white"></button>
+                            <button type="button"
+                                    class="selected changeSideBarColor"
+                                    data-color="dark"></button>
+                            <button type="button"
+                                    class="changeSideBarColor"
+                                    data-color="dark2"></button>
                         </div>
                     </div>
                 </div>
-            </nav>
-            <!-- Navbar End -->
-            <div style="min-height: 400px; margin: 0 50px">
-            @*     <partial name="_Notification" /> *@
-                @RenderBody()
+            </div>
+            <div class="custom-toggle">
+                <i class="bi bi-gear"></i>
             </div>
         </div>
-
-        <!-- Back to Top -->
-        <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
+        <!-- End Custom template -->
     </div>
-
-    <!-- JavaScript Libraries -->
+    <!--   Core JS Files   -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/admin/lib/chart/chart.min.js"></script>
-    <script src="~/admin/lib/easing/easing.min.js"></script>
-    <script src="~/admin/lib/waypoints/waypoints.min.js"></script>
-    <script src="~/admin/lib/owlcarousel/owl.carousel.min.js"></script>
-    <script src="~/admin/lib/tempusdominus/js/moment.min.js"></script>
-    <script src="~/admin/lib/tempusdominus/js/moment-timezone.min.js"></script>
-    <script src="~/admin/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+    <script src="~/admin/assets/js/core/jquery-3.7.1.min.js"></script>
+    <script src="~/admin/assets/js/core/popper.min.js"></script>
+    <script src="~/admin/assets/js/core/bootstrap.min.js"></script>
 
-    <!-- Template Javascript -->
+    <!-- jQuery Scrollbar -->
+    <script src="~/admin/assets/js/plugin/jquery-scrollbar/jquery.scrollbar.min.js"></script>
+
+    <!-- Chart JS -->
+    <script src="~/admin/assets/js/plugin/chart.js/chart.min.js"></script>
+
+    <!-- jQuery Sparkline -->
+    <script src="~/admin/assets/js/plugin/jquery.sparkline/jquery.sparkline.min.js"></script>
+
+    <!-- Chart Circle -->
+    <script src="~/admin/assets/js/plugin/chart-circle/circles.min.js"></script>
+
+    <!-- Datatables -->
+    <script src="~/admin/assets/js/plugin/datatables/datatables.min.js"></script>
+
+    @*     <!-- Bootstrap Notify -->
+    <script src="~/admin/assets/js/plugin/bootstrap-notify/bootstrap-notify.min.js"></script> *@
+
+    <!-- jQuery Vector Maps -->
+    <script src="~/admin/assets/js/plugin/jsvectormap/jsvectormap.min.js"></script>
+    <script src="~/admin/assets/js/plugin/jsvectormap/world.js"></script>
+
+    <!-- Sweet Alert -->
+    <script src="~/admin/assets/js/plugin/sweetalert/sweetalert.min.js"></script>
+
+    <!-- Kaiadmin JS -->
+    <script src="~/admin/assets/js/kaiadmin.min.js"></script>
+
+    <!-- Kaiadmin DEMO methods, don't include it in your project! -->
+    <script src="~/admin/assets/js/setting-demo.js"></script>
+    <script src="~/admin/assets/js/demo.js"></script>
+
     <script src="~/admin/js/main.js"></script>
 
-
-    @* Thêm thông báo khi muốn xóa product *@
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    @* Thêm bộ nâng cao cho trang sản phẩm (có thể tìm kiếm tên, giá từ thấp đến cao, phân trang...) *@
-    <script src="//cdn.datatables.net/1.13.3/js/jquery.dataTables.min.js" asp-append-version="true"></script>
-    @* Thêm bộ chỉnh sửa cho Description *@
-    <script src="https://cdn.tiny.cloud/1/g28lhnxtlihu4l4a381gw7tz47voznshwbi10lmsvlekrfme/tinymce/6/tinymce.min.js" referrerpolicy="origin">
-        <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script></script>
+    <script src="//cdn.datatables.net/2.1.4/js/dataTables.min.js" asp-append-version="true"></script>
+
+    <script>
+        $("#lineChart").sparkline([102, 109, 120, 99, 110, 105, 115], {
+            type: "line",
+            height: "70",
+            width: "100%",
+            lineWidth: "2",
+            lineColor: "#177dff",
+            fillColor: "rgba(23, 125, 255, 0.14)",
+        });
+
+        $("#lineChart2").sparkline([99, 125, 122, 105, 110, 124, 115], {
+            type: "line",
+            height: "70",
+            width: "100%",
+            lineWidth: "2",
+            lineColor: "#f3545d",
+            fillColor: "rgba(243, 84, 93, .14)",
+        });
+
+        $("#lineChart3").sparkline([105, 103, 123, 100, 95, 105, 115], {
+            type: "line",
+            height: "70",
+            width: "100%",
+            lineWidth: "2",
+            lineColor: "#ffa534",
+            fillColor: "rgba(255, 165, 52, .14)",
+        });
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 
 </html>
+
+
+

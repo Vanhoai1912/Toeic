@@ -10,7 +10,7 @@ function loadDataTable() {
         "columns": [
             { "data": "name", "width": "20%" },
             { "data": "email", "width": "20%" },
-            { "data": "phoneNumber", "width": "20%" },
+            { "data": "phoneNumber", "width": "15%" },
             { "data": "role", "width": "15%" },
             {
                 data: { id:"id", lockoutEnd:"lockoutEnd"},
@@ -33,7 +33,7 @@ function loadDataTable() {
                     else {
                         return `
                         <div class="text-center">
-                              <a onclick=LockUnlock('${data.id}') class="btn btn-success text-white" style="cursor:pointer; width:102px;">
+                              <a onclick=LockUnlock('${data.id}') class="btn btn-success text-white" style="cursor:pointer; width:108px;">
                                     <i class="bi bi-unlock-fill"></i>  UnLock
                                 </a>
                                 <a href="/admin/user/RoleManagment?userId=${data.id}" class="btn btn-danger text-white" style="cursor:pointer; width:150px;">
@@ -45,7 +45,7 @@ function loadDataTable() {
 
                    
                 },
-                "width": "25%"
+                "width": "30%"
             }
         ]
     });

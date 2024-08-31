@@ -19,6 +19,11 @@ namespace ToeicWeb.Areas.Customer.Controllers
             return View();
         }
 
+        public IActionResult Details()
+        {
+            return View();
+        }
+
         public IActionResult Vocabulary()
         {
             return View();
