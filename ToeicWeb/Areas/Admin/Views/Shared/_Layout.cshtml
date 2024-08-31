@@ -131,7 +131,7 @@
                 <!-- Navbar Header -->
                 <nav class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom">
                     <div class="container-fluid">
-                        <nav class="navbar navbar-header-left navbar-expand-lg navbar-form nav-search p-0 d-none d-lg-flex">
+                       @*  <nav class="navbar navbar-header-left navbar-expand-lg navbar-form nav-search p-0 d-none d-lg-flex">
                             <div class="input-group">
                                 <div class="input-group-prepend">
                                     <button type="submit" class="btn btn-search pe-1">
@@ -142,8 +142,8 @@
                                        placeholder="Search ..."
                                        class="form-control" />
                             </div>
-                        </nav>
-
+                        </nav>*@
+                       
                         <ul class="navbar-nav topbar-nav ms-md-auto align-items-center">
                             <li class="nav-item topbar-icon dropdown hidden-caret d-flex d-lg-none">
                                 <a class="nav-link dropdown-toggle"
@@ -194,9 +194,9 @@
                                     </li> *@
                                     <li>
                                         <form id="logoutForm" class="form-inline dropdown-item" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                                            <btn id="logout" type="submit" class="w-100 p-2 px-sm-2">Đăng xuất</btn>
+                                            <button style="border: none" id="logout" type="submit" class="w-100 p-2 px-sm-2">
+                                                <i class="bi bi-box-arrow-right"></i> Đăng xuất</button>
                                         </form>
-
                                     </li>
                                 </ul>
                             </li>

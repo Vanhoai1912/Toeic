@@ -9,28 +9,29 @@
                 aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
+
         <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item m-sm-2 fs-6 text-light">
-                    <a class="nav-link text-sm-center fw-medium tranN " asp-area="Customer" asp-controller="Home" asp-action="Index">
+                    <a class="nav-link" asp-area="Customer" asp-controller="Home" asp-action="Index">
                         <i class="bi bi-house-door fst-normal ">  Trang chủ</i>
                     </a>
 
                 </li>
                 <li class="nav-item m-sm-2 fs-6 text-light">
-                    <a class="nav-link text-sm-center fw-medium tranN " asp-area="Customer" asp-controller="Home" asp-action="Vocabulary">
+                    <a class="nav-link" asp-area="Customer" asp-controller="Home" asp-action="Vocabulary">
                         <i class="bi bi-translate fst-normal "> Từ vựng</i>
                     </a>
                 </li>
                 <li class="nav-item m-sm-2 fs-6 text-light">
-                    <a class="nav-link text-sm-center fw-medium tranN " asp-area="Customer" asp-controller="Home" asp-action="Grammar">
+                    <a class="nav-link" asp-area="Customer" asp-controller="Home" asp-action="Grammar">
                         <i class="bi bi-book fst-normal "> Ngữ pháp</i>
                     </a>
                 </li>
                 @if (User.IsInRole(SD.Role_Admin))
                 {
                     <li class="nav-item m-sm-2 text-light">
-                        <a class="nav-link text-sm-center fw-medium tranN " asp-area="Admin" asp-controller="HomeAdmin" asp-action="Index">
+                        <a class="nav-link" asp-area="Admin" asp-controller="HomeAdmin" asp-action="Index">
                             <i class="bi bi-person-lines-fill fst-normal "> Admin</i>
                         </a>
                     </li>
@@ -38,7 +39,7 @@
             </ul>
                 <ul class="navbar-nav flex-grow-1 d-md-flex justify-content-end">
                 <li class="nav-item m-sm-2 fs-6 text-light">
-                    <a class="nav-link text-sm-center fw-medium tranN ">
+                    <a class="nav-link">
                         <i class="bi-brightness-high-fill fst-normal " id="toggleDark">Giao diện</i>
                     </a>
                 </li>
