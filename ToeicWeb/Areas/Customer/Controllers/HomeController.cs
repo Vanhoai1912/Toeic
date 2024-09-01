@@ -27,7 +27,7 @@ namespace ToeicWeb.Areas.Customer.Controllers
 
         public IActionResult Vocabulary()
         {
-            return View();
+            return PartialView("Vocabulary");
         }
 
         public IActionResult Grammar()

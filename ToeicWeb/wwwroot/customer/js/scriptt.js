@@ -16,3 +16,14 @@ toggle.addEventListener('click', function(){
         body.style.transition = '1.5s';
     }
 });
+
+
+const navlinkEls = document.querySelectorAll(".nav-linkH")
+navlinkEls.forEach(navlinkEl => {
+    navlinkEl.addEventListener("click", () => {
+        document.querySelector(".active")?.classList.remove("active"); 
+        navlinkEl.classList.add("active");
+
+    })
+})
+
