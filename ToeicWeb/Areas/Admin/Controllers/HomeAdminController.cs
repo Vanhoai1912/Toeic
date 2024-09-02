@@ -13,6 +13,7 @@ namespace ToeicWeb.Areas.Admin.Controllers
         {
             return View();
         }
+
         
     }
 }
