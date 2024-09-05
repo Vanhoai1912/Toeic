@@ -21,7 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Areas\Customer\Data\" />
     <Folder Include="wwwroot\customer\css\" />
     <Folder Include="wwwroot\customer\images\" />
   </ItemGroup>
