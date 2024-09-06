@@ -10,14 +10,20 @@
     <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5>Thêm đề mới</h5>
+                <h5 class="fs-4">Thêm đề mới</h5>
                 @* <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> *@
             </div>
             <div class="modal-body">
                 <form id="createForm" asp-action="Create" method="post">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     <div class="form-group">
-                        <label asp-for="Part" class="control-label">ETS - TEST - PART</label>
+                        @* <label asp-for="Part" class="control-label">ETS - TEST - PART</label> *@
+                       
+                        <!--begin::Label-->
+                        <label asp-for="Part" class="d-flex align-items-center fs-5 fw-semibold mb-2">
+                            <span class="required">ETS - TEST - PART</span>
+                        </label>
+                        <!--end::Label-->
                         <input asp-for="Part" class="form-control" />
                         <span asp-validation-for="Part" class="text-danger"></span>
                     </div>
