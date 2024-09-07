@@ -243,7 +243,7 @@ namespace ToeicWeb.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Bai_tap_doc");
+                    b.ToTable("Bai_tap_docs");
 
                     b.HasData(
                         new
@@ -260,6 +260,21 @@ namespace ToeicWeb.Migrations
                         {
                             Id = 3,
                             Part = "ETS 2024 - TEST 1 - PART 7"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Part = "ETS 2024 - TEST 2 - PART 5"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Part = "ETS 2024 - TEST 2 - PART 6"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Part = "ETS 2024 - TEST 2 - PART 7"
                         });
                 });
 
@@ -314,7 +329,7 @@ namespace ToeicWeb.Migrations
 
                     b.HasIndex("Bai_tap_docId");
 
-                    b.ToTable("Cau_hoi_bai_tap_doc");
+                    b.ToTable("Cau_hoi_bai_tap_docs");
                 });
 
             modelBuilder.Entity("ToeicWeb.Models.ApplicationUser", b =>

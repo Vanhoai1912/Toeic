@@ -1,72 +1,62 @@
-﻿@model IEnumerable<ToeicWeb.Models.Bai_tap_doc>
+﻿@model Bai_tap_doc
 
-@{
-    ViewData["Title"] = "Index";
-}
 <div class="container">
     <div class="row pt-4 pb-3 mx-2">
         <div class="col-6">
             <h1 class="text-primary">
-                Quản lý đề
+                Quản lý mã bài tập đọc
             </h1>
         </div>
         <hr class="mx-3" style="width:98%" />
     </div>
     <div class="row pt-2 ms-2">
         <div class="col-6 col-md-3">
-            <button type="button" class="btn btn-primary" data-toggle="modal" 
-                                  data-target="#addBaitapdoc" onclick="addBaitapdoc()">
-                <i class="bi bi-plus-circle"></i> Thêm đề mới
+            <button class="btn btn-primary" id="btnAdd">
+                <i class="bi bi-plus-circle"></i> Thêm mã bài đọc mới
             </button>
         </div>
     </div>
-    <div class="card-body p-4 text-center">
-        <table class="table table-bordered" id="BtTable">
+    <div class="card-body p-4">
+        <table id="tblData" class="table table-bordered table-striped" style="width:100%">
             <thead>
                 <tr>
-                    <th> @Html.DisplayNameFor(model => model.Id)</th>
-                    <th>
-                        ETS - TEST - PART
-                    </th>
+                    <th class="text-start">Id</th>
+                    <th>ETS - TEST - PART</th>
+                    <th></th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Id)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Part)
-                    </td>
-                    <td>
-                        <div class="w-75 btn-group" role="group">
-                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary mx-2">
-                                <i class="bi bi-pencil-square"></i> Sửa
-                            </a>
-                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger mx-2">
-                                <i class="bi bi-trash3"></i> Xóa
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-                }
-            </tbody>
         </table>
     </div>
 </div>
 
-<script>
-    function addBaitapdoc(){
-        $.ajax({
-            type: "Get",
-            url: "/Admin/Quanlybaidoc/Create",
-            success: function (result) {
-                $("#BtTable").html(result);
-                $("#addBaitapdoc").modal('show');
-            }
-        });
-       
-    }
-</script>
+<!-- Modal -->
+<div class="modal fade" id="BaitapdocModal">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle"></h3>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" asp-for="Id" value="0" />
+                <div class="mb-2">
+                    <label asp-for="Part" class="d-flex align-items-center fs-5 fw-semibold mb-2">
+                        <span class="required">ETS - TEST - PART</span>
+                    </label>
+                    <input asp-for="Part" class="form-control" />
+                    <span asp-validation-for="Part" class="text-danger"></span>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" onclick="HideModal();">Hủy</button>
+                <button class="btn btn-primary" type="button" id="Save" onclick="Insert();">Thêm</button>
+                <button class="btn btn-success" type="button" id="Update" onclick="Update();" style="display:none">Cập nhật</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="~/adminn/js/baitapdoc.js"></script>
+}
