@@ -135,9 +135,10 @@ function Update() {
 
 // Delete data
 function Delete(url) {
+
     Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
+        title: 'Bạn có chắc không?',
+        text: "Bạn sẽ không thể hoàn tác!",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
@@ -150,6 +151,12 @@ function Delete(url) {
                 type: 'DELETE',
                 success: function (data) {
                     if (data.success) {
+                        
+                        Swal.fire({
+                            title: "Đã xóa!",
+                            text: "Tập tin đã bị xóa.",
+                            icon: "success"
+                        });
                         dataTable.ajax.reload();
                         toastr.success(data.message);
                     }
