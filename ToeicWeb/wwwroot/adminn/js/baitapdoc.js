@@ -22,9 +22,9 @@ function loadDataTable() {
                     return `
                         <div class="w-75 btn-group" role="group">
                         <a href="#" onclick="Edit(${data})"
-                        class="btn btn-primary mx-2"> <i class="bi bi-pencil-square"></i> Edit</a>
+                        class="btn btn-primary ms-2"> <i class="bi bi-pencil-square"></i> Edit</a>
                         <a onClick=Delete('/Admin/Quanlybaidoc/Delete/${data}')
-                        class="btn btn-danger mx-2"> <i class="bi bi-trash-fill"></i> Delete</a>
+                        class="btn btn-danger ms-2"> <i class="bi bi-trash-fill"></i> Delete</a>
                     </div>
                     `;
                 },
@@ -49,20 +49,18 @@ function Insert() {
         url: '/Admin/Quanlybaidoc/Insert',
         data: formData,
         type: 'post',
+
         success: function (response) {
             if (response == null || response == undefined || response.length == 0) {
-                /* alert('Không thể lưu mã bài tập đọc mới');*/
                 toastr.error(response.message);
 
             } else {
                 HideModal();
                 loadDataTable();
-                //alert(response);
                 toastr.success(response.message);
             }
         },
         error: function () {
-            //alert('Không thể lưu mã bài tập đọc mới');
             toastr.error(response.message);
         }
     });
@@ -135,9 +133,8 @@ function Update() {
 
 // Delete data
 function Delete(url) {
-
     Swal.fire({
-        title: 'Bạn có chắc không?',
+        title: 'Bạn có chắc chắn muốn xóa không?',
         text: "Bạn sẽ không thể hoàn tác!",
         icon: 'warning',
         showCancelButton: true,
@@ -158,7 +155,7 @@ function Delete(url) {
                             icon: "success"
                         });
                         dataTable.ajax.reload();
-                        toastr.success(data.message);
+                        clearFormData();
                     }
                     else {
                         toastr.error(data.message);
@@ -180,6 +177,11 @@ $('#btnAdd').click(function () {
 function HideModal() {
     ClearData();
     $('#BaitapdocModal').modal('hide');
+}
+
+function clearFormData() {
+    $('#Id').val('');
+    $('#Part').val('');
 }
 
 function ClearData() {
