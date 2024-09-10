@@ -2,7 +2,7 @@
 
 namespace ToeicWeb.Models
 {
-    public class Bai_tap_doc
+    public class Ma_bai_tap_doc
     {
         [Key]
         public int Id { get; set; }

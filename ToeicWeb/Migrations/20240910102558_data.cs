@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ToeicWeb.Migrations
 {
     /// <inheritdoc />
-    public partial class database : Migration
+    public partial class data : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -55,7 +55,7 @@ namespace ToeicWeb.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Bai_tap_docs",
+                name: "Mabaitapdocs",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -64,7 +64,7 @@ namespace ToeicWeb.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Bai_tap_docs", x => x.Id);
+                    table.PrimaryKey("PK_Mabaitapdocs", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -174,7 +174,7 @@ namespace ToeicWeb.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Cau_hoi_bai_tap_docs",
+                name: "Cauhoibaitapdocs",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -186,23 +186,23 @@ namespace ToeicWeb.Migrations
                     Dap_an_3 = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Dap_an_4 = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Giai_thich = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Photo_name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    So_thu_tu = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Bai_tap_docId = table.Column<int>(type: "int", nullable: false)
+                    Bai_doc = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Thu_tu_cau = table.Column<int>(type: "int", nullable: false),
+                    Ma_bai_tap_docId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Cau_hoi_bai_tap_docs", x => x.Id);
+                    table.PrimaryKey("PK_Cauhoibaitapdocs", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Cau_hoi_bai_tap_docs_Bai_tap_docs_Bai_tap_docId",
-                        column: x => x.Bai_tap_docId,
-                        principalTable: "Bai_tap_docs",
+                        name: "FK_Cauhoibaitapdocs_Mabaitapdocs_Ma_bai_tap_docId",
+                        column: x => x.Ma_bai_tap_docId,
+                        principalTable: "Mabaitapdocs",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.InsertData(
-                table: "Bai_tap_docs",
+                table: "Mabaitapdocs",
                 columns: new[] { "Id", "Part" },
                 values: new object[,]
                 {
@@ -213,6 +213,11 @@ namespace ToeicWeb.Migrations
                     { 5, "ETS 2024 - TEST 2 - PART 6" },
                     { 6, "ETS 2024 - TEST 2 - PART 7" }
                 });
+
+            migrationBuilder.InsertData(
+                table: "Cauhoibaitapdocs",
+                columns: new[] { "Id", "Bai_doc", "Cau_hoi", "Dap_an_1", "Dap_an_2", "Dap_an_3", "Dap_an_4", "Dap_an_dung", "Giai_thich", "Ma_bai_tap_docId", "Thu_tu_cau" },
+                values: new object[] { 1, "", "H", "A", "B", "C", "D", "A", "A ĐÚNG", 1, 101 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -254,9 +259,9 @@ namespace ToeicWeb.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Cau_hoi_bai_tap_docs_Bai_tap_docId",
-                table: "Cau_hoi_bai_tap_docs",
-                column: "Bai_tap_docId");
+                name: "IX_Cauhoibaitapdocs_Ma_bai_tap_docId",
+                table: "Cauhoibaitapdocs",
+                column: "Ma_bai_tap_docId");
         }
 
         /// <inheritdoc />
@@ -278,7 +283,7 @@ namespace ToeicWeb.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Cau_hoi_bai_tap_docs");
+                name: "Cauhoibaitapdocs");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
@@ -287,7 +292,7 @@ namespace ToeicWeb.Migrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "Bai_tap_docs");
+                name: "Mabaitapdocs");
         }
     }
 }

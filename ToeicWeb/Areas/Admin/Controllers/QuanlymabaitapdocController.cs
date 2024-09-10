@@ -11,11 +11,11 @@ namespace ToeicWeb.Areas.Admin.Controllers
     [Area("Admin")]
     [Authorize(Roles = SD.Role_Admin)]
 
-    public class QuanlybaidocController : Controller
+    public class QuanlymabaitapdocController : Controller
     {
         private readonly ApplicationDbContext _db;
 
-        public QuanlybaidocController(UserManager<IdentityUser> userManager, ApplicationDbContext db, RoleManager<IdentityRole> roleManager)
+        public QuanlymabaitapdocController(UserManager<IdentityUser> userManager, ApplicationDbContext db, RoleManager<IdentityRole> roleManager)
         {
             _db = db;
         }
@@ -26,11 +26,11 @@ namespace ToeicWeb.Areas.Admin.Controllers
 
 
         [HttpPost]
-        public JsonResult Insert(Bai_tap_doc model)
+        public JsonResult Insert(Ma_bai_tap_doc model)
         {
             if (ModelState.IsValid)
             {
-                _db.Bai_tap_docs.Add(model);
+                _db.Mabaitapdocs.Add(model);
                 _db.SaveChanges();
                 return Json(new { success = true, message = "Thêm mã thành công" });
             }
@@ -42,16 +42,16 @@ namespace ToeicWeb.Areas.Admin.Controllers
         [HttpGet]
         public JsonResult Edit(int id)
         {
-            var baitapdoc = _db.Bai_tap_docs.Find(id);
+            var baitapdoc = _db.Mabaitapdocs.Find(id);
             return Json(baitapdoc);
         }
 
         [HttpPost]
-        public JsonResult Update(Bai_tap_doc model)
+        public JsonResult Update(Ma_bai_tap_doc model)
         {
             if (ModelState.IsValid)
             {
-                _db.Bai_tap_docs.Update(model);
+                _db.Mabaitapdocs.Update(model);
                 _db.SaveChanges();
                 return Json(new { success = true, message = "Cập nhật mã thành công" });
             }
@@ -62,7 +62,7 @@ namespace ToeicWeb.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            List<Bai_tap_doc> objBtapdocList = _db.Bai_tap_docs.ToList();
+            List<Ma_bai_tap_doc> objBtapdocList = _db.Mabaitapdocs.ToList();
 
             return Json(new { data = objBtapdocList });
         }
@@ -70,10 +70,10 @@ namespace ToeicWeb.Areas.Admin.Controllers
         [HttpDelete]
         public JsonResult Delete(int? id)
         {
-            var baitapdoc = _db.Bai_tap_docs.Find(id);
+            var baitapdoc = _db.Mabaitapdocs.Find(id);
             if(baitapdoc != null)
             {
-                _db.Bai_tap_docs.Remove(baitapdoc);
+                _db.Mabaitapdocs.Remove(baitapdoc);
                 _db.SaveChanges();
                 return Json(new { success = true, message = "Xóa thành công" });
             }

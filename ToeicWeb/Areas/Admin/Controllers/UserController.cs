@@ -39,7 +39,7 @@ namespace ToeicWeb.Areas.Admin.Controllers
 
             RoleManagmentVM RoleVM = new RoleManagmentVM()
             {
-                ApplicationUser = _db.applicationUsers.FirstOrDefault(u => u.Id == userId),
+                ApplicationUser = _db.ApplicationUsers.FirstOrDefault(u => u.Id == userId),
                 RoleList = _db.Roles.Select( i => new SelectListItem
                 {
                     Text = i.Name,
@@ -60,9 +60,9 @@ namespace ToeicWeb.Areas.Admin.Controllers
 
             if (!(roleManagmentVM.ApplicationUser.Role == oldRole))
             {
-                 ApplicationUser applicationUser = _db.applicationUsers.FirstOrDefault(u => u.Id == roleManagmentVM.ApplicationUser.Id);
+                 ApplicationUser applicationUser = _db.ApplicationUsers.FirstOrDefault(u => u.Id == roleManagmentVM.ApplicationUser.Id);
 
-                _db.applicationUsers.Update(applicationUser);
+                _db.ApplicationUsers.Update(applicationUser);
                 _db.SaveChanges();
 
                 _userManager.RemoveFromRoleAsync(applicationUser, oldRole).GetAwaiter().GetResult();
@@ -80,7 +80,7 @@ namespace ToeicWeb.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            List<ApplicationUser> objUserList = _db.applicationUsers.ToList();
+            List<ApplicationUser> objUserList = _db.ApplicationUsers.ToList();
 
             var userRoles = _db.UserRoles.ToList();
             var roles = _db.Roles.ToList();
@@ -97,7 +97,7 @@ namespace ToeicWeb.Areas.Admin.Controllers
         [HttpPost]
         public IActionResult LockUnlock([FromBody]string id)
         {
-            var objFromDb = _db.applicationUsers.FirstOrDefault(u => u.Id == id);
+            var objFromDb = _db.ApplicationUsers.FirstOrDefault(u => u.Id == id);
             if (objFromDb == null)
             {
                 return Json(new { success = false, message = "Lỗi" });

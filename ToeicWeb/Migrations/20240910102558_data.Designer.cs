@@ -12,8 +12,8 @@ using ToeicWeb.Data;
 namespace ToeicWeb.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240906163453_database")]
-    partial class database
+    [Migration("20240910102558_data")]
+    partial class data
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -232,7 +232,76 @@ namespace ToeicWeb.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("ToeicWeb.Models.Bai_tap_doc", b =>
+            modelBuilder.Entity("ToeicWeb.Models.Cau_hoi_bai_tap_doc", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Bai_doc")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Cau_hoi")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Dap_an_1")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Dap_an_2")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Dap_an_3")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Dap_an_4")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Dap_an_dung")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Giai_thich")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Ma_bai_tap_docId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Thu_tu_cau")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Ma_bai_tap_docId");
+
+                    b.ToTable("Cauhoibaitapdocs");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Bai_doc = "",
+                            Cau_hoi = "H",
+                            Dap_an_1 = "A",
+                            Dap_an_2 = "B",
+                            Dap_an_3 = "C",
+                            Dap_an_4 = "D",
+                            Dap_an_dung = "A",
+                            Giai_thich = "A ĐÚNG",
+                            Ma_bai_tap_docId = 1,
+                            Thu_tu_cau = 101
+                        });
+                });
+
+            modelBuilder.Entity("ToeicWeb.Models.Ma_bai_tap_doc", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -246,7 +315,7 @@ namespace ToeicWeb.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Bai_tap_docs");
+                    b.ToTable("Mabaitapdocs");
 
                     b.HasData(
                         new
@@ -279,60 +348,6 @@ namespace ToeicWeb.Migrations
                             Id = 6,
                             Part = "ETS 2024 - TEST 2 - PART 7"
                         });
-                });
-
-            modelBuilder.Entity("ToeicWeb.Models.Cau_hoi_bai_tap_doc", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Bai_tap_docId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Cau_hoi")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Dap_an_1")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Dap_an_2")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Dap_an_3")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Dap_an_4")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Dap_an_dung")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Giai_thich")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Photo_name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("So_thu_tu")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Bai_tap_docId");
-
-                    b.ToTable("Cau_hoi_bai_tap_docs");
                 });
 
             modelBuilder.Entity("ToeicWeb.Models.ApplicationUser", b =>
@@ -399,13 +414,13 @@ namespace ToeicWeb.Migrations
 
             modelBuilder.Entity("ToeicWeb.Models.Cau_hoi_bai_tap_doc", b =>
                 {
-                    b.HasOne("ToeicWeb.Models.Bai_tap_doc", "Bai_tap_doc")
+                    b.HasOne("ToeicWeb.Models.Ma_bai_tap_doc", "Ma_bai_tap_doc")
                         .WithMany()
-                        .HasForeignKey("Bai_tap_docId")
+                        .HasForeignKey("Ma_bai_tap_docId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Bai_tap_doc");
+                    b.Navigation("Ma_bai_tap_doc");
                 });
 #pragma warning restore 612, 618
         }

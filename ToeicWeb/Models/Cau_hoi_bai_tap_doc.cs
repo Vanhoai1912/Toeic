@@ -23,13 +23,13 @@ namespace ToeicWeb.Models
 
         public string Giai_thich { get; set; }
 
-        public string Photo_name { get; set; }
+        public string Bai_doc { get; set; }
 
-        public string So_thu_tu { get; set; }
+        public int Thu_tu_cau { get; set; }
 
-        public int Bai_tap_docId { get; set; }
-        [ForeignKey("Bai_tap_docId")]
-        public Bai_tap_doc Bai_tap_doc { get; set; }
+        public int Ma_bai_tap_docId { get; set; }
+        [ForeignKey("Ma_bai_tap_docId")]
+        public Ma_bai_tap_doc Ma_bai_tap_doc { get; set; }
 
     }
 }
