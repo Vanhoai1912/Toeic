@@ -11,11 +11,11 @@ namespace ToeicWeb.Areas.Admin.Controllers
     [Area("Admin")]
     [Authorize(Roles = SD.Role_Admin)]
 
-    public class QuanlymabaitapdocController : Controller
+    public class MaBTdocController : Controller
     {
         private readonly ApplicationDbContext _db;
 
-        public QuanlymabaitapdocController(UserManager<IdentityUser> userManager, ApplicationDbContext db, RoleManager<IdentityRole> roleManager)
+        public MaBTdocController(UserManager<IdentityUser> userManager, ApplicationDbContext db, RoleManager<IdentityRole> roleManager)
         {
             _db = db;
         }

@@ -11,7 +11,7 @@ function loadDataTable() {
     }
     dataTable = $('#tblData').DataTable({
         "ajax": {
-            "url": "/Admin/Quanlymabaitapdoc/GetAll"
+            "url": "/Admin/MaBTdoc/GetAll"
         },
         "columns": [
             { "data": "id", "width": "25%", "className": "text-start" },
@@ -23,7 +23,7 @@ function loadDataTable() {
                         <div class="w-75 btn-group" role="group">
                         <a href="#" onclick="Edit(${data})"
                         class="btn btn-primary ms-2"> <i class="bi bi-pencil-square"></i> Edit</a>
-                        <a onClick=Delete('/Admin/Quanlymabaitapdoc/Delete/${data}')
+                        <a onClick=Delete('/Admin/MaBTdoc/Delete/${data}')
                         class="btn btn-danger ms-2"> <i class="bi bi-trash-fill"></i> Delete</a>
                     </div>
                     `;
@@ -46,7 +46,7 @@ function Insert() {
     formData.part = $('#Part').val();
 
     $.ajax({
-        url: '/Admin/Quanlymabaitapdoc/Insert',
+        url: '/Admin/MaBTdoc/Insert',
         data: formData,
         type: 'post',
 
@@ -70,7 +70,7 @@ function Insert() {
 // Edit
 function Edit(id) {
     $.ajax({
-        url: '/Admin/Quanlymabaitapdoc/Edit?id=' + id,
+        url: '/Admin/MaBTdoc/Edit?id=' + id,
         type: 'get',
         contentType: 'application/json; charset=uft-8',
         datatype: 'json',
@@ -107,7 +107,7 @@ function Update() {
     formData.part = $('#Part').val();
 
     $.ajax({
-        url: '/Admin/Quanlymabaitapdoc/Update',
+        url: '/Admin/MaBTdoc/Update',
         data: formData,
         type: 'post',
         success: function (response) {
