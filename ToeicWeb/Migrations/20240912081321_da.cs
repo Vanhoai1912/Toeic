@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ToeicWeb.Migrations
 {
     /// <inheritdoc />
-    public partial class data : Migration
+    public partial class da : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -60,7 +60,8 @@ namespace ToeicWeb.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Part = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Part = table.Column<int>(type: "int", nullable: false),
+                    Tieu_de = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -186,7 +187,7 @@ namespace ToeicWeb.Migrations
                     Dap_an_3 = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Dap_an_4 = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Giai_thich = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Bai_doc = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Bai_doc = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Thu_tu_cau = table.Column<int>(type: "int", nullable: false),
                     Ma_bai_tap_docId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -203,15 +204,12 @@ namespace ToeicWeb.Migrations
 
             migrationBuilder.InsertData(
                 table: "Mabaitapdocs",
-                columns: new[] { "Id", "Part" },
+                columns: new[] { "Id", "Part", "Tieu_de" },
                 values: new object[,]
                 {
-                    { 1, "ETS 2024 - TEST 1 - PART 5" },
-                    { 2, "ETS 2024 - TEST 1 - PART 6" },
-                    { 3, "ETS 2024 - TEST 1 - PART 7" },
-                    { 4, "ETS 2024 - TEST 2 - PART 5" },
-                    { 5, "ETS 2024 - TEST 2 - PART 6" },
-                    { 6, "ETS 2024 - TEST 2 - PART 7" }
+                    { 1, 5, "Tiêu đề" },
+                    { 2, 6, "Tiêu đề" },
+                    { 3, 7, "Tiêu đề" }
                 });
 
             migrationBuilder.InsertData(

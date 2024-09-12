@@ -14,8 +14,10 @@ function loadDataTable() {
             "url": "/Admin/CauhoiBTdoc/GetAll"
         },
         "columns": [
-            { "data": "id", "width": "25%", "className": "text-start" },
-            { "data": "ma_bai_tap_doc.part", "width": "45%" },
+            { "data": "id", "width": "20%", "className": "text-start" },
+            { "data": "ma_bai_tap_doc.tieu_de", "width": "40%" },
+            { "data": "ma_bai_tap_doc.part", "width": "10%" },
+
             {
                 "data": "id",
                 "render": function (data) {
@@ -28,7 +30,7 @@ function loadDataTable() {
                     </div>
                     `;
                 },
-                "width": "40%"
+                "width": "30%"
             }
         ]
     });
@@ -69,3 +71,18 @@ function Delete(url) {
     })
 }
 
+
+//$('#btnAdd').click(function () {
+//    $('#CauhoiBTdocModal').modal('show');
+//    $('#modalTitle').text('Thêm bài tập đọc mới');
+//    $('#Save').css('display', 'block');
+//    $('#Update').css('display', 'none');
+//});
+//function HideModal() {
+//    ClearData();
+//    $('#uploadModal').modal('hide');
+//}
+//function ClearData() {
+//    $('#Tieu_de').val('');
+//    $('#Tieu_de').css('border-color', 'lightgrey');
+//}

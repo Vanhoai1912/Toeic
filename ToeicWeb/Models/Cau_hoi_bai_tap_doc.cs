@@ -9,8 +9,6 @@ namespace ToeicWeb.Models
         [Key]
         public int Id { get; set; }
 
-        public string? Tieu_de {  get; set; }
-
         public string Cau_hoi { get; set; }
 
         public string Dap_an_dung {  get; set; }

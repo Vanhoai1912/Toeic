@@ -9,19 +9,20 @@
         </div>
         <hr class="mx-3" style="width:98%" />
     </div>
-    <div class="row pt-2 ms-2">
+    @* <div class="row pt-2 ms-2">
         <div class="col-6 col-md-3">
             <button class="btn btn-primary" id="btnAdd">
                 <i class="bi bi-plus-circle"></i> Thêm mã bài đọc mới
             </button>
         </div>
-    </div>
+    </div> *@
     <div class="card-body p-4">
         <table id="tblData" class="table table-bordered table-striped" style="width:100%">
             <thead>
                 <tr>
                     <th class="text-start">Id</th>
-                    <th>ETS - TEST - PART</th>
+                    <th>TIÊU ĐỀ</th>
+                    <th class="text-start">PART</th>
                     <th></th>
                 </tr>
             </thead>
@@ -39,10 +40,22 @@
             <div class="modal-body">
                 <input type="hidden" asp-for="Id" value="0" />
                 <div class="mb-2">
-                    <label asp-for="Part" class="d-flex align-items-center fs-5 fw-semibold mb-2">
-                        <span class="required">ETS - TEST - PART</span>
+                    <label asp-for="Tieu_de" class="d-flex align-items-center fs-5 fw-semibold mb-2">
+                        <span class="required">Tiêu đề</span>
                     </label>
-                    <input asp-for="Part" class="form-control" />
+                    <input asp-for="Tieu_de" class="form-control" />
+                    <span asp-validation-for="Tieu_de" class="text-danger"></span>
+                </div>
+
+                <div class="mb-2">
+                    <label asp-for="Part" class="d-flex align-items-center fs-5 fw-semibold mb-2">
+                        <span class="required">Part</span>
+                    </label>
+                    <select class="form-control" asp-for="Part">
+                        <option value="5">Part 5</option>
+                        <option value="6">Part 6</option>
+                        <option value="7">Part 7</option>
+                    </select>
                     <span asp-validation-for="Part" class="text-danger"></span>
                 </div>
 

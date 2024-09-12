@@ -15,7 +15,9 @@ function loadDataTable() {
         },
         "columns": [
             { "data": "id", "width": "25%", "className": "text-start" },
-            { "data": "part", "width": "45%" },
+            { "data": "tieu_de", "width": "30%" },
+            { "data": "part", "width": "15%", "className": "text-start" },
+
             {
                 "data": "id",
                 "render": function (data) {
@@ -85,6 +87,7 @@ function Edit(id) {
                 $('#Save').css('display', 'none');
                 $('#Update').css('display', 'block');
                 $('#Id').val(response.id);
+                $('#Tieu_de').val(response.tieu_de);
                 $('#Part').val(response.part);
 
             }
@@ -104,6 +107,7 @@ function Update() {
     }
     var formData = new Object();
     formData.id = $('#Id').val();
+    formData.tieu_de = $('#Tieu_de').val();
     formData.part = $('#Part').val();
 
     $.ajax({
@@ -182,11 +186,15 @@ function HideModal() {
 function clearFormData() {
     $('#Id').val('');
     $('#Part').val('');
+    $('#Tieu_de').val('');
+
 }
 
 function ClearData() {
     $('#Part').val('');
     $('#Part').css('border-color', 'lightgrey');
+    $('#Tieu_de').val('');
+    $('#Tieu_de').css('border-color', 'lightgrey');
 }
 
 function Validate() {
@@ -197,9 +205,18 @@ function Validate() {
     } else {
         $('#Part').css('border-color', 'lightgrey');
     }
+    if ($('#Tieu_de').val().trim() == "") {
+        $('#Tieu_de').css('border-color', 'Red');
+        isValid = false;
+    } else {
+        $('#Tieu_de').css('border-color', 'lightgrey');
+    }
     return isValid;
 }
 
 $('#Part').change(function () {
+    Validate();
+})
+$('#Tieu_de').change(function () {
     Validate();
 })

@@ -24,12 +24,9 @@ namespace ToeicWeb.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<Ma_bai_tap_doc>().HasData(
-                new Ma_bai_tap_doc { Id = 1, Part = "ETS 2024 - TEST 1 - PART 5" },
-                new Ma_bai_tap_doc { Id = 2, Part = "ETS 2024 - TEST 1 - PART 6" },
-                new Ma_bai_tap_doc { Id = 3, Part = "ETS 2024 - TEST 1 - PART 7" },
-                new Ma_bai_tap_doc { Id = 4, Part = "ETS 2024 - TEST 2 - PART 5" },
-                new Ma_bai_tap_doc { Id = 5, Part = "ETS 2024 - TEST 2 - PART 6" },
-                new Ma_bai_tap_doc { Id = 6, Part = "ETS 2024 - TEST 2 - PART 7" }
+                new Ma_bai_tap_doc { Id = 1, Part = 5, Tieu_de = "Tiêu đề"},
+                new Ma_bai_tap_doc { Id = 2, Part = 6, Tieu_de = "Tiêu đề" },
+                new Ma_bai_tap_doc { Id = 3, Part = 7, Tieu_de = "Tiêu đề" }
             );
             modelBuilder.Entity<Cau_hoi_bai_tap_doc>().HasData(
                 new Cau_hoi_bai_tap_doc

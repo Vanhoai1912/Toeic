@@ -12,8 +12,8 @@ using ToeicWeb.Data;
 namespace ToeicWeb.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240911014755_colum")]
-    partial class colum
+    [Migration("20240912081321_da")]
+    partial class da
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -277,9 +277,6 @@ namespace ToeicWeb.Migrations
                     b.Property<int>("Thu_tu_cau")
                         .HasColumnType("int");
 
-                    b.Property<string>("Tieu_de")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("Ma_bai_tap_docId");
@@ -311,7 +308,10 @@ namespace ToeicWeb.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Part")
+                    b.Property<int>("Part")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Tieu_de")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -323,32 +323,20 @@ namespace ToeicWeb.Migrations
                         new
                         {
                             Id = 1,
-                            Part = "ETS 2024 - TEST 1 - PART 5"
+                            Part = 5,
+                            Tieu_de = "Tiêu đề"
                         },
                         new
                         {
                             Id = 2,
-                            Part = "ETS 2024 - TEST 1 - PART 6"
+                            Part = 6,
+                            Tieu_de = "Tiêu đề"
                         },
                         new
                         {
                             Id = 3,
-                            Part = "ETS 2024 - TEST 1 - PART 7"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Part = "ETS 2024 - TEST 2 - PART 5"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Part = "ETS 2024 - TEST 2 - PART 6"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Part = "ETS 2024 - TEST 2 - PART 7"
+                            Part = 7,
+                            Tieu_de = "Tiêu đề"
                         });
                 });
 

@@ -1,4 +1,4 @@
-﻿@model Cau_hoi_bai_tap_doc
+﻿@model ToeicWeb.Models.ViewModels.CauhoiBTdocVM
 
 <div class="container">
     <div class="row pt-4 pb-3 mx-2">
@@ -11,47 +11,69 @@
     </div>
     <div class="row pt-2 ms-2">
         <div class="col-6 col-md-3">
-            <button class="btn btn-primary" id="btnAdd">
+            <button type="button" data-toggle="modal" data-target="#uploadModal" class="btn btn-primary">
                 <i class="bi bi-plus-circle"></i> Thêm bài đọc mới
             </button>
         </div>
     </div>
-    <div class="card-body p-4">
+   @*  <div class="card-body p-4">
         <table id="tblData" class="table table-bordered table-striped" style="width:100%">
             <thead>
                 <tr>
                     <th class="text-start">Id</th>
-                    <th>MÃ BÀI ĐỌC</th>
-                    <th></th>
+                    <th>TIÊU ĐỀ BÀI TẬP ĐỌC</th>
+                    <th>PART</th>
+                    <th>Action</th>
                 </tr>
             </thead>
         </table>
-    </div>
+    </div> *@
 </div>
 
 <!-- Modal -->
-<div class="modal fade" id="CauhoiBTdocModal">
+<div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title" id="modalTitle"></h3>
+                <h3 class="modal-title" id="modalTitle">Thêm bài tập đọc mới</h3>
             </div>
             <div class="modal-body">
-                <input type="hidden" asp-for="Id" value="0" />
-                <div class="mb-2">
-                    <label class="d-flex align-items-center fs-5 fw-semibold mb-2">
-                        <span class="required">ETS - TEST - PART</span>
-                    </label>
-                    <input  class="form-control" />
-                    <span  class="text-danger"></span>
-                </div>
+                <form asp-action="Create" method="post" enctype="multipart/form-data">
+                    <div class="mb-2">
+                        <label asp-for="Tieu_de" class="d-flex align-items-center fs-5 fw-semibold mb-2">
+                            <span class="required">Tiêu đề</span>
+                        </label>
+                        <input asp-for="Tieu_de" class="form-control" required/>
+                        <span asp-validation-for="Tieu_de" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-2">
+                        <label asp-for="Part" class="d-flex align-items-center fs-5 fw-semibold mb-2">
+                            <span class="required">Part</span>
+                        </label>
+                        <select class="form-control" asp-for="Part">
+                            <option value="5" disabled selected>--Chọn Part--</option>
+                            <option value="5">Part 5</option>
+                            <option value="6">Part 6</option>
+                            <option value="7">Part 7</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-2">
+                        <label asp-for="ExcelFile" class="d-flex align-items-center fs-5 fw-semibold mb-2">
+                            <span class="required">File Excel</span>
+                        </label>
+                        <input type="file" class="form-control" asp-for="ExcelFile" required />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                        <button class="btn btn-primary" type="submit" id="Save">Thêm</button>
+                        <button class="btn btn-success" type="submit" id="Update" style="display:none">Cập nhật</button>
+                    </div>
+                </form>
 
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal" onclick="HideModal();">Hủy</button>
-                <button class="btn btn-primary" type="button" id="Save" onclick="Insert();">Thêm</button>
-                <button class="btn btn-success" type="button" id="Update" onclick="Update();" style="display:none">Cập nhật</button>
-            </div>
+           
         </div>
     </div>
 </div>
@@ -60,3 +82,5 @@
 @section Scripts {
     <script src="~/adminn/js/cauhoibtdoc.js"></script>
 }
+
+
