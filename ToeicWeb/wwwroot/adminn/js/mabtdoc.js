@@ -161,7 +161,7 @@ function Delete(url) {
                             icon: "success"
                         });
                         dataTable.ajax.reload();
-                        clearFormData();
+                        //clearFormData();
                     }
                     else {
                         toastr.error(data.message);
@@ -185,23 +185,22 @@ function HideModal() {
     $('#BaitapdocModal').modal('hide');
 }
 
-function clearFormData() {
-    $('#Id').val('');
-    $('#Part').val('');
-    $('#Tieu_de').val('');
 
-}
 
 function ClearData() {
     $('#Part').val('');
     $('#Part').css('border-color', 'lightgrey');
+    $('#Part').prop('selectedIndex', 0);
+
     $('#Tieu_de').val('');
     $('#Tieu_de').css('border-color', 'lightgrey');
+    $('#ExcelFile').val('');
+    $('#ExcelFile').css('border-color', 'lightgrey');
 }
 
 function Validate() {
     var isValid = true;
-    if ($('#Part').val().trim() == "") {
+    if ($('#Part').prop('selectedIndex') == 0) {
         $('#Part').css('border-color', 'Red');
         isValid = false;
     } else {
@@ -213,6 +212,12 @@ function Validate() {
     } else {
         $('#Tieu_de').css('border-color', 'lightgrey');
     }
+    if ($('#ExcelFile').get(0).files.length === 0) {
+        $('#ExcelFile').css('border-color', 'Red');
+        isValid = false;
+    } else {
+        $('#ExcelFile').css('border-color', 'lightgrey');
+    }
     return isValid;
 }
 
@@ -220,5 +225,8 @@ $('#Part').change(function () {
     Validate();
 })
 $('#Tieu_de').change(function () {
+    Validate();
+})
+$('#ExcelFile').change(function () {
     Validate();
 })

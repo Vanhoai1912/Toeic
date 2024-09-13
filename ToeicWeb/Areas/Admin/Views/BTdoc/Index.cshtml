@@ -45,7 +45,7 @@
                     <label asp-for="Tieu_de" class="d-flex align-items-center fs-5 fw-semibold mb-2">
                         <span class="required">Tiêu đề</span>
                     </label>
-                    <input asp-for="Tieu_de" class="form-control" />
+                    <input asp-for="Tieu_de" class="form-control" required/>
                     <span asp-validation-for="Tieu_de" class="text-danger"></span>
                 </div>
 
@@ -53,7 +53,8 @@
                     <label asp-for="Part" class="d-flex align-items-center fs-5 fw-semibold mb-2">
                         <span class="required">Part</span>
                     </label>
-                    <select class="form-control" asp-for="Part">
+                    <select class="form-control" asp-for="Part" required>
+                        <option disabled selected>--Chọn part--</option>
                         <option value="5">Part 5</option>
                         <option value="6">Part 6</option>
                         <option value="7">Part 7</option>
