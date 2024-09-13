@@ -70,13 +70,12 @@ function Create() {
     });
 }
 
-
 // Edit
 function Edit(id) {
     $.ajax({
         url: '/Admin/BTdoc/Edit?id=' + id,
         type: 'get',
-        contentType: 'application/json; charset=uft-8',
+        contentType: 'application/json; charset=utf-8',
         datatype: 'json',
         success: function (response) {
             if (response == null || response == undefined) {
@@ -88,55 +87,66 @@ function Edit(id) {
                 $('#modalTitle').text('Sửa bài tập đọc ');
                 $('#Save').css('display', 'none');
                 $('#Update').css('display', 'block');
-                $('#Id').val(response.id);
+                $('#Id').val(response.id);  // Lưu id trong trường ẩn
                 $('#Tieu_de').val(response.tieu_de);
                 $('#Part').val(response.part);
-
+                // Hiển thị file Excel nếu có
+                if (response.filePath) {
+                    $('#ExcelFile').attr('href', response.filePath).text('Tải file Excel hiện tại');
+                } else {
+                    $('#ExcelFile').text('Không có file Excel');
+                }
             }
         },
         error: function () {
             alert('Không thể đọc dữ liệu');
         }
-
     });
 }
 
-// Update data
+// Update
 function Update() {
     var result = Validate();
     if (result == false) {
         return false;
     }
-    var formData = new Object();
-    formData.id = $('#Id').val();
-    formData.tieu_de = $('#Tieu_de').val();
-    formData.part = $('#Part').val();
+
+    var formData = new FormData();
+    var tieuDe = $('#Tieu_de').val();
+    var part = $('#Part').val();
+    var excelFile = $('#ExcelFile')[0].files[0];  // Lấy file excel từ input
+
+    var id = $('#Id').val();  // Lấy id từ trường ẩn
+
+    formData.append('id', id);
+    formData.append('tieu_de', tieuDe);
+    formData.append('part', part);
+
+    if (excelFile) {
+        formData.append('FileExcel', excelFile);
+    }
 
     $.ajax({
         url: '/Admin/BTdoc/Update',
-        data: formData,
         type: 'post',
-        success: function (response) {
-            if (response == null || response == undefined || response.length == 0) {
-                //alert('Không thể lưu mã bài tập đọc mới');
-                toastr.error(response.message);
-
-            } else {
+        data: formData,
+        processData: false,  // Không xử lý dữ liệu dưới dạng string
+        contentType: false,  // Để ajax tự xác định content-type cho FormData
+        success: function (data) {
+            if (data.success) {
                 HideModal();
                 loadDataTable();
-                //alert(response);
-                toastr.success(response.message);
+                toastr.success(data.message);
+            } else {
+                toastr.error(data.message);
 
             }
         },
         error: function () {
-            //alert('Không thể lưu mã bài tập đọc mới');
-            toastr.error(response.message);
-
+            alert('Lỗi khi cập nhật dữ liệu');
         }
     });
 }
-
 // Delete data
 function Delete(url) {
     Swal.fire({
