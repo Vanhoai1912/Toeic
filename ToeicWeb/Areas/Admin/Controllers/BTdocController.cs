@@ -56,7 +56,7 @@ namespace ToeicWeb.Areas.Admin.Controllers
         {
             if (viewModel.ExcelFile != null && viewModel.ExcelFile.Length > 0)
             {
-                // Lưu file vào thư mục wwwroot/uploads
+                // Lưu file vào thư mục wwwroot/adminn/upload
                 string uploadsFolder = Path.Combine(_environment.WebRootPath, "adminn", "upload");
                 if (!Directory.Exists(uploadsFolder))
                 {
@@ -83,7 +83,8 @@ namespace ToeicWeb.Areas.Admin.Controllers
                             category = new Ma_bai_tap_doc
                             {
                                 Tieu_de = viewModel.Tieu_de,
-                                Part = viewModel.Part
+                                Part = viewModel.Part,
+                                FilePath = Path.Combine("adminn", "upload", viewModel.ExcelFile.FileName) // Lưu đường dẫn file
                             };
                             _db.Mabaitapdocs.Add(category);
                             await _db.SaveChangesAsync();
@@ -113,12 +114,21 @@ namespace ToeicWeb.Areas.Admin.Controllers
             return Json(new { success = false, message = "Không thể thêm bài tập đọc mới" });
         }
 
+
         #region API CALLS
         [HttpGet]
-        public JsonResult Edit(int id)
+        public async Task<JsonResult> Edit(int id)
         {
-            var baitapdoc = _db.Mabaitapdocs.Find(id);
-            return Json(baitapdoc);
+            var baitapdoc = await _db.Mabaitapdocs.FindAsync(id);
+            if (baitapdoc == null)
+            {
+                return Json(new { success = false, message = "Không tìm thấy bài tập đọc" });
+            }
+
+            // Lấy đường dẫn file Excel từ cơ sở dữ liệu (nếu có)
+            var filePath = baitapdoc.FilePath; // Giả sử bạn lưu đường dẫn file trong thuộc tính FilePath
+
+            return Json( baitapdoc);
         }
 
         [HttpPost]
@@ -134,13 +144,21 @@ namespace ToeicWeb.Areas.Admin.Controllers
             // Cập nhật thông tin tiêu đề và part
             baitapdoc.Tieu_de = tieu_de;
             baitapdoc.Part = part;
-            _db.Mabaitapdocs.Update(baitapdoc);
-            await _db.SaveChangesAsync();
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
             // Kiểm tra file Excel
             if (FileExcel != null && FileExcel.Length > 0)
             {
-                // Lưu file vào thư mục wwwroot/adminn/upload
+                // Xóa file Excel cũ nếu tồn tại
+                if (!string.IsNullOrEmpty(baitapdoc.FilePath))
+                {
+                    string oldFilePath = Path.Combine(_environment.WebRootPath, baitapdoc.FilePath);
+                    if (System.IO.File.Exists(oldFilePath))
+                    {
+                        System.IO.File.Delete(oldFilePath);
+                    }
+                }
+
+                // Lưu file mới vào thư mục wwwroot/adminn/upload
                 string uploadsFolder = Path.Combine(_environment.WebRootPath, "adminn", "upload");
                 if (!Directory.Exists(uploadsFolder))
                 {
@@ -155,6 +173,7 @@ namespace ToeicWeb.Areas.Admin.Controllers
 
                 // Cập nhật đường dẫn file trong cơ sở dữ liệu
                 baitapdoc.FilePath = Path.Combine("adminn", "upload", FileExcel.FileName);
+
                 // Xóa các câu hỏi cũ trong bảng Câu hỏi bài tập đọc
                 var oldQuestions = _db.Cauhoibaitapdocs.Where(q => q.Ma_bai_tap_docId == baitapdoc.Id);
                 _db.Cauhoibaitapdocs.RemoveRange(oldQuestions);
@@ -188,12 +207,14 @@ namespace ToeicWeb.Areas.Admin.Controllers
                         }
                     }
                 }
-
-                await _db.SaveChangesAsync();
             }
+
+            _db.Mabaitapdocs.Update(baitapdoc);
+            await _db.SaveChangesAsync();
 
             return Json(new { success = true, message = "Sửa bài đọc thành công" });
         }
+
 
 
         [HttpGet]

@@ -91,11 +91,7 @@ function Edit(id) {
                 $('#Tieu_de').val(response.tieu_de);
                 $('#Part').val(response.part);
                 // Hiển thị file Excel nếu có
-                if (response.filePath) {
-                    $('#ExcelFile').attr('href', response.filePath).text('Tải file Excel hiện tại');
-                } else {
-                    $('#ExcelFile').text('Không có file Excel');
-                }
+                $('#ExcelFile').val(response.filePath);
             }
         },
         error: function () {
