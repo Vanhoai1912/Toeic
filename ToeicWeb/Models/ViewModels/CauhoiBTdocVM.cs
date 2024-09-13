@@ -7,7 +7,9 @@ namespace ToeicWeb.Models.ViewModels
     {
         public IFormFile ExcelFile { get; set; }
         public string Tieu_de { get; set; }
+        public int Id { get; set; }
         public int Part { get; set; }
         public List<Ma_bai_tap_doc> Mabaitapdocs { get; set; }
+        public Ma_bai_tap_doc MaBaiTapDoc { get; set; }
     }
 }

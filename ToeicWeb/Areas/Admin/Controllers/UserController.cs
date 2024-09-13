@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ToeicWeb.Utility;
 using ToeicWeb.Data;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using ToeicWeb.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Data;

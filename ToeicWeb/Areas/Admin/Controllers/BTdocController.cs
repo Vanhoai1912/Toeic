@@ -1,12 +1,8 @@
-﻿using ExcelDataReader;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
 using OfficeOpenXml;
-using System.Text;
 using ToeicWeb.Data;
 using ToeicWeb.Models;
 using ToeicWeb.Models.ViewModels;
@@ -16,26 +12,34 @@ namespace ToeicWeb.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = SD.Role_Admin)]
-    public class CauhoiBTdocController : Controller
+
+    public class BTdocController : Controller
     {
         private readonly ApplicationDbContext _db;
-
         private readonly IWebHostEnvironment _environment;
 
-        public CauhoiBTdocController(UserManager<IdentityUser> userManager, ApplicationDbContext db, RoleManager<IdentityRole> roleManager, IWebHostEnvironment environment)
+        public BTdocController(UserManager<IdentityUser> userManager, ApplicationDbContext db, RoleManager<IdentityRole> roleManager, IWebHostEnvironment environment)
         {
             _db = db;
             _environment = environment;
-
         }
         public IActionResult Index()
         {
-            var viewModel = new CauhoiBTdocVM
-            {
-                Mabaitapdocs = _db.Mabaitapdocs.ToList()
-            };
-            return View(viewModel);
+            return View();
         }
+
+
+        //[HttpPost]
+        //public JsonResult Insert(Ma_bai_tap_doc model)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        _db.Mabaitapdocs.Add(model);
+        //        _db.SaveChanges();
+        //        return Json(new { success = true, message = "Thêm mã thành công" });
+        //    }
+        //    return Json(new { success = false, message = "Không thể lưu mã bài tập đọc mới" });
+        //}
 
         [HttpGet]
         public IActionResult Create()
@@ -53,7 +57,7 @@ namespace ToeicWeb.Areas.Admin.Controllers
             if (viewModel.ExcelFile != null && viewModel.ExcelFile.Length > 0)
             {
                 // Lưu file vào thư mục wwwroot/uploads
-                string uploadsFolder = Path.Combine(_environment.WebRootPath,"wwwroot", "adminn",  "upload");
+                string uploadsFolder = Path.Combine(_environment.WebRootPath, "adminn", "upload");
                 if (!Directory.Exists(uploadsFolder))
                 {
                     Directory.CreateDirectory(uploadsFolder);
@@ -110,26 +114,45 @@ namespace ToeicWeb.Areas.Admin.Controllers
 
         #region API CALLS
         [HttpGet]
+        public JsonResult Edit(int id)
+        {
+            var baitapdoc = _db.Mabaitapdocs.Find(id);
+            return Json(baitapdoc);
+        }
+
+        [HttpPost]
+        public JsonResult Update(Ma_bai_tap_doc model)
+        {
+            if (ModelState.IsValid)
+            {
+                _db.Mabaitapdocs.Update(model);
+                _db.SaveChanges();
+                return Json(new { success = true, message = "Cập nhật thành công" });
+            }
+            return Json(new { success = true, message = "Model validation failed" });
+        }
+
+
+        [HttpGet]
         public IActionResult GetAll()
         {
-            var objCauhoiList = _db.Cauhoibaitapdocs.ToList();
+            List<Ma_bai_tap_doc> objBtapdocList = _db.Mabaitapdocs.ToList();
 
-            return Json(new { data = objCauhoiList });
+            return Json(new { data = objBtapdocList });
         }
 
         [HttpDelete]
         public JsonResult Delete(int? id)
         {
-            var cauhoiBTdoc = _db.Cauhoibaitapdocs.Find(id);
-            if (cauhoiBTdoc != null)
+            var baitapdoc = _db.Mabaitapdocs.Find(id);
+            if(baitapdoc != null)
             {
-                _db.Cauhoibaitapdocs.Remove(cauhoiBTdoc);
+                _db.Mabaitapdocs.Remove(baitapdoc);
                 _db.SaveChanges();
                 return Json(new { success = true, message = "Xóa thành công" });
             }
             return Json(new { success = false, message = "Có lỗi khi xóa" });
         }
         #endregion
-
     }
 }

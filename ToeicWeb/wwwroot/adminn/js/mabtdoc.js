@@ -11,7 +11,7 @@ function loadDataTable() {
     }
     dataTable = $('#tblData').DataTable({
         "ajax": {
-            "url": "/Admin/MaBTdoc/GetAll"
+            "url": "/Admin/BTdoc/GetAll"
         },
         "columns": [
             { "data": "id", "width": "25%", "className": "text-start" },
@@ -25,7 +25,7 @@ function loadDataTable() {
                         <div class="w-75 btn-group" role="group">
                         <a href="#" onclick="Edit(${data})"
                         class="btn btn-primary ms-2"> <i class="bi bi-pencil-square"></i> Edit</a>
-                        <a onClick=Delete('/Admin/MaBTdoc/Delete/${data}')
+                        <a onClick=Delete('/Admin/BTdoc/Delete/${data}')
                         class="btn btn-danger ms-2"> <i class="bi bi-trash-fill"></i> Delete</a>
                     </div>
                     `;
@@ -48,7 +48,7 @@ function Insert() {
     formData.part = $('#Part').val();
 
     $.ajax({
-        url: '/Admin/MaBTdoc/Insert',
+        url: '/Admin/BTdoc/Insert',
         data: formData,
         type: 'post',
 
@@ -72,7 +72,7 @@ function Insert() {
 // Edit
 function Edit(id) {
     $.ajax({
-        url: '/Admin/MaBTdoc/Edit?id=' + id,
+        url: '/Admin/BTdoc/Edit?id=' + id,
         type: 'get',
         contentType: 'application/json; charset=uft-8',
         datatype: 'json',
@@ -83,7 +83,7 @@ function Edit(id) {
                 alert('Không có dữ liệu với id' + id);
             } else {
                 $('#BaitapdocModal').modal('show');
-                $('#modalTitle').text('Sửa mã bài tập đọc ');
+                $('#modalTitle').text('Sửa bài tập đọc ');
                 $('#Save').css('display', 'none');
                 $('#Update').css('display', 'block');
                 $('#Id').val(response.id);
@@ -111,7 +111,7 @@ function Update() {
     formData.part = $('#Part').val();
 
     $.ajax({
-        url: '/Admin/MaBTdoc/Update',
+        url: '/Admin/BTdoc/Update',
         data: formData,
         type: 'post',
         success: function (response) {
@@ -173,7 +173,7 @@ function Delete(url) {
 
 $('#btnAdd').click(function () {
     $('#BaitapdocModal').modal('show');
-    $('#modalTitle').text('Thêm mã bài tập đọc mới');
+    $('#modalTitle').text('Thêm bài tập đọc mới');
     $('#Save').css('display', 'block');
     $('#Update').css('display', 'none');
 });

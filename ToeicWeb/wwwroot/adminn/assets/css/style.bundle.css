@@ -338,6 +338,7 @@ a {
 }
 a:hover {
   --bs-link-color-rgb: var(--bs-link-hover-color-rgb);
+  opacity: 0.8;
   text-decoration: none;
 }
 
