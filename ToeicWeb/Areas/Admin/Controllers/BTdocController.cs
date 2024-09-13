@@ -52,7 +52,7 @@ namespace ToeicWeb.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CauhoiBTdocVM viewModel)
+        public async Task<JsonResult> Create(CauhoiBTdocVM viewModel)
         {
             if (viewModel.ExcelFile != null && viewModel.ExcelFile.Length > 0)
             {
@@ -76,21 +76,21 @@ namespace ToeicWeb.Areas.Admin.Controllers
                     using (var package = new ExcelPackage(stream))
                     {
                         var worksheet = package.Workbook.Worksheets.First();
-                        // Kiểm tra xem mabaidoc đã tồn tại chưa
-                        var mabaidoc = _db.Mabaitapdocs.FirstOrDefault(c => c.Tieu_de == viewModel.Tieu_de);
-                        if (mabaidoc == null)
+                        // Kiểm tra xem category đã tồn tại chưa
+                        var category = _db.Mabaitapdocs.FirstOrDefault(c => c.Tieu_de == viewModel.Tieu_de);
+                        if (category == null)
                         {
-                            mabaidoc = new Ma_bai_tap_doc
+                            category = new Ma_bai_tap_doc
                             {
                                 Tieu_de = viewModel.Tieu_de,
                                 Part = viewModel.Part
                             };
-                            _db.Mabaitapdocs.Add(mabaidoc);
+                            _db.Mabaitapdocs.Add(category);
                             await _db.SaveChangesAsync();
                         }
                         for (int row = 2; row <= worksheet.Dimension.Rows; row++)
                         {
-                            var cauhoi = new Cau_hoi_bai_tap_doc
+                            var product = new Cau_hoi_bai_tap_doc
                             {
                                 Thu_tu_cau = worksheet.Cells[row, 1].Value != null ? Convert.ToInt32(worksheet.Cells[row, 1].Value) : 0,
                                 Cau_hoi = worksheet.Cells[row, 2].Value?.ToString() ?? string.Empty,
@@ -101,15 +101,16 @@ namespace ToeicWeb.Areas.Admin.Controllers
                                 Dap_an_dung = worksheet.Cells[row, 7].Value?.ToString() ?? string.Empty,
                                 Giai_thich = worksheet.Cells[row, 8].Value?.ToString() ?? string.Empty,
                                 Bai_doc = worksheet.Cells[row, 9].Value?.ToString() ?? string.Empty,
-                                Ma_bai_tap_docId = mabaidoc.Id
+                                Ma_bai_tap_docId = category.Id
                             };
-                            _db.Cauhoibaitapdocs.Add(cauhoi);
+                            _db.Cauhoibaitapdocs.Add(product);
                         }
                         await _db.SaveChangesAsync();
                     }
                 }
+                return Json(new { success = true, message = "Thêm bài đọc mới thành công" });
             }
-            return RedirectToAction("Index");
+            return Json(new { success = false, message = "Không thể thêm bài tập đọc mới" });
         }
 
         #region API CALLS

@@ -36,38 +36,40 @@ function loadDataTable() {
     });
 }
 
-// Insert data
-function Insert() {
+// Create data
+function Create() {
     var result = Validate();
     if (result == false) {
         return false;
     }
 
-    var formData = new Object();
-    formData.id = $('#Id').val();
-    formData.part = $('#Part').val();
+    var formData = new FormData();
+    formData.append('ExcelFile', $('#ExcelFile')[0].files[0]);
+    formData.append('Tieu_de', $('#Tieu_de').val());
+    formData.append('Part', $('#Part').val());
 
     $.ajax({
-        url: '/Admin/BTdoc/Insert',
+        url: '/Admin/BTdoc/Create',
         data: formData,
-        type: 'post',
+        type: 'POST',
+        contentType: false,
+        processData: false,
 
         success: function (response) {
-            if (response == null || response == undefined || response.length == 0) {
+            if (!response.success) {
                 toastr.error(response.message);
-
             } else {
                 HideModal();
                 loadDataTable();
                 toastr.success(response.message);
             }
         },
-        error: function () {
-            toastr.error(response.message);
+        error: function (xhr, status, error) {
+            toastr.error(xhr.responseJSON.message);
         }
     });
-
 }
+
 
 // Edit
 function Edit(id) {

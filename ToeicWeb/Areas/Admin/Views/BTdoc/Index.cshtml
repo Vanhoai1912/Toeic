@@ -12,7 +12,7 @@
 
     <div class="row pt-2 ms-2">
         <div class="col-6 col-md-3">
-            <button type="button" data-toggle="modal" data-target="#uploadModal" class="btn btn-primary">
+            <button id="btnAdd" class="btn btn-primary">
                 <i class="bi bi-plus-circle"></i> Thêm bài đọc mới
             </button>
         </div>
@@ -60,65 +60,21 @@
                     </select>
                     <span asp-validation-for="Part" class="text-danger"></span>
                 </div>
-
+                <div class="mb-2">
+                    <label asp-for="ExcelFile" class="d-flex align-items-center fs-5 fw-semibold mb-2">
+                        <span class="required">File Excel</span>
+                    </label>
+                    <input type="file" class="form-control" asp-for="ExcelFile" required />
+                </div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" data-bs-dismiss="modal" onclick="HideModal();">Hủy</button>
-                <button class="btn btn-primary" type="button" id="Save" onclick="Insert();">Thêm</button>
+                <button class="btn btn-primary" type="button" id="Save" onclick="Create();">Thêm</button>
                 <button class="btn btn-success" type="button" id="Update" onclick="Update();" style="display:none">Cập nhật</button>
             </div>
         </div>
     </div>
 </div>
-
-<!-- Modal -->
-<div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title" id="modalTitle">Thêm bài tập đọc mới</h3>
-            </div>
-            <div class="modal-body">
-                <form asp-action="Create" method="post" enctype="multipart/form-data">
-                    <div class="mb-2">
-                        <label asp-for="Tieu_de" class="d-flex align-items-center fs-5 fw-semibold mb-2">
-                            <span class="required">Tiêu đề</span>
-                        </label>
-                        <input asp-for="Tieu_de" class="form-control" required />
-                        <span asp-validation-for="Tieu_de" class="text-danger"></span>
-                    </div>
-
-                    <div class="mb-2">
-                        <label asp-for="Part" class="d-flex align-items-center fs-5 fw-semibold mb-2">
-                            <span class="required">Part</span>
-                        </label>
-                        <select class="form-control" asp-for="Part">
-                            <option value="5" disabled selected>--Chọn Part--</option>
-                            <option value="5">Part 5</option>
-                            <option value="6">Part 6</option>
-                            <option value="7">Part 7</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-2">
-                        <label asp-for="ExcelFile" class="d-flex align-items-center fs-5 fw-semibold mb-2">
-                            <span class="required">File Excel</span>
-                        </label>
-                        <input type="file" class="form-control" asp-for="ExcelFile" required />
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
-                        <button class="btn btn-primary" type="submit" id="Save">Thêm</button>
-                        <button class="btn btn-success" type="submit" id="Update" style="display:none">Cập nhật</button>
-                    </div>
-                </form>
-
-            </div>
-
-        </div>
-    </div>
-</div>
-
 
 
 @section Scripts {
