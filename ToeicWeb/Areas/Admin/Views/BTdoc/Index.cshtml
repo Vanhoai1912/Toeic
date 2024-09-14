@@ -33,39 +33,50 @@
 </div>
 
 <!-- Modal -->
-<div class="modal fade" id="BaitapdocModal">
+<div class="modal fade" id="BaitapdocModal" tabindex="-1" aria-labelledby="BaitapdocModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title" id="modalTitle"></h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <input type="hidden" asp-for="Id" value="0" />
+                <input type="hidden" id="Id" value="0" />
+
                 <div class="mb-2">
-                    <label asp-for="Tieu_de" class="d-flex align-items-center fs-5 fw-semibold mb-2">
+                    <label for="Tieu_de" class="d-flex align-items-center fs-5 fw-semibold mb-2">
                         <span class="required">Tiêu đề</span>
                     </label>
-                    <input asp-for="Tieu_de" class="form-control" required/>
-                    <span asp-validation-for="Tieu_de"  class="text-danger"></span>
+                    <input type="text" id="Tieu_de" class="form-control" required />
+                    <span id="Tieu_deError" class="text-danger"></span>
                 </div>
 
                 <div class="mb-2">
-                    <label asp-for="Part" class="d-flex align-items-center fs-5 fw-semibold mb-2">
+                    <label for="Part" class="d-flex align-items-center fs-5 fw-semibold mb-2">
                         <span class="required">Part</span>
                     </label>
-                    <select class="form-control" asp-for="Part" required>
-                        <option disabled selected>--Chọn part--</option>
+                    <select id="Part" class="form-control" required>
+                        <option value="" disabled selected>--Chọn part--</option>
                         <option value="5">Part 5</option>
                         <option value="6">Part 6</option>
                         <option value="7">Part 7</option>
                     </select>
-                    <span asp-validation-for="Part" class="text-danger"></span>
+                    <span id="PartError" class="text-danger"></span>
                 </div>
+
                 <div class="mb-2">
-                    <label asp-for="ExcelFile" class="d-flex align-items-center fs-5 fw-semibold mb-2">
+                    <label for="NewExcelFile" class="d-flex align-items-center fs-5 fw-semibold mb-2">
                         <span class="required">File Excel</span>
                     </label>
-                    <input type="file" class="form-control" asp-for="ExcelFile" required />
+
+                    <!-- Hiển thị thông tin về file đã chọn trước đó -->
+                    <div id="ExcelFileInfo" class="mb-2" style="display:none;">
+                        <p>File hiện tại: <span id="ExcelFile"></span></p>
+                    </div>
+
+                    <!-- Input để upload file mới nếu muốn thay thế -->
+                    <input type="file" class="form-control" id="NewExcelFile" />
+                    <span id="ExcelFileError" class="text-danger"></span>
                 </div>
             </div>
             <div class="modal-footer">
@@ -76,6 +87,7 @@
         </div>
     </div>
 </div>
+
 
 
 @section Scripts {

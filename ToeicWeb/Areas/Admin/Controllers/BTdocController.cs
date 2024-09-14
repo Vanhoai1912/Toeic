@@ -54,7 +54,12 @@ namespace ToeicWeb.Areas.Admin.Controllers
         [HttpPost]
         public async Task<JsonResult> Create(CauhoiBTdocVM viewModel)
         {
-            if (viewModel.ExcelFile != null && viewModel.ExcelFile.Length > 0)
+            if (viewModel.ExcelFile == null || viewModel.ExcelFile.Length == 0)
+            {
+                return Json(new { success = false, message = "File không được chọn hoặc không có dữ liệu" });
+            }
+
+            try
             {
                 // Lưu file vào thư mục wwwroot/adminn/upload
                 string uploadsFolder = Path.Combine(_environment.WebRootPath, "adminn", "upload");
@@ -89,6 +94,7 @@ namespace ToeicWeb.Areas.Admin.Controllers
                             _db.Mabaitapdocs.Add(category);
                             await _db.SaveChangesAsync();
                         }
+
                         for (int row = 2; row <= worksheet.Dimension.Rows; row++)
                         {
                             var product = new Cau_hoi_bai_tap_doc
@@ -106,30 +112,47 @@ namespace ToeicWeb.Areas.Admin.Controllers
                             };
                             _db.Cauhoibaitapdocs.Add(product);
                         }
+
                         await _db.SaveChangesAsync();
                     }
                 }
+
                 return Json(new { success = true, message = "Thêm bài đọc mới thành công" });
             }
-            return Json(new { success = false, message = "Không thể thêm bài tập đọc mới" });
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Lỗi khi thêm bài đọc mới: {ex.Message}" });
+            }
         }
+
 
 
         #region API CALLS
         [HttpGet]
         public async Task<JsonResult> Edit(int id)
         {
+            // Tìm bài tập đọc theo ID
             var baitapdoc = await _db.Mabaitapdocs.FindAsync(id);
             if (baitapdoc == null)
             {
                 return Json(new { success = false, message = "Không tìm thấy bài tập đọc" });
             }
 
-            // Lấy đường dẫn file Excel từ cơ sở dữ liệu (nếu có)
+            // Lấy đường dẫn file Excel từ cơ sở dữ liệu
             var filePath = baitapdoc.FilePath; // Giả sử bạn lưu đường dẫn file trong thuộc tính FilePath
 
-            return Json( baitapdoc);
+            // Kiểm tra xem file có tồn tại hay không
+            bool fileExists = !string.IsNullOrEmpty(filePath) && System.IO.File.Exists(filePath);
+
+            // Trả về thông tin của bài tập đọc và đường dẫn file Excel
+            return Json(new
+            {
+                success = true,
+                data = baitapdoc,
+                filePath = fileExists ? filePath : null // Nếu file tồn tại, trả về đường dẫn, nếu không thì trả về null
+            });
         }
+
 
         [HttpPost]
         public async Task<JsonResult> Update(int id, string tieu_de, int part, IFormFile FileExcel)
