@@ -13916,3 +13916,8 @@ a :hover{
 .text-d {
     color: #191414 !important;
 }
+
+.cauhoi {
+    border-radius: 0.5rem !important;
+    background-color: #fff !important;
+}

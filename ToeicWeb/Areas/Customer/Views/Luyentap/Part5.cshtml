@@ -4,7 +4,7 @@
 {
     @if (@Model[i].Part == 5)
     {
-        <a class="col-lg-3 col-sm-6 text-decoration-none" asp-area="Customer" asp-controller="Luyentap" asp-action="PracticePart5">
+        <a class="col-lg-3 col-sm-6 text-decoration-none" asp-area="Customer" asp-controller="Luyentap" asp-action="PracticePart5" asp-route-baiTapId="@Model[i].Id">
             <div class="col d-sm-flex justify-content-sm-center">
                 <div class="col-8 p-1 border-primary mb-3 hV">
                     <div class="shadow border rounded bgC">
@@ -23,7 +23,7 @@
                     </div>
                 </div>
             </div>
-
         </a>
+
     }
 }

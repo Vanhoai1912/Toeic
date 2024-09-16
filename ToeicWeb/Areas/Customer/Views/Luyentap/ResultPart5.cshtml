@@ -1,5 +1,42 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿
+
+<h3>Kết quả luyện tập:</h3>
+<div class="container mt-5">
+    <div class="row text-center">
+        <!-- Correct Answer Card -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <i class="bi bi-check-circle-fill text-success card-icon fs-4"></i>
+                    <h5 class="card-title text-success">Trả lời đúng</h5>
+                    <p class="card-text fs-4">@ViewBag.CorrectAnswers</p>
+                </div>
+            </div>
+        </div>
+        <!-- Incorrect Answer Card -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <i class="bi bi-x-circle-fill text-danger card-icon fs-4"></i>
+                    <h5 class="card-title text-danger">Trả lời sai</h5>
+                    <p class="card-text fs-4">@ViewBag.IncorrectAnswers</p>
+                </div>
+            </div>
+        </div>
+        <!-- Skipped Question Card -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <i class="bi bi-dash-circle-fill card-icon fs-4"></i>
+                    <h5 class="card-title">Bỏ qua</h5>
+                    <p class="card-text fs-4">@ViewBag.SkippedQuestions</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="custom-container mt-xxl-5 d-xxl-flex">
+    <h3 class="custom-text me-xl-3">Đáp án:</h3>
+    <button type="button" class="btn btn-primary mb-3 text-light rounded-3">Xem chi tiết đáp án</button>
+</div>

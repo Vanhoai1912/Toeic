@@ -1,54 +1,130 @@
-﻿@model List<Ma_bai_tap_doc>
+﻿@model ToeicWeb.Models.ViewModels.TracNghiemViewModel
 
-<form action="" method="post">
-    <div class="row" style="margin-bottom:200px">
-        <div class="col-md-12">
-            <div>
-                @* @for (int i = 0; i < Model.Count; i++)
-                { *@
-                    <div class="card card-table">
-                        <input type="hidden" @* name="questions[@i].Id" value="@Model[i].Id" *@ />
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="box-audio">
-                                        <span>Câu </span>
-                                    </div>
+<!-- Tiêu đề -->
+<div class="col-12 text-center">
+    <h2>@Model.BaiTap.Tieu_de</h2>
+    @* <button class="btn btn-secondary">Thoát</button> *@
+</div>
+<div class="container rounded-4" style="max-width: 1220px;box-shadow: 0 2px 4px rgba(0, 0, 0, .08), 0 4px 12px rgba(0, 0, 0, .08);margin-left: -6rem;">
+    <div class="row">
+       
+        <!-- Phần bài làm (câu hỏi) bên trái -->
+        <p class="mt-xxl-3">
+            <span class="badge rounded-4 bg-primary">
+                 Part @Model.BaiTap.Part 
+            </span>
+        </p>
+        <!-- Phần bài làm (câu hỏi) bên trái -->
+        <div class="col-md-8">
+            <!-- Form câu   ỏi -->
+            <form asp-action="ResultPart5" method="post" id="tracNghiemForm">
+                @for (int i = 0; i < Model.CauHoiList.Count; i++)
+                {
+                    <div class="question-block" id="question_@Model.CauHoiList[i].Id" style="padding: 10px; margin-bottom: 30px;">
+                        <p><b>@Model.CauHoiList[i].Thu_tu_cau. @Model.CauHoiList[i].Cau_hoi</b></p>
 
-                                </div>
-                                <div class="col-md-12">
-                                    <div style="margin-bottom: 15px;">
-                                        @* @Model[i].Content *@
-                                    </div>
-                                    @* @foreach (var answer in Model[i].CauHoiBaiTapDocs)
-                                    { *@
-                                        <div style="margin-bottom: 10px; margin-left: 15px;">
-                                            <label>
-                                                <input type="radio" @* name="questions[@i].UserAnswer" value="@answer.Id" *@ />
-                                                @* @answer.Dap_an_1 *@
-                                            </label>
-                                        </div>
-                                    @* } *@
-                                </div>
+                        @{
+                            var options = new[]
+                            {
+                    new { Letter = "A", Text = Model.CauHoiList[i].Dap_an_1 },
+                    new { Letter = "B", Text = Model.CauHoiList[i].Dap_an_2 },
+                    new { Letter = "C", Text = Model.CauHoiList[i].Dap_an_3 },
+                    new { Letter = "D", Text = Model.CauHoiList[i].Dap_an_4 }
+                    };
+                        }
+
+                        @* Hiển thị các đáp án với ký hiệu *@
+                        @for (int j = 0; j < options.Length; j++)
+                        {
+                            <div>
+                                <input type="radio" name="cauHoi_@Model.CauHoiList[i].Id" value="@options[j].Text" />
+                                <label>@options[j].Letter. @options[j].Text</label>
                             </div>
-                        </div>
+                        }
+
+                        @* Input ẩn để đánh dấu câu hỏi đã được hiển thị *@
+                        <input type="hidden" name="questionIds" value="@Model.CauHoiList[i].Id" />
                     </div>
-                @* } *@
-            </div>
-        </div>
-        <div class="col-md-12 text-center">
-            <button class="btn btn-primary">Nộp bài thi</button>
+                }
+            </form>
+
         </div>
     </div>
-</form>
+</div>
+
+<!-- Phần thời gian và danh sách câu hỏi bên phải -->
+<div style="position: fixed; top: 130px; right: 10px; width: 250px; box-shadow: 0 2px 4px rgba(0, 0, 0, .08), 0 4px 12px rgba(0, 0, 0, .08); border-radius: 10px; padding: 18px;">
+    <!-- Hiển thị thời gian làm bài -->
+    <div style="margin-bottom: 20px;">
+        <label>Thời gian làm bài:</label>
+        <div id="timer" style="font-size: 24px">00:00</div>
+    </div>
+
+    <!-- Nút nộp bài -->
+    <button type="submit" form="tracNghiemForm" class="btn btn-primary mb-3 text-light rounded-3">NỘP BÀI</button>
+
+    <p style="color: orange; font-size: 12px;">
+        Chú ý: bạn có thể click vào số thứ tự câu hỏi trong bảng để đánh dấu review
+    </p>
+
+    <!-- Danh sách câu hỏi -->
+    <div>
+        <label>Danh sách câu hỏi:</label>
+        <div style="display: flex; flex-wrap: wrap;">
+            @for (int i = 0; i < Model.CauHoiList.Count; i++)
+            {
+                <button id="btn_@Model.CauHoiList[i].Id" class="m-1 rounded-3" style="background-color: #fff;font-size: 0.75rem;" onclick="scrollToQuestion(@Model.CauHoiList[i].Id)">
+                    @Model.CauHoiList[i].Thu_tu_cau
+                </button>
+            }
+        </div>
+    </div>
+</div>
 
 
 <script>
-    $("form").submit(function(event) {
-        if (confirm("Xác nhận nộp bài thi")) {
-            return;
+    var elapsedTime = 0;  // Bắt đầu từ 0 giây
+    var timerElement = document.getElementById('timer');
+    var interval;
+
+    function startTimer() {
+        if (interval) return; // Ngăn việc thiết lập lại nhiều lần
+
+        interval = setInterval(function() {
+            var minutes = Math.floor(elapsedTime / 60);
+            var seconds = elapsedTime % 60;
+
+            // Thêm số 0 nếu giây < 10
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+
+            // Hiển thị thời gian đã trôi qua
+            timerElement.textContent = minutes + ":" + seconds;
+
+            elapsedTime++;
+        }, 1000);  // Cập nhật mỗi giây
+    }
+
+    // Khi trang PracticePart5 được tải, bắt đầu đồng hồ
+    window.onload = function() {
+        startTimer();
+    };
+
+    // Đánh dấu câu hỏi đã chọn
+    function markAsSelected(questionId) {
+        var button = document.getElementById('btn_' + questionId);
+        if (button.style.backgroundColor === '#3b4f95') {
+            button.style.backgroundColor = '#fff';
+        } else {
+            button.style.backgroundColor = '#3b4f95';
+            button.style.color = '#fff';
         }
-        else
-            event.preventDefault();
-    });
+    }
+
+
+    // Scroll tới câu hỏi khi nhấn vào nút
+    function scrollToQuestion(questionId) {
+        document.getElementById('question_' + questionId).scrollIntoView({ behavior: 'smooth' });
+    }
 </script>
+
