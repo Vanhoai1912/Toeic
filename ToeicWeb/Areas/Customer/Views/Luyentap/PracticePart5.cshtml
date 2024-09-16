@@ -1,0 +1,54 @@
+﻿@model List<Ma_bai_tap_doc>
+
+<form action="" method="post">
+    <div class="row" style="margin-bottom:200px">
+        <div class="col-md-12">
+            <div>
+                @* @for (int i = 0; i < Model.Count; i++)
+                { *@
+                    <div class="card card-table">
+                        <input type="hidden" @* name="questions[@i].Id" value="@Model[i].Id" *@ />
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="box-audio">
+                                        <span>Câu </span>
+                                    </div>
+
+                                </div>
+                                <div class="col-md-12">
+                                    <div style="margin-bottom: 15px;">
+                                        @* @Model[i].Content *@
+                                    </div>
+                                    @* @foreach (var answer in Model[i].CauHoiBaiTapDocs)
+                                    { *@
+                                        <div style="margin-bottom: 10px; margin-left: 15px;">
+                                            <label>
+                                                <input type="radio" @* name="questions[@i].UserAnswer" value="@answer.Id" *@ />
+                                                @* @answer.Dap_an_1 *@
+                                            </label>
+                                        </div>
+                                    @* } *@
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @* } *@
+            </div>
+        </div>
+        <div class="col-md-12 text-center">
+            <button class="btn btn-primary">Nộp bài thi</button>
+        </div>
+    </div>
+</form>
+
+
+<script>
+    $("form").submit(function(event) {
+        if (confirm("Xác nhận nộp bài thi")) {
+            return;
+        }
+        else
+            event.preventDefault();
+    });
+</script>
