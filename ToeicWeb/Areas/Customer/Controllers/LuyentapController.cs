@@ -114,8 +114,5 @@ namespace ToeicWeb.Areas.Customer.Controllers
             return View();
         }
 
-
-
-
     }
 }
