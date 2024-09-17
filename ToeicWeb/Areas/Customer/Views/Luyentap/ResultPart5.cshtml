@@ -1,5 +1,4 @@
 ﻿
-
 <h3>Kết quả luyện tập:</h3>
 <div class="container mt-5">
     <div class="row text-center">
@@ -38,5 +37,31 @@
 
 <div class="custom-container mt-xxl-5 d-xxl-flex">
     <h3 class="custom-text me-xl-3">Đáp án:</h3>
-    <button type="button" class="btn btn-primary mb-3 text-light rounded-3">Xem chi tiết đáp án</button>
+    @* <a asp-area="Customer" asp-controller="Luyentap" asp-action="ResultDetailPart5" class="btn btn-primary mb-3 text-light rounded-3">Xem chi tiết đáp án</a> *@
 </div>
+<a href="#" onclick="postData(@Model.BaiTapId); return false;" class="btn btn-primary mb-3 text-light rounded-3">Xem chi tiết đáp án</a>
+
+<script>
+    function postData(baiTapId) {
+        fetch('/Customer/Luyentap/ResultDetailPart5', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+            },
+            body: new URLSearchParams({
+                baiTapId: baiTapId,
+                questionIds: '1,2,3', // Replace with actual question IDs
+                // Add other form data if necessary
+            })
+        })
+        .then(response => response.text())
+        .then(data => {
+            // Handle the response data
+            document.open();
+            document.write(data);
+            document.close();
+        })
+        .catch(error => console.error('Error:', error));
+    }
+</script>

@@ -68,7 +68,8 @@ namespace ToeicWeb.Data
                     Dap_an_3 = "C",
                     Dap_an_4 = "D",
                     Giai_thich = "A ĐÚNG",
-                    Ma_bai_tap_ngeId = 1
+                    Ma_bai_tap_ngeId = 1,
+
                 }
             );
         }

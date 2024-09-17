@@ -57,23 +57,80 @@ namespace ToeicWeb.Areas.Customer.Controllers
         // Xử lý kết quả trắc nghiệm
 
 
+        //[HttpPost]
+        //public async Task<IActionResult> ResultPart5(IFormCollection form)
+        //{
+        //    int correctAnswers = 0;
+        //    int incorrectAnswers = 0;
+        //    int skippedQuestions = 0;
+
+        //    // Lấy danh sách ID câu hỏi từ form
+        //    var questionIds = form["questionIds"].Select(int.Parse).ToList();
+
+        //    // Truy vấn danh sách câu hỏi từ cơ sở dữ liệu dựa trên danh sách ID
+        //    var cauHoiList = await _db.Cauhoibaitapdocs
+        //                              .Where(q => questionIds.Contains(q.Id))
+        //                              .ToListAsync();
+
+        //    // Lặp qua danh sách câu hỏi vừa truy vấn
+        //    foreach (var cauHoi in cauHoiList)
+        //    {
+        //        var key = $"cauHoi_{cauHoi.Id}";
+
+        //        // Kiểm tra nếu form chứa khóa này hay không
+        //        if (form.ContainsKey(key))
+        //        {
+        //            var selectedAnswer = form[key]; // User's selected answer
+
+        //            if (string.IsNullOrEmpty(selectedAnswer))
+        //            {
+        //                // Nếu không chọn câu trả lời, tăng số câu bị bỏ qua
+        //                skippedQuestions++;
+        //            }
+        //            else if (selectedAnswer == cauHoi.Dap_an_dung)
+        //            {
+        //                // Nếu câu trả lời đúng
+        //                correctAnswers++;
+        //            }
+        //            else
+        //            {
+        //                // Nếu câu trả lời sai
+        //                incorrectAnswers++;
+        //            }
+        //        }
+        //        else
+        //        {
+        //            // Nếu không có trong form, nghĩa là câu này bị bỏ qua
+        //            skippedQuestions++;
+        //        }
+        //    }
+
+        //    // Set view data to pass the results to the view
+        //    ViewData["NavbarType"] = "_NavbarBack";
+        //    ViewBag.CorrectAnswers = correctAnswers;
+        //    ViewBag.IncorrectAnswers = incorrectAnswers;
+        //    ViewBag.SkippedQuestions = skippedQuestions;
+
+        //    return View();
+        //}
+
         [HttpPost]
-        public async Task<IActionResult> ResultPart5(IFormCollection form)
+        public async Task<IActionResult> ResultDetailPart5(IFormCollection form, int baiTapId)
         {
             int correctAnswers = 0;
             int incorrectAnswers = 0;
             int skippedQuestions = 0;
 
             // Lấy danh sách ID câu hỏi từ form
-            var questionIds = form["questionIds"].Select(int.Parse).ToList();
+            var questionid = form["questionIds"].Select(int.Parse).ToList();
 
             // Truy vấn danh sách câu hỏi từ cơ sở dữ liệu dựa trên danh sách ID
-            var cauHoiList = await _db.Cauhoibaitapdocs
-                                      .Where(q => questionIds.Contains(q.Id))
+            var cauhoiList = await _db.Cauhoibaitapdocs
+                                      .Where(q => questionid.Contains(q.Id))
                                       .ToListAsync();
 
             // Lặp qua danh sách câu hỏi vừa truy vấn
-            foreach (var cauHoi in cauHoiList)
+            foreach (var cauHoi in cauhoiList)
             {
                 var key = $"cauHoi_{cauHoi.Id}";
 
@@ -106,13 +163,62 @@ namespace ToeicWeb.Areas.Customer.Controllers
             }
 
             // Set view data to pass the results to the view
-            ViewData["NavbarType"] = "_NavbarBack";
             ViewBag.CorrectAnswers = correctAnswers;
             ViewBag.IncorrectAnswers = incorrectAnswers;
             ViewBag.SkippedQuestions = skippedQuestions;
+            // Retrieve BaiTap from the database
+            var baiTap = await _db.Mabaitapdocs.FindAsync(baiTapId);
+            if (baiTap == null)
+            {
+                return NotFound();
+            }
 
-            return View();
+            // Retrieve the list of questions for the given baiTapId
+            var cauHoiList = await _db.Cauhoibaitapdocs
+                                      .Where(c => c.Ma_bai_tap_docId == baiTapId)
+                                      .OrderBy(c => c.Thu_tu_cau)
+                                      .ToListAsync();
+
+            // Extract user answers from the form
+            var questionIds = form["questionIds"].ToString().Split(',');
+            var userAnswers = new Dictionary<int, string>();
+
+            foreach (var questionIdStr in questionIds)
+            {
+                if (int.TryParse(questionIdStr, out int questionId))
+                {
+                    var answer = form[$"cauHoi_{questionId}"];
+                    if (!string.IsNullOrEmpty(answer))
+                    {
+                        userAnswers.Add(questionId, answer);
+                    }
+                }
+            }
+
+            // Process the user answers and calculate results
+            foreach (var question in cauHoiList)
+            {
+                if (userAnswers.TryGetValue(question.Id, out var userAnswer))
+                {
+                    question.UserAnswer = userAnswer; // Store the user's answer
+                    question.IsCorrect = string.Equals(userAnswer, question.Dap_an_dung, StringComparison.OrdinalIgnoreCase); // Check if the answer is correct
+                }
+            }
+
+            // Create the view model
+            var viewModel = new TracNghiemViewModel
+            {
+                BaiTap = baiTap,  // Store exercise details
+                CauHoiList = cauHoiList,  // Store the list of questions and their results
+                TotalTime = form["TotalTime"] // If you are tracking time
+            };
+
+            // Return the view with the results
+            ViewData["NavbarType"] = "_NavbarBack";
+
+            return View(viewModel);
         }
+
 
     }
 }

@@ -31,5 +31,8 @@ namespace ToeicWeb.Models
         [ForeignKey("Ma_bai_tap_docId")]
         public Ma_bai_tap_doc Ma_bai_tap_doc { get; set; }
 
+        // Fields for storing result-related information
+        public string? UserAnswer { get; set; } // User's selected answer
+        public bool IsCorrect { get; set; } // Whether the user's answer is correct
     }
 }
