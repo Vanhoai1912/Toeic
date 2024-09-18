@@ -1,0 +1,213 @@
+﻿@model ToeicWeb.Models.ViewModels.TracNghiemViewModel
+
+<!-- Tiêu đề -->
+<div class="col-12 text-center">
+    <h2>@Model.BaiTap.Tieu_de</h2>
+</div>
+
+<div class="container rounded-4" style="max-width: 1220px; box-shadow: 0 2px 4px rgba(0, 0, 0, .08), 0 4px 12px rgba(0, 0, 0, .08); margin-left: -6rem;">
+    <div class="row">
+        <p class="mt-xxl-3 ">
+            <span class="badge rounded-4 bg-primary">
+                Part @Model.BaiTap.Part
+            </span>
+        </p>
+
+        <!-- Vòng lặp qua các câu hỏi -->
+        @foreach (var question in Model.CauHoiList)
+        {
+            <div class="row question-row" style="margin-bottom: 30px;">
+                 <!-- Đường cắt ngang phía trên câu hỏi nếu có bài đọc -->
+                @if (!string.IsNullOrEmpty(question.Bai_doc) && Model.BaiDocs.ContainsKey(question.Bai_doc))
+                {
+                    <hr style="border: 1px solid #ccc; margin-bottom: 20px;" />
+                }
+                <!-- Cột bên trái: Bài đọc (chỉ hiển thị nếu có bài đọc) -->
+                @if (!string.IsNullOrEmpty(question.Bai_doc) && Model.BaiDocs.ContainsKey(question.Bai_doc))
+                {
+                    <div class="col-md-6 reading-column" style="border-right: 1px solid #ddd; padding-right: 30px; position: relative;">
+                         <div class="reading-passage" style="margin-top: 20px;">
+                            @{
+                                // Xác định vị trí của câu hiện tại trong danh sách câu hỏi
+                                var startIndex = Model.CauHoiList.IndexOf(question);
+                                var endIndex = startIndex; // Biến endIndex để xác định câu kết thúc
+
+                                // Tìm câu tiếp theo có bài đọc
+                                for (int i = startIndex + 1; i < Model.CauHoiList.Count; i++)
+                                {
+                                    if (!string.IsNullOrEmpty(Model.CauHoiList[i].Bai_doc) && Model.BaiDocs.ContainsKey(Model.CauHoiList[i].Bai_doc))
+                                    {
+                                        endIndex = i - 1; // Kết thúc trước câu tiếp theo có bài đọc
+                                        break;
+                                    }
+                                }
+
+                                // Nếu không tìm thấy câu tiếp theo có bài đọc, lấy đến cuối danh sách
+                                if (endIndex == startIndex)
+                                {
+                                    endIndex = Model.CauHoiList.Count - 1;
+                                }
+                            }
+
+                            <!-- Hiển thị phạm vi câu hỏi -->
+                            <h5>Questions @question.Thu_tu_cau - @Model.CauHoiList[endIndex].Thu_tu_cau</h5>
+                            <p>@Model.BaiDocs[question.Bai_doc]</p> <!-- Hiển thị bài đọc tương ứng -->
+
+                            <!-- Giải thích đáp án bài đọc -->
+                            <div class="mt-2">
+                                <div class="toggle-explanation" onclick="toggleExplanation('readingExplanation_@question.Id')" style="cursor: pointer; color: #3b4f95; text-decoration: none;">
+                                    Giải thích chi tiết bài đọc <i class="bi bi-chevron-down"></i>
+                                </div>
+                                <div class="explanation-content mt-2" id="readingExplanation_@question.Id">
+                                    <div class="">
+                                        @question.Giai_thich
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <!-- Nếu không có bài đọc, tạo một cột trống bên trái để câu hỏi luôn nằm bên phải -->
+                    <div class="col-md-6" style="border-right: 1px solid #ddd; padding-right: 30px;">
+                        <!-- Cột trống -->
+                    </div>
+                }
+
+                <!-- Cột bên phải: Câu hỏi -->
+                <div class="col-md-6" style="padding-left: 30px;">
+                    <div class="question-block" id="question_@question.Id" style="padding: 10px; border-bottom: 1px solid #ddd;">
+                        <!-- Hiển thị số câu và nội dung câu hỏi -->
+                        <p><b>@question.Thu_tu_cau. @question.Cau_hoi</b></p>
+
+                        <!-- Đáp án (A, B, C, D) -->
+                        @{
+                            var options = new[] {
+                                new { Letter = "A", Text = question.Dap_an_1 },
+                                new { Letter = "B", Text = question.Dap_an_2 },
+                                new { Letter = "C", Text = question.Dap_an_3 },
+                                new { Letter = "D", Text = question.Dap_an_4 }
+                            };
+
+                            var userAnswered = !string.IsNullOrEmpty(question.UserAnswer);
+                        }
+
+                        @for (int j = 0; j < options.Length; j++)
+                        {
+                            var option = options[j];
+                            var isCorrectAnswer = string.Equals(option.Text, question.Dap_an_dung, StringComparison.OrdinalIgnoreCase);
+                            var isUserAnswer = string.Equals(option.Text, question.UserAnswer, StringComparison.OrdinalIgnoreCase);
+
+                            <div>
+                                <!-- Hiển thị đáp án với màu tương ứng -->
+                                <span style="color: @(userAnswered && isUserAnswer ? (isCorrectAnswer ? "green" : "#e69a9c") : (userAnswered && isCorrectAnswer ? "green" : "black")); font-weight: @(userAnswered && (isUserAnswer || isCorrectAnswer) ? "bold" : "normal");">
+                                    <input type="radio" name="cauHoi_@question.Id" value="@option.Text" disabled @(isUserAnswer ? "checked" : "") />
+                                    @option.Letter. @option.Text
+                                </span>
+                            </div>
+                        }
+
+                        <!-- Đáp án đúng -->
+                        <p><strong>Đáp án đúng:</strong> <span style="color:green; font-weight: bold">@question.Dap_an_dung</span></p>
+
+                        <div class="mt-2">
+                            <div class="toggle-explanation" onclick="toggleExplanation('explanation_@question.Id')" style="cursor: pointer; color: #3b4f95; text-decoration: none;">
+                                Giải thích chi tiết đáp án <i class="bi bi-chevron-down"></i>
+                            </div>
+                            <div class="explanation-content mt-2" id="explanation_@question.Id">
+                                <div class="">
+                                    @question.Giai_thich <!-- Assuming you have an explanation field -->
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div style="position: fixed; top: 130px; right: 10px; width: 250px; box-shadow: 0 2px 4px rgba(0, 0, 0, .08), 0 4px 12px rgba(0, 0, 0, .08); border-radius: 10px; padding: 18px;">
+    <h4>Kết quả làm bài:</h4>
+    <div class="">
+        <div class="row text-center">
+            <!-- Correct Answer Card -->
+            <div class="row mt-3">
+                <div class=" d-sm-flex">
+                    <i class="bi bi-check-circle-fill text-success card-icon me-sm-3 "></i>
+                    <h5 class="card-title text-success me-sm-3">Trả lời đúng:</h5>
+                    <p class="card-text">@ViewBag.CorrectAnswers</p>
+                </div>
+            </div>
+            <!-- Incorrect Answer Card -->
+            <div class="row mt-3 d-sm-flex">
+                <div class=" d-sm-flex">
+                    <i class="bi bi-x-circle-fill text-danger card-icon me-sm-3"></i>
+                    <h5 class="card-title text-danger me-sm-3">Trả lời sai:</h5>
+                    <p class="card-text ">@ViewBag.IncorrectAnswers</p>
+                </div>
+            </div>
+            <!-- Skipped Question Card -->
+            <div class="row mt-3 d-sm-flex">
+                <div class=" d-sm-flex">
+                    <i class="bi bi-dash-circle-fill card-icon me-sm-3"></i>
+                    <h5 class="card-title me-sm-3">Bỏ qua:</h5>
+                    <p class="card-text ">@ViewBag.SkippedQuestions</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+    function toggleExplanation(id) {
+        var explanationElement = document.getElementById(id);
+
+        if (!explanationElement) {
+            console.error('Element with id ' + id + ' not found.');
+            return;
+        }
+
+        if (explanationElement.classList.contains('show')) {
+            // Nếu đang hiển thị, thu nhỏ và ẩn
+            explanationElement.style.height = '0';
+            explanationElement.classList.remove('show');
+            explanationElement.style.visibility = 'hidden';
+        } else {
+            // Nếu đang ẩn, mở rộng và hiển thị
+            explanationElement.style.height = explanationElement.scrollHeight + 'px';
+            explanationElement.classList.add('show');
+            explanationElement.style.visibility = 'visible';
+        }
+    }
+</script>
+
+
+
+
+<style>
+    /* Phần tử giải thích ban đầu ẩn */
+    .explanation-content {
+        height: 0;
+        overflow: hidden;
+        transition: height 0.5s ease, visibility 0.5s ease; /* Tạo hiệu ứng chuyển tiếp cho chiều cao và khả năng hiển thị */
+        visibility: hidden; /* Ẩn nội dung */
+    }
+
+    .explanation-content.show {
+        visibility: visible; /* Hiển thị nội dung */
+        height: auto; /* Đặt chiều cao tự động khi hiển thị */
+    }
+
+    /* Đảm bảo rằng phần giải thích không làm ảnh hưởng đến các cột khác */
+    .reading-column {
+        position: relative; /* Đảm bảo rằng các phần tử con không làm thay đổi chiều cao của cột bên phải */
+    }
+</style>
+
+
+
+

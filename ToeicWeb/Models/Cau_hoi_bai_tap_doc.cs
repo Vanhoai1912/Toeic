@@ -9,7 +9,7 @@ namespace ToeicWeb.Models
         [Key]
         public int Id { get; set; }
 
-        public string Cau_hoi { get; set; }
+        public string? Cau_hoi { get; set; }
 
         public string Dap_an_dung {  get; set; }
 
@@ -22,6 +22,8 @@ namespace ToeicWeb.Models
         public string Dap_an_4 { get; set; }
 
         public string Giai_thich { get; set; }
+
+        public string? Giai_thich_bai_doc { get; set; }
 
         public string? Bai_doc { get; set; }
 

@@ -22,9 +22,9 @@
         {
             @await Html.PartialAsync("_NavbarBack")
         }
-        @if (ViewData["NavbarType"] == "_NavbarLuyentap")
+        @if (ViewData["NavbarType"] == "_NavbarThoat")
         {
-            @await Html.PartialAsync("_NavbarLuyentap")
+            @await Html.PartialAsync("_NavbarThoat")
         }
     </header>
     <div class="container">
@@ -40,6 +40,7 @@
     </footer> *@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

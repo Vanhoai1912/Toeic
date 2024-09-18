@@ -86,27 +86,16 @@
 
 
 <script>
-    var elapsedTime = 0;  // Bắt đầu từ 0 giây
-    var timerElement = document.getElementById('timer');
-    var interval;
-
-    function startTimer() {
-        if (interval) return; // Ngăn việc thiết lập lại nhiều lần
-
-        interval = setInterval(function() {
-            var minutes = Math.floor(elapsedTime / 60);
-            var seconds = elapsedTime % 60;
-
-            // Thêm số 0 nếu giây < 10
-            seconds = seconds < 10 ? "0" + seconds : seconds;
-            minutes = minutes < 10 ? "0" + minutes : minutes;
-
-            // Hiển thị thời gian đã trôi qua
-            timerElement.textContent = minutes + ":" + seconds;
-
-            elapsedTime++;
-        }, 1000);  // Cập nhật mỗi giây
-    }
+    var elapsedTime = 0;
+var timerElement = document.getElementById('timer');
+setInterval(function() {
+    var minutes = Math.floor(elapsedTime / 60);
+    var seconds = elapsedTime % 60;
+    seconds = seconds < 10 ? "0" + seconds : seconds;
+    minutes = minutes < 10 ? "0" + minutes : minutes;
+    timerElement.textContent = minutes + ":" + seconds;
+    elapsedTime++;
+}, 1000);
 
     // Khi trang PracticePart5 được tải, bắt đầu đồng hồ
     window.onload = function() {
@@ -148,7 +137,7 @@
                     title: "Đã nộp bài!",
                     text: "Bài làm của bạn đã được nộp.",
                     icon: "success",
-                    timer: 2000, // Thời gian hiển thị thông báo thành công (1500 ms = 1.5 giây)
+                    timer: 3000, // Thời gian hiển thị thông báo thành công (1500 ms = 1.5 giây)
                     timerProgressBar: true,
                     didClose: () => {
                         // Sau khi thông báo thành công bị đóng, nộp form
