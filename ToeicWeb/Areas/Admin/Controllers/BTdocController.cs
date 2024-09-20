@@ -28,19 +28,6 @@ namespace ToeicWeb.Areas.Admin.Controllers
             return View();
         }
 
-
-        //[HttpPost]
-        //public JsonResult Insert(Ma_bai_tap_doc model)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        _db.Mabaitapdocs.Add(model);
-        //        _db.SaveChanges();
-        //        return Json(new { success = true, message = "Thêm mã thành công" });
-        //    }
-        //    return Json(new { success = false, message = "Không thể lưu mã bài tập đọc mới" });
-        //}
-
         [HttpGet]
         public IActionResult Create()
         {
@@ -124,8 +111,6 @@ namespace ToeicWeb.Areas.Admin.Controllers
                 return Json(new { success = false, message = $"Lỗi khi thêm bài đọc mới: {ex.Message}" });
             }
         }
-
-
 
         #region API CALLS
         [HttpGet]
@@ -237,7 +222,6 @@ namespace ToeicWeb.Areas.Admin.Controllers
 
             return Json(new { success = true, message = "Sửa bài đọc thành công" });
         }
-
 
 
         [HttpGet]

@@ -10,11 +10,11 @@ namespace ToeicWeb.Models
 
         public int Thu_tu_cau { get; set; }
 
-        public string Audio { get; set; }
+        public string? Audio { get; set; }
 
-        public string Image { get; set; }
+        public string? Image { get; set; }
 
-        public string Cau_hoi { get; set; }
+        public string? Cau_hoi { get; set; }
 
         public string Dap_an_1 { get; set; }
 

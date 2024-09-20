@@ -27,6 +27,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="wwwroot\adminn\upload\audio\" />
+    <Folder Include="wwwroot\adminn\upload\image\" />
     <Folder Include="wwwroot\customer\css\" />
     <Folder Include="wwwroot\customer\images\" />
   </ItemGroup>

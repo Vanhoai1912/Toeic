@@ -4,9 +4,98 @@ $(document).ready(function () {
     loadDataTable();
 });
 
+// Read data
+function loadDataTable() {
+    if ($.fn.dataTable.isDataTable('#tblData')) {
+        $('#tblData').DataTable().destroy();
+    }
+    dataTable = $('#tblData').DataTable({
+        "ajax": {
+            "url": "/Admin/BTnge/GetAll"
+        },
+        "columns": [
+            { "data": "id", "width": "25%", "className": "text-start" },
+            { "data": "tieu_de", "width": "30%" },
+            { "data": "part", "width": "15%", "className": "text-start" },
+
+            {
+                "data": "id",
+                "render": function (data) {
+                    return `
+                        <div class="w-75 btn-group" role="group">
+                        <a href="#" onclick="Edit(${data})"
+                        class="btn btn-primary ms-2"> <i class="bi bi-pencil-square"></i> Edit</a>
+                        <a onClick=Delete('/Admin/BTdoc/Delete/${data}')
+                        class="btn btn-danger ms-2"> <i class="bi bi-trash-fill"></i> Delete</a>
+                    </div>
+                    `;
+                },
+                "width": "40%"
+            }
+        ]
+    });
+}
+
+// Create data
+function Create() {
+    var result = Validate();
+    if (result == false) {
+        return false;
+    }
+
+    var formData = new FormData();
+    var newExcelFile = $('#NewExcelFile').get(0).files[0];
+    var newImageFiles = $('#NewImageFile').get(0).files; // Lấy nhiều file ảnh
+    var newAudioFiles = $('#NewAudioFile').get(0).files; // Lấy nhiều file âm thanh
+
+    // Chỉ thêm file Excel nếu có
+    if (newExcelFile) {
+        formData.append('ExcelFile', newExcelFile);
+    }
+
+    // Thêm nhiều file ảnh nếu có
+    if (newImageFiles.length > 0) {
+        for (var i = 0; i < newImageFiles.length; i++) {
+            formData.append('ImageFiles[]', newImageFiles[i]); // Thêm nhiều ảnh vào FormData
+        }
+    }
+
+    // Thêm nhiều file âm thanh nếu có
+    if (newAudioFiles.length > 0) {
+        for (var j = 0; j < newAudioFiles.length; j++) {
+            formData.append('AudioFiles[]', newAudioFiles[j]); // Thêm nhiều âm thanh vào FormData
+        }
+    }
+
+    formData.append('Tieu_de', $('#Tieu_de').val());
+    formData.append('Part', $('#Part').val());
+
+    $.ajax({
+        url: '/Admin/BTnge/Create',
+        data: formData,
+        type: 'POST',
+        contentType: false,
+        processData: false,
+        success: function (response) {
+            if (!response.success) {
+                toastr.error(response.message);
+            } else {
+                HideModal();
+                loadDataTable();
+                toastr.success(response.message);
+            }
+        },
+        error: function (xhr, status, error) {
+            console.log(xhr);  // Log the entire response to inspect it
+            toastr.error(xhr.responseJSON ? xhr.responseJSON.message : 'An error occurred.');
+        }
+
+    });
+}
 
 
-// Edit
+
+// Edit data
 function Edit(id) {
     $.ajax({
         url: '/Admin/BTdoc/Edit?id=' + id,
@@ -48,46 +137,7 @@ function Edit(id) {
     });
 }
 
-
-// Create data
-function Create() {
-    var result = Validate();
-    if (result == false) {
-        return false;
-    }
-
-    var formData = new FormData();
-    var newExcelFile = $('#NewExcelFile').get(0).files[0];
-
-    // Chỉ thêm file nếu có
-    if (newExcelFile) {
-        formData.append('ExcelFile', newExcelFile);
-    }
-    formData.append('Tieu_de', $('#Tieu_de').val());
-    formData.append('Part', $('#Part').val());
-
-    $.ajax({
-        url: '/Admin/BTdoc/Create',
-        data: formData,
-        type: 'POST',
-        contentType: false,
-        processData: false,
-        success: function (response) {
-            if (!response.success) {
-                toastr.error(response.message);
-            } else {
-                HideModal();
-                loadDataTable();
-                toastr.success(response.message);
-            }
-        },
-        error: function (xhr, status, error) {
-            toastr.error(xhr.responseJSON.message);
-        }
-    });
-}
-
-//Update data
+// Update data
 function Update() {
     var result = Validate();
     if (!result) {
@@ -167,47 +217,15 @@ function Delete(url) {
 
 
 $('#btnAdd').click(function () {
-    $('#BaitapdocModal').modal('show');
-    $('#modalTitle').text('Thêm bài tập đọc mới');
+    $('#BaitapngeModal').modal('show');
+    $('#modalTitle').text('Thêm bài tập nghe mới');
     $('#Save').css('display', 'block');
     $('#Update').css('display', 'none');
 });
 
 function HideModal() {
     ClearData();
-    $('#BaitapdocModal').modal('hide');
-}
-
-// Read data
-function loadDataTable() {
-    if ($.fn.dataTable.isDataTable('#tblData')) {
-        $('#tblData').DataTable().destroy();
-    }
-    dataTable = $('#tblData').DataTable({
-        "ajax": {
-            "url": "/Admin/BTdoc/GetAll"
-        },
-        "columns": [
-            { "data": "id", "width": "25%", "className": "text-start" },
-            { "data": "tieu_de", "width": "30%" },
-            { "data": "part", "width": "15%", "className": "text-start" },
-
-            {
-                "data": "id",
-                "render": function (data) {
-                    return `
-                        <div class="w-75 btn-group" role="group">
-                        <a href="#" onclick="Edit(${data})"
-                        class="btn btn-primary ms-2"> <i class="bi bi-pencil-square"></i> Edit</a>
-                        <a onClick=Delete('/Admin/BTdoc/Delete/${data}')
-                        class="btn btn-danger ms-2"> <i class="bi bi-trash-fill"></i> Delete</a>
-                    </div>
-                    `;
-                },
-                "width": "40%"
-            }
-        ]
-    });
+    $('#BaitapngeModal').modal('hide');
 }
 
 function ClearData() {
