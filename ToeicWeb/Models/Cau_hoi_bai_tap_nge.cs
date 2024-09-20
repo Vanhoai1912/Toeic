@@ -31,5 +31,9 @@ namespace ToeicWeb.Models
         public int Ma_bai_tap_ngeId { get; set; }
         [ForeignKey("Ma_bai_tap_ngeId")]
         public Ma_bai_tap_nge Ma_bai_tap_nge { get; set; }
+
+        // Fields for storing result-related information
+        public string? UserAnswer { get; set; } // User's selected answer
+        public bool IsCorrect { get; set; } // Whether the user's answer is correct
     }
 }
