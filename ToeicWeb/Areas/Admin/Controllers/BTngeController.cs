@@ -170,6 +170,7 @@ namespace ToeicWeb.Areas.Admin.Controllers
                                 Dap_an_4 = worksheet.Cells[row, 8].Value?.ToString() ?? string.Empty,
                                 Dap_an_dung = worksheet.Cells[row, 9].Value?.ToString() ?? string.Empty,
                                 Giai_thich = worksheet.Cells[row, 10].Value?.ToString() ?? string.Empty,
+                                Transcript = worksheet.Cells[row, 11].Value?.ToString() ?? string.Empty,
                                 Ma_bai_tap_ngeId = mabainge.Id
                             };
 

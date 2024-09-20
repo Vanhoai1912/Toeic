@@ -26,6 +26,8 @@ namespace ToeicWeb.Models
 
         public string Dap_an_dung { get; set; }
 
+        public string? Transcript { get; set; }
+
         public string Giai_thich { get; set; }
 
         public int Ma_bai_tap_ngeId { get; set; }
