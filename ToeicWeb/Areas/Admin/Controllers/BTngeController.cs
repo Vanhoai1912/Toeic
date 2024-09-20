@@ -67,16 +67,30 @@ namespace ToeicWeb.Areas.Admin.Controllers
                 }
             }
 
-            //Lưu đường dẫn file Audio
-            var allowedAudioExtensions = ".mp3";
+            var allowedAudioExtensions = new[] { ".mp3" };
+
+            // Dùng để kiểm tra loại MIME hợp lệ
+            var allowedAudioMimeTypes = new[] { "audio/mpeg" };
 
             var fileAudioPaths = new Dictionary<string, string>();
             foreach (var formFile in viewModel.AudioFile)
             {
-                var fileExtension = Path.GetExtension(formFile.FileName).ToLowerInvariant();
+                var fileExtension = Path.GetExtension(formFile.FileName).Trim().ToLowerInvariant();
+                var mimeType = formFile.ContentType.ToLowerInvariant(); // Lấy loại MIME của file
+
+                // Log chi tiết
+                Console.WriteLine($"File name: {formFile.FileName}, Extension: {fileExtension}, MIME: {mimeType}");
+
                 if (string.IsNullOrEmpty(fileExtension) || !allowedAudioExtensions.Contains(fileExtension))
                 {
-                    return Json(new { success = false, message = "Invalid file extension for audio. Allowed extension is: " + allowedAudioExtensions });
+                    Console.WriteLine($"Invalid extension detected: {fileExtension}. Expected: {string.Join(", ", allowedAudioExtensions)}");
+                    return Json(new { success = false, message = "Invalid file extension for audio. Allowed extensions are: " + string.Join(", ", allowedAudioExtensions) });
+                }
+
+                if (!allowedAudioMimeTypes.Contains(mimeType))
+                {
+                    Console.WriteLine($"Invalid MIME type detected: {mimeType}. Expected: {string.Join(", ", allowedAudioMimeTypes)}");
+                    return Json(new { success = false, message = "Invalid MIME type for audio. Allowed MIME types are: " + string.Join(", ", allowedAudioMimeTypes) });
                 }
 
                 if (formFile.Length > 0)
@@ -84,9 +98,10 @@ namespace ToeicWeb.Areas.Admin.Controllers
                     var uploadFolderPath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "audio");
                     Directory.CreateDirectory(uploadFolderPath);
 
-                    var fileName = Path.GetFileNameWithoutExtension(formFile.FileName);
+                    var fileName = Path.GetFileNameWithoutExtension(formFile.FileName).Trim();
                     var fileNameFul = fileName + fileExtension;
                     var filePath = Path.Combine(uploadFolderPath, fileNameFul);
+
                     using (var stream = new FileStream(filePath, FileMode.Create))
                     {
                         await formFile.CopyToAsync(stream);
@@ -96,6 +111,9 @@ namespace ToeicWeb.Areas.Admin.Controllers
                     fileAudioPaths.Add(relativeFilePath, fileName);
                 }
             }
+
+
+
 
             //EXCEL
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;

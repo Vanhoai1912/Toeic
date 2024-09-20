@@ -25,7 +25,7 @@ function loadDataTable() {
                         <div class="w-75 btn-group" role="group">
                         <a href="#" onclick="Edit(${data})"
                         class="btn btn-primary ms-2"> <i class="bi bi-pencil-square"></i> Edit</a>
-                        <a onClick=Delete('/Admin/BTdoc/Delete/${data}')
+                        <a onClick=Delete('/Admin/BTnge/Delete/${data}')
                         class="btn btn-danger ms-2"> <i class="bi bi-trash-fill"></i> Delete</a>
                     </div>
                     `;
@@ -39,32 +39,23 @@ function loadDataTable() {
 // Create data
 function Create() {
     var result = Validate();
-    if (result == false) {
+    if (!result) {
         return false;
     }
 
     var formData = new FormData();
     var newExcelFile = $('#NewExcelFile').get(0).files[0];
-    var newImageFiles = $('#NewImageFile').get(0).files; // Lấy nhiều file ảnh
-    var newAudioFiles = $('#NewAudioFile').get(0).files; // Lấy nhiều file âm thanh
+    var newImageFiles = $('#NewImageFile').get(0).files;
+    var newAudioFiles = $('#NewAudioFile').get(0).files;
 
-    // Chỉ thêm file Excel nếu có
     if (newExcelFile) {
         formData.append('ExcelFile', newExcelFile);
     }
-
-    // Thêm nhiều file ảnh nếu có
-    if (newImageFiles.length > 0) {
-        for (var i = 0; i < newImageFiles.length; i++) {
-            formData.append('ImageFiles[]', newImageFiles[i]); // Thêm nhiều ảnh vào FormData
-        }
+    for (var i = 0; i < newImageFiles.length; i++) {
+        formData.append('ImageFile', newImageFiles[i]); 
     }
-
-    // Thêm nhiều file âm thanh nếu có
-    if (newAudioFiles.length > 0) {
-        for (var j = 0; j < newAudioFiles.length; j++) {
-            formData.append('AudioFiles[]', newAudioFiles[j]); // Thêm nhiều âm thanh vào FormData
-        }
+    for (var i = 0; i < newAudioFiles.length; i++) {
+        formData.append('AudioFile', newAudioFiles[i]); 
     }
 
     formData.append('Tieu_de', $('#Tieu_de').val());
@@ -80,18 +71,18 @@ function Create() {
             if (!response.success) {
                 toastr.error(response.message);
             } else {
-                HideModal();
-                loadDataTable();
+                HideModal(); 
+                loadDataTable(); 
                 toastr.success(response.message);
             }
         },
-        error: function (xhr, status, error) {
-            console.log(xhr);  // Log the entire response to inspect it
+        error: function (xhr) {
+            console.error(xhr); 
             toastr.error(xhr.responseJSON ? xhr.responseJSON.message : 'An error occurred.');
         }
-
     });
 }
+
 
 
 
