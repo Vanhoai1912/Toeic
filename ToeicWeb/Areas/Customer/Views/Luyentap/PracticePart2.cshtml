@@ -17,15 +17,15 @@
         <!-- Phần bài làm (câu hỏi) bên trái -->
         <div class="col-md-8">
             <!-- Form câu hỏi -->
-            <form asp-action="ResultDetailPart1" method="post" id="tracNghiemForm">
+            <form asp-action="ResultDetailPart2" method="post" id="tracNghiemForm">
                 <input type="hidden" name="baiTapId" value="@Model.BaiTapNge.Id" />
                 @for (int i = 0; i < Model.CauHoiNgeList.Count; i++)
                 {
                 // Kiểm tra giá trị của đường dẫn
 
                     <div class="question-block" id="question_@Model.CauHoiNgeList[i].Id" style="padding: 10px; margin-bottom: 30px;">
-                       
-                       
+
+
                         @if (!string.IsNullOrEmpty(Model.CauHoiNgeList[i].Audio))
                         {
                             <div class="box-audio mb-3">
@@ -34,21 +34,14 @@
                                 </audio>
                             </div>
                         }
-                        @if (!string.IsNullOrEmpty(Model.CauHoiNgeList[i].Image))
-                        {
-                            <div class="box-image w-75 h-50">
-                                <img src="~/@Model.CauHoiNgeList[i].Image" alt="Question Image" />
-                            </div>
-                        }
+                       
                         <div class="my-3"><b>@Model.CauHoiNgeList[i].Thu_tu_cau</b></div>
                         @{
                             var options = new[]
                             {
                     new { Text = Model.CauHoiNgeList[i].Dap_an_1 },
                     new { Text = Model.CauHoiNgeList[i].Dap_an_2 },
-                    new { Text = Model.CauHoiNgeList[i].Dap_an_3 },
-                    new { Text = Model.CauHoiNgeList[i].Dap_an_4 }
-
+                    new { Text = Model.CauHoiNgeList[i].Dap_an_3 }
                     };
                         }
 

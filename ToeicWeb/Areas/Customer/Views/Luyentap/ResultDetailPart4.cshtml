@@ -41,27 +41,32 @@
                         </div>
                     }
 
-                    <!-- Hiện transcript -->
-                    <div class="mt-4">
-                        <div class="toggle-explanation" onclick="toggleExplanation('transcript_@question.Id')" style="cursor: pointer; color: #3b4f95; text-decoration: none;">
-                            Hiện transcript <i class="bi bi-chevron-down"></i>
-                        </div>
-                        <div class="explanation-content mt-2" id="transcript_@question.Id">
-                            <div>
-                                @question.Transcript
+                    <!-- Hiện transcript nếu có -->
+                    @if (!string.IsNullOrEmpty(question.Transcript))
+                    {
+
+                        <div class="mt-4">
+                            <div class="toggle-explanation" onclick="toggleExplanation('transcript_@question.Id')" style="cursor: pointer; color: #3b4f95; text-decoration: none;">
+                                Hiện transcript <i class="bi bi-chevron-down"></i>
+                            </div>
+                            <div class="explanation-content mt-2" id="transcript_@question.Id">
+                                <div>
+                                    @question.Transcript
+                                </div>
                             </div>
                         </div>
-                    </div>
-                   
-                    
+                    }
+
+
+
                     <div class="my-3"><b>@Model.CauHoiNgeList[i].Thu_tu_cau</b></div>
                     <!-- Hiển thị đáp án -->
                     @{
                         var options = new[] {
-                new { Text = question.Dap_an_1 },
-                new { Text = question.Dap_an_2 },
-                new { Text = question.Dap_an_3 },
-                new { Text = question.Dap_an_4 }
+                new { Letter = "A", Text = Model.CauHoiNgeList[i].Dap_an_1 },
+                new { Letter = "B", Text = Model.CauHoiNgeList[i].Dap_an_2 },
+                new { Letter = "C", Text = Model.CauHoiNgeList[i].Dap_an_3 },
+                new { Letter = "D", Text = Model.CauHoiNgeList[i].Dap_an_4 }
 
                 };
 
@@ -78,7 +83,7 @@
                             <!-- Apply color only if user answered, otherwise no color -->
                             <span style="color: @(userAnswered && isUserAnswer ? (isCorrectAnswer ? "green" : "#e69a9c") : (userAnswered && isCorrectAnswer ? "green" : "black")); font-weight: @(userAnswered && (isUserAnswer || isCorrectAnswer) ? "bold" : "normal");">
                                 <input type="radio" name="cauHoi_@question.Id" value="@option.Text" disabled @(isUserAnswer ? "checked" : "") />
-                                @option.Text.
+                                @options[j].Letter. @option.Text.
                             </span>
                         </div>
                     }
@@ -87,7 +92,7 @@
                     <p><strong>Đáp án đúng:</strong> <span style="color:green; font-weight: bold">@question.Dap_an_dung</span></p>
 
 
-                    
+
 
                     <!-- Giải thích chi tiết đáp án -->
                     <div class="mt-2">
