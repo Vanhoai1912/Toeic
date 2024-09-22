@@ -36,56 +36,6 @@ function loadDataTable() {
     });
 }
 
-// Create data
-function Create() {
-    var result = Validate();
-    if (!result) {
-        return false;
-    }
-
-    var formData = new FormData();
-    var newExcelFile = $('#NewExcelFile').get(0).files[0];
-    var newImageFiles = $('#NewImageFile').get(0).files;
-    var newAudioFiles = $('#NewAudioFile').get(0).files;
-
-    if (newExcelFile) {
-        formData.append('ExcelFile', newExcelFile);
-    }
-    for (var i = 0; i < newImageFiles.length; i++) {
-        formData.append('ImageFile', newImageFiles[i]); 
-    }
-    for (var i = 0; i < newAudioFiles.length; i++) {
-        formData.append('AudioFile', newAudioFiles[i]); 
-    }
-
-    formData.append('Tieu_de', $('#Tieu_de').val());
-    formData.append('Part', $('#Part').val());
-
-    $.ajax({
-        url: '/Admin/BTnge/Create',
-        data: formData,
-        type: 'POST',
-        contentType: false,
-        processData: false,
-        success: function (response) {
-            if (!response.success) {
-                toastr.error(response.message);
-            } else {
-                HideModal(); 
-                loadDataTable(); 
-                toastr.success(response.message);
-            }
-        },
-        error: function (xhr) {
-            console.error(xhr); 
-            toastr.error(xhr.responseJSON ? xhr.responseJSON.message : 'An error occurred.');
-        }
-    });
-}
-
-
-
-
 // Edit data
 function Edit(id) {
     $.ajax({
@@ -206,6 +156,97 @@ function Delete(url) {
     })
 }
 
+// Create data
+function Create() {
+    var result = Validate();
+    if (!result) {
+        return false;
+    }
+
+    var formData = new FormData();
+    var newExcelFile = $('#NewExcelFile').get(0).files[0];
+    var newImageFiles = $('#NewImageFile').get(0).files;
+    var newAudioFiles = $('#NewAudioFile').get(0).files;
+
+    if (newExcelFile) {
+        formData.append('ExcelFile', newExcelFile);
+    }
+    for (var i = 0; i < newImageFiles.length; i++) {
+        formData.append('ImageFile', newImageFiles[i]);
+    }
+    for (var i = 0; i < newAudioFiles.length; i++) {
+        formData.append('AudioFile', newAudioFiles[i]);
+    }
+
+    formData.append('Tieu_de', $('#Tieu_de').val());
+    formData.append('Part', $('#Part').val());
+
+    $.ajax({
+        url: '/Admin/BTnge/Create',
+        data: formData,
+        type: 'POST',
+        contentType: false,
+        processData: false,
+        success: function (response) {
+            if (!response.success) {
+                toastr.error(response.message);
+            } else {
+                HideModal();
+                loadDataTable();
+                ClearData();
+                toastr.success(response.message);
+            }
+        },
+        error: function (xhr) {
+            console.error(xhr);
+            toastr.error(xhr.responseJSON ? xhr.responseJSON.message : 'An error occurred.');
+        }
+    });
+}
+
+function Validate() {
+    var isValid = true;
+
+    if ($('#Tieu_de').val().trim() == "") {
+        $('#Tieu_de').css('border-color', 'Red');
+        $('#Tieu_deError').text('Vui lòng nhập tiêu đề.').show();
+        isValid = false;
+    } else {
+        $('#Tieu_de').css('border-color', 'lightgrey');
+        $('#Tieu_deError').text('').hide();
+    }
+
+    if ($('#Part').prop('selectedIndex') == 0 || $('#Part').val() === "") {
+        $('#Part').css('border-color', 'Red');
+        $('#PartError').text('Vui lòng chọn Part.').show();
+        isValid = false;
+    } else {
+        $('#Part').css('border-color', 'lightgrey');
+        $('#PartError').text('').hide();
+    }
+
+    var newExcelFileInput = $('#NewExcelFile').get(0);
+    if (newExcelFileInput && newExcelFileInput.files.length === 0) {
+        $('#NewExcelFile').css('border-color', 'Red');
+        $('#ExcelFileError').text('Vui lòng chọn file Excel.').show();
+        isValid = false;
+    } else {
+        $('#NewExcelFile').css('border-color', 'lightgrey');
+        $('#ExcelFileError').text('').hide();
+    }
+
+    var newAudioFileInput = $('#NewAudioFile').get(0);
+    if (newAudioFileInput && newAudioFileInput.files.length === 0) {
+        $('#NewAudioFile').css('border-color', 'Red');
+        $('#AudioFileError').text('Vui lòng chọn file nghe.').show();
+        isValid = false;
+    } else {
+        $('#NewAudioFile').css('border-color', 'lightgrey');
+        $('#AudioFileError').text('').hide();
+    }
+
+    return isValid;
+}
 
 $('#btnAdd').click(function () {
     $('#BaitapngeModal').modal('show');
@@ -220,57 +261,49 @@ function HideModal() {
 }
 
 function ClearData() {
-    $('#Part').val('');
-    $('#Part').css('border-color', 'lightgrey');
-    $('#Part').prop('selectedIndex', 0);
-
     $('#Tieu_de').val('');
-    $('#Tieu_de').css('border-color', 'lightgrey');
-
-    // Xóa thông tin file cũ và reset input file mới
-    $('#ExcelFile').text('');
-    $('#ExcelFileInfo').hide();
+    $('#Part').val('');
     $('#NewExcelFile').val('');
+    $('#NewImageFile').val('');
+    $('#NewAudioFile').val('');
+
+    // Ẩn các lỗi và khôi phục lại màu 
+    $('#Tieu_deError').text('').hide();
+    $('#PartError').text('').hide();
+    $('#ExcelFileError').text('').hide();
+    $('#AudioFileError').text('').hide();
+
+    $('#Tieu_de').css('border-color', 'lightgrey');
+    $('#Part').css('border-color', 'lightgrey');
     $('#NewExcelFile').css('border-color', 'lightgrey');
+    $('#NewAudioFile').css('border-color', 'lightgrey');
 }
 
-function Validate() {
-    var isValid = true;
-
-    // Kiểm tra Part
-    if ($('#Part').prop('selectedIndex') == 0) {
-        $('#Part').css('border-color', 'Red');
-        isValid = false;
-    } else {
-        $('#Part').css('border-color', 'lightgrey');
-    }
-
-    // Kiểm tra Tiêu đề
-    if ($('#Tieu_de').val().trim() == "") {
-        $('#Tieu_de').css('border-color', 'Red');
-        isValid = false;
-    } else {
+$('#Tieu_de').on('input', function () {
+    if ($(this).val().trim() !== "") {
         $('#Tieu_de').css('border-color', 'lightgrey');
+        $('#Tieu_deError').text('').hide();
     }
+});
 
-    // Kiểm tra file Excel
-    var newFileInput = $('#NewExcelFile').get(0); // Lấy phần tử input file mới
-    if (newFileInput && newFileInput.files.length === 0) {
-        $('#NewExcelFile').css('border-color', 'Red');
-        isValid = false;
-    } else {
+$('#Part').on('change', function () {
+    if ($(this).val() !== "") {
+        $('#Part').css('border-color', 'lightgrey');
+        $('#PartError').text('').hide();
+    }
+});
+
+$('#NewExcelFile').on('change', function () {
+    if (this.files.length > 0) {
         $('#NewExcelFile').css('border-color', 'lightgrey');
+        $('#ExcelFileError').text('').hide();
     }
+});
 
-    return isValid;
-}
+$('#NewAudioFile').on('change', function () {
+    if (this.files.length > 0) {
+        $('#NewAudioFile').css('border-color', 'lightgrey');
+        $('#AudioFileError').text('').hide();
+    }
+});
 
-$('#Part').change(function () {
-    Validate();
-})
-$('#Tieu_de').change(function () {
-    Validate();
-})
-$('#ExcelFile').change(function () {
-    Validate();
-})

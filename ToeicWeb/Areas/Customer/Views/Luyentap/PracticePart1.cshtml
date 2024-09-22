@@ -30,7 +30,8 @@
                         {
                             <div class="box-audio mb-3">
                                 <audio controls class=" w-100">
-                                    <source src="~/@Model.CauHoiNgeList[i].Audio" type="audio/mpeg" />
+                                    <source src="@Url.Content("~/" + Model.CauHoiNgeList[i].Audio)" type="audio/mpeg" />
+                                    <source src="@Url.Content("~/" + Model.CauHoiNgeList[i].Audio)" type="audio/ogg" />
                                 </audio>
                             </div>
                         }

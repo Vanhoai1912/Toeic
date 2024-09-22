@@ -37,12 +37,13 @@
     <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title" id="modalTitle"></h3>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h3 class="modal-title" id="modalTitle">Thêm bài tập nghe</h3>
+                <button type="button" onclick="HideModal();" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="Id" value="0" />
 
+                <!-- Input cho tiêu đề -->
                 <div class="mb-2">
                     <label for="Tieu_de" class="d-flex align-items-center fs-5 fw-semibold mb-2">
                         <span class="required">Tiêu đề</span>
@@ -51,6 +52,7 @@
                     <span id="Tieu_deError" class="text-danger"></span>
                 </div>
 
+                <!-- Select cho Part -->
                 <div class="mb-2">
                     <label for="Part" class="d-flex align-items-center fs-5 fw-semibold mb-2">
                         <span class="required">Part</span>
@@ -65,7 +67,7 @@
                     <span id="PartError" class="text-danger"></span>
                 </div>
 
-                <!-- Input for Excel file -->
+                <!-- Input cho file Excel -->
                 <div class="mb-2">
                     <label for="NewExcelFile" class="d-flex align-items-center fs-5 fw-semibold mb-2">
                         <span class="required">File Excel</span>
@@ -73,23 +75,23 @@
                     <div id="ExcelFileInfo" class="mb-2" style="display:none;">
                         <p>File hiện tại: <span id="ExcelFile"></span></p>
                     </div>
-                    <input type="file" class="form-control" id="NewExcelFile" />
+                    <input type="file" class="form-control" id="NewExcelFile" accept=".xls,.xlsx" />
                     <span id="ExcelFileError" class="text-danger"></span>
                 </div>
 
-                <!-- Input for multiple Image files -->
+                <!-- Input cho nhiều file ảnh -->
                 <div class="mb-2">
                     <label for="NewImageFile" class="d-flex align-items-center fs-5 fw-semibold mb-2">
-                        <span class="required">Chọn nhiều ảnh</span>
+                        <span class="required">File ảnh</span>
                     </label>
                     <input type="file" class="form-control" id="NewImageFile" name="ImageFile" accept="image/*" multiple />
                     <span id="ImageFileError" class="text-danger"></span>
                 </div>
 
-                <!-- Input for multiple Audio files -->
+                <!-- Input cho nhiều file âm thanh -->
                 <div class="mb-2">
                     <label for="NewAudioFile" class="d-flex align-items-center fs-5 fw-semibold mb-2">
-                        <span class="required">Chọn nhiều file âm thanh</span>
+                        <span class="required">File nghe</span>
                     </label>
                     <input type="file" class="form-control" id="NewAudioFile" name="AudioFile" accept="audio/*" multiple />
                     <span id="AudioFileError" class="text-danger"></span>

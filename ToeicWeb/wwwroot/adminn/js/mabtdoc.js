@@ -48,7 +48,6 @@ function Edit(id) {
     });
 }
 
-
 // Create data
 function Create() {
     var result = Validate();
@@ -59,7 +58,6 @@ function Create() {
     var formData = new FormData();
     var newExcelFile = $('#NewExcelFile').get(0).files[0];
 
-    // Chỉ thêm file nếu có
     if (newExcelFile) {
         formData.append('ExcelFile', newExcelFile);
     }
@@ -228,40 +226,75 @@ function ClearData() {
 function Validate() {
     var isValid = true;
 
-    // Kiểm tra Part
-    if ($('#Part').prop('selectedIndex') == 0) {
-        $('#Part').css('border-color', 'Red');
-        isValid = false;
-    } else {
-        $('#Part').css('border-color', 'lightgrey');
-    }
-
-    // Kiểm tra Tiêu đề
     if ($('#Tieu_de').val().trim() == "") {
         $('#Tieu_de').css('border-color', 'Red');
+        $('#Tieu_deError').text('Vui lòng nhập tiêu đề.').show();
         isValid = false;
     } else {
         $('#Tieu_de').css('border-color', 'lightgrey');
+        $('#Tieu_deError').text('').hide();
     }
 
-    // Kiểm tra file Excel
-    var newFileInput = $('#NewExcelFile').get(0); // Lấy phần tử input file mới
-    if (newFileInput && newFileInput.files.length === 0) {
+    if ($('#Part').prop('selectedIndex') == 0 || $('#Part').val() === "") {
+        $('#Part').css('border-color', 'Red');
+        $('#PartError').text('Vui lòng chọn Part.').show();
+        isValid = false;
+    } else {
+        $('#Part').css('border-color', 'lightgrey');
+        $('#PartError').text('').hide();
+    }
+
+    var newExcelFileInput = $('#NewExcelFile').get(0);
+    if (newExcelFileInput && newExcelFileInput.files.length === 0) {
         $('#NewExcelFile').css('border-color', 'Red');
+        $('#ExcelFileError').text('Vui lòng chọn file Excel.').show();
         isValid = false;
     } else {
         $('#NewExcelFile').css('border-color', 'lightgrey');
+        $('#ExcelFileError').text('').hide();
     }
 
     return isValid;
 }
 
-$('#Part').change(function () {
-    Validate();
-})
-$('#Tieu_de').change(function () {
-    Validate();
-})
-$('#ExcelFile').change(function () {
-    Validate();
-})
+function ClearData() {
+    $('#Tieu_de').val('');
+    $('#Part').val('');
+    $('#NewExcelFile').val('');
+
+    // Ẩn các lỗi và khôi phục lại màu 
+    $('#Tieu_deError').text('').hide();
+    $('#PartError').text('').hide();
+    $('#ExcelFileError').text('').hide();
+
+    $('#Tieu_de').css('border-color', 'lightgrey');
+    $('#Part').css('border-color', 'lightgrey');
+    $('#NewExcelFile').css('border-color', 'lightgrey');
+
+    // Xóa thông tin file cũ và reset input file mới
+    $('#ExcelFile').text('');
+    $('#ExcelFileInfo').hide();
+    $('#NewExcelFile').val('');
+    $('#NewExcelFile').css('border-color', 'lightgrey');
+}
+
+$('#Tieu_de').on('input', function () {
+    if ($(this).val().trim() !== "") {
+        $('#Tieu_de').css('border-color', 'lightgrey');
+        $('#Tieu_deError').text('').hide();
+    }
+});
+
+$('#Part').on('change', function () {
+    if ($(this).val() !== "") {
+        $('#Part').css('border-color', 'lightgrey');
+        $('#PartError').text('').hide();
+    }
+});
+
+$('#NewExcelFile').on('change', function () {
+    if (this.files.length > 0) {
+        $('#NewExcelFile').css('border-color', 'lightgrey');
+        $('#ExcelFileError').text('').hide();
+    }
+});

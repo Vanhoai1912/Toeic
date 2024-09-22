@@ -68,17 +68,16 @@ namespace ToeicWeb.Areas.Admin.Controllers
                     using (var package = new ExcelPackage(stream))
                     {
                         var worksheet = package.Workbook.Worksheets.First();
-                        // Kiểm tra xem category đã tồn tại chưa
-                        var category = _db.Mabaitapdocs.FirstOrDefault(c => c.Tieu_de == viewModel.Tieu_de);
-                        if (category == null)
+                        var mabaidoc = _db.Mabaitapdocs.FirstOrDefault(c => c.Tieu_de == viewModel.Tieu_de);
+                        if (mabaidoc == null)
                         {
-                            category = new Ma_bai_tap_doc
+                            mabaidoc = new Ma_bai_tap_doc
                             {
                                 Tieu_de = viewModel.Tieu_de,
                                 Part = viewModel.Part,
                                 FilePath = Path.Combine("adminn", "upload", viewModel.ExcelFile.FileName) // Lưu đường dẫn file
                             };
-                            _db.Mabaitapdocs.Add(category);
+                            _db.Mabaitapdocs.Add(mabaidoc);
                             await _db.SaveChangesAsync();
                         }
 
@@ -95,7 +94,7 @@ namespace ToeicWeb.Areas.Admin.Controllers
                                 Dap_an_dung = worksheet.Cells[row, 7].Value?.ToString() ?? string.Empty,
                                 Giai_thich = worksheet.Cells[row, 8].Value?.ToString() ?? string.Empty,
                                 Bai_doc = worksheet.Cells[row, 9].Value?.ToString() ?? string.Empty,
-                                Ma_bai_tap_docId = category.Id
+                                Ma_bai_tap_docId = mabaidoc.Id
                             };
                             _db.Cauhoibaitapdocs.Add(product);
                         }
