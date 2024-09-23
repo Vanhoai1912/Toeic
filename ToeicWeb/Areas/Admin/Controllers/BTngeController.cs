@@ -163,6 +163,7 @@ namespace ToeicWeb.Areas.Admin.Controllers
                         {
                             var cauhoi = new Cau_hoi_bai_tap_nge
                             {
+
                                 Thu_tu_cau = worksheet.Cells[row, 1].Value != null ? Convert.ToInt32(worksheet.Cells[row, 1].Value) : 0,
                                 Cau_hoi = worksheet.Cells[row, 2].Value?.ToString() ?? string.Empty,
                                 Dap_an_1 = worksheet.Cells[row, 5].Value?.ToString() ?? string.Empty,
@@ -173,6 +174,14 @@ namespace ToeicWeb.Areas.Admin.Controllers
                                 Giai_thich = worksheet.Cells[row, 10].Value?.ToString() ?? string.Empty,
                                 Ma_bai_tap_ngeId = mabainge.Id
                             };
+                            if (!string.IsNullOrEmpty(worksheet.Cells[row, 11].Value?.ToString()))
+                            {
+                                cauhoi.Transcript = worksheet.Cells[row, 11].Value.ToString();
+                            }
+                            else
+                            {
+                                cauhoi.Transcript = string.Empty;
+                            }
 
                             for (int i = 0; i < fileAudioPaths.Count; i++)
                             {
