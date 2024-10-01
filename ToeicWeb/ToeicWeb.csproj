@@ -35,4 +35,9 @@
     <None Include="wwwroot\adminn\upload\.editorconfig" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Toeic.DataAccess\Toeic.DataAccess.csproj" />
+    <ProjectReference Include="..\Toeic.Utility\Toeic.Utility.csproj" />
+  </ItemGroup>
+
 </Project>

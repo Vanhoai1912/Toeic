@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
-using ToeicWeb.Data;
-using ToeicWeb.Models;
-using ToeicWeb.Models.ViewModels;
-using ToeicWeb.Utility;
+using Toeic.DataAccess;
+using Toeic.Models;
+using Toeic.Models.ViewModels;
+using Toeic.Utility;
 
-namespace ToeicWeb.Areas.Admin.Controllers
+namespace Toeic.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = SD.Role_Admin)]

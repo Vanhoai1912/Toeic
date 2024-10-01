@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using ToeicWeb.Data;
 using Microsoft.AspNetCore.Identity;
-using ToeicWeb.Utility;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Toeic.DataAccess;
+using Toeic.Utility;
 
 var builder = WebApplication.CreateBuilder(args);
 

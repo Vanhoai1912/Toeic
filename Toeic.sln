@@ -5,6 +5,12 @@ VisualStudioVersion = 17.12.35209.166
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToeicWeb", "ToeicWeb\ToeicWeb.csproj", "{78E08270-2C4C-467B-8F1A-9C10E12EE03B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Toeic.DataAccess", "Toeic.DataAccess\Toeic.DataAccess.csproj", "{E697DFE9-CDFD-453B-971B-3C630BB87858}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Toeic.Models", "Toeic.Models\Toeic.Models.csproj", "{16B7DA85-FE9A-4FA5-B98F-2476BC4E7A02}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Toeic.Utility", "Toeic.Utility\Toeic.Utility.csproj", "{F5BEE876-25C7-4C9D-8AAB-4AAFEC48B75D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +21,18 @@ Global
 		{78E08270-2C4C-467B-8F1A-9C10E12EE03B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{78E08270-2C4C-467B-8F1A-9C10E12EE03B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{78E08270-2C4C-467B-8F1A-9C10E12EE03B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E697DFE9-CDFD-453B-971B-3C630BB87858}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E697DFE9-CDFD-453B-971B-3C630BB87858}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E697DFE9-CDFD-453B-971B-3C630BB87858}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E697DFE9-CDFD-453B-971B-3C630BB87858}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16B7DA85-FE9A-4FA5-B98F-2476BC4E7A02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16B7DA85-FE9A-4FA5-B98F-2476BC4E7A02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16B7DA85-FE9A-4FA5-B98F-2476BC4E7A02}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16B7DA85-FE9A-4FA5-B98F-2476BC4E7A02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5BEE876-25C7-4C9D-8AAB-4AAFEC48B75D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5BEE876-25C7-4C9D-8AAB-4AAFEC48B75D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5BEE876-25C7-4C9D-8AAB-4AAFEC48B75D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5BEE876-25C7-4C9D-8AAB-4AAFEC48B75D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

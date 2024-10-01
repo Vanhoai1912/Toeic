@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ToeicWeb.Data;
-using ToeicWeb.Models;
-using ToeicWeb.Models.ViewModels;
+using Toeic.DataAccess;
+using Toeic.Models;
+using Toeic.Models.ViewModels;
 
 namespace ToeicWeb.Areas.Customer.Controllers
 {

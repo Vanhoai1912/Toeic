@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ToeicWeb.Utility;
+using Toeic.Utility;
 
 namespace ToeicWeb.Areas.Admin.Controllers
 {

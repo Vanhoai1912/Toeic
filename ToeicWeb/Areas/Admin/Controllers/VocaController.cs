@@ -4,10 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using OfficeOpenXml;
 using System.Linq;
-using ToeicWeb.Data;
-using ToeicWeb.Models;
-using ToeicWeb.Models.ViewModels;
-using ToeicWeb.Utility;
+using Toeic.Utility;
+using Toeic.Models;
+using Toeic.Models.ViewModels;
+using Toeic.DataAccess;
 
 namespace ToeicWeb.Areas.Admin.Controllers
 {

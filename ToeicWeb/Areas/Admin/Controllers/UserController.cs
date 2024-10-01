@@ -2,13 +2,13 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ToeicWeb.Utility;
-using ToeicWeb.Data;
-using ToeicWeb.Models;
+using Toeic.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
-using ToeicWeb.ViewModels;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Toeic.DataAccess;
+using Toeic.Models.ViewModels;
+using Toeic.Utility;
 
 namespace ToeicWeb.Areas.Admin.Controllers
 {

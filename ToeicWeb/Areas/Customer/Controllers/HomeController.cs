@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using ToeicWeb.Data;
-using ToeicWeb.Models;
+using Toeic.DataAccess;
+using Toeic.Models;
 
 namespace ToeicWeb.Areas.Customer.Controllers
 {
