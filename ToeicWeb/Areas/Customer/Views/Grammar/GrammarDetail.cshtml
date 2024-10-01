@@ -1,0 +1,37 @@
+﻿@model Toeic.Models.ViewModels.BainguphapVM
+
+<!-- Tiêu đề -->
+<div class="col-12 text-center">
+    <h2>@Model.Mabainguphap.Ten_bai</h2>
+    @* <button class="btn btn-secondary">Thoát</button> *@
+</div>
+<style>
+    .custom-text {
+        color: black !important; /* Đảm bảo màu đen */
+        font-weight: 500; /* Độ dày chữ */
+    }
+</style>
+
+<div class="container rounded-4" style="max-width: 1220px;box-shadow: 0 2px 4px rgba(0, 0, 0, .08), 0 4px 12px rgba(0, 0, 0, .08);margin-left: -6rem;">
+    <div class="row">
+        <!-- Repeat this block for each item -->
+        @for (int i = 0; i < Model.Noidungbainguphaps.Count; i++)
+        {
+            <div class="col-12 mb-4">
+                <div class="p-3 shadow-sm">
+                    <div class="row">
+
+                        <!-- Right side: Content -->
+                        <div class="col-md-10">
+                            <div class="d-flex flex-column">
+                                <p class="mb-1 custom-text">
+                                    @Html.Raw(Model.Noidungbainguphaps[i].Noi_dung)  <!-- Replace with word type -->
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

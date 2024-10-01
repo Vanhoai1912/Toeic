@@ -1,0 +1,90 @@
+﻿@model Toeic.Models.ViewModels.BainguphapVM
+
+<div class="container">
+    <div class="row pt-4 pb-3 mx-2">
+        <div class="col-6">
+            <h1 class="text-primary">
+                Quản lý bài ngữ pháp
+            </h1>
+        </div>
+        <hr class="mx-3" style="width:98%" />
+    </div>
+
+    <div class="row pt-2 ms-2">
+        <div class="col-6 col-md-3">
+            <button id="btnAdd" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Thêm bài ngữ pháp mới
+            </button>
+        </div>
+    </div>
+
+    <div class="card-body p-4">
+        <table id="tblData" class="table table-bordered table-striped" style="width:100%">
+            <thead>
+                <tr>
+                    <th class="text-start">Id</th>
+                    <th>TÊN BÀI</th>
+                    <th></th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="BaigrammarModal" tabindex="-1" aria-labelledby="BaigrammarModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Thêm bài ngữ pháp</h3>
+                <button type="button" onclick="HideModal();" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="Id" value="0" />
+
+                <!-- Input cho tên bài -->
+                <div class="mb-2">
+                    <label for="Ten_bai" class="d-flex align-items-center fs-5 fw-semibold mb-2">
+                        <span class="required">Tên bài</span>
+                    </label>
+                    <input type="text" id="Ten_bai" class="form-control" required />
+                    <span id="Ten_baiError" class="text-danger"></span>
+                </div>
+
+                <div class="mb-2">
+                    <label for="NewImageFileGra" class="d-flex align-items-center fs-5 fw-semibold mb-2">
+                        <span class="required">Ảnh bài ngữ pháp</span>
+                    </label>
+                    <input type="file" class="form-control" id="NewImageFileGra" name="ImageFileGra" accept="image/*" />
+                    <span id="ImageFileGraError" class="text-danger"></span>
+                </div>
+                
+                <div class="mb-2">
+                    <label for="Noi_dung" class="d-flex align-items-center fs-5 fw-semibold mb-2">
+                        <span class="required">Nội dung</span>
+                    </label>
+                    <textarea type="text" id="Noi_dung" class="form-control" required></textarea>
+                    <span id="Noi_dungError" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" onclick="HideModal();">Hủy</button>
+                <button class="btn btn-primary" type="button" id="Save" onclick="Create();">Thêm</button>
+                <button class="btn btn-success" type="button" id="Update" onclick="Update();" style="display:none">Cập nhật</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <script>
+        tinymce.init({
+            selector: 'textarea',
+          plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',
+          toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat',
+        });
+    </script>
+    <script src="~/adminn/js/mabaigrammar.js"></script>
+}

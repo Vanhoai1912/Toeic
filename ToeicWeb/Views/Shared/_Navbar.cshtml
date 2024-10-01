@@ -24,11 +24,11 @@
                     </a>
                 </li>
                 <li class="nav-item m-sm-2 fs-6 fw-bold text-d">
-                    <a class="nav-link nav-linkH" asp-area="Customer" asp-controller="Home" asp-action="Grammar">
-                        <i class="bi bi-book"></i> Grammar</i>
+                    <a class="nav-link nav-linkH" asp-area="Customer" asp-controller="Grammar" asp-action="Index">
+                        <i class="bi bi-book fst-normal ">Grammar</i>
                     </a>
                 </li>
-                @if (User.IsInRole(SD.Role_Admin))
+                @if (User.IsInRole(SD.Role_Admin) || User.IsInRole(SD.Role_Employee))
                 {
                     <li class="nav-item m-sm-2 fw-bold text-d">
                         <a class="nav-link nav-linkH" asp-area="Admin" asp-controller="HomeAdmin" asp-action="Index">

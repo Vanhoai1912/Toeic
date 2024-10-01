@@ -176,7 +176,7 @@ function Validate() {
 
 $('#btnAdd').click(function () {
     $('#BaivocaModal').modal('show');
-    $('#modalTitle').text('Thêm bài tập nghe mới');
+    $('#modalTitle').text('Thêm bài từ vựng mới');
     $('#Save').css('display', 'block');
     $('#Update').css('display', 'none');
 });

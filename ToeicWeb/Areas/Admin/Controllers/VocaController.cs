@@ -12,8 +12,7 @@ using Toeic.DataAccess;
 namespace ToeicWeb.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = SD.Role_Admin)]
-
+    [Authorize(Roles = SD.Role_Admin + "," + SD.Role_Employee)]
     public class VocaController : Controller
     {
         private readonly ApplicationDbContext _db;
@@ -46,11 +45,11 @@ namespace ToeicWeb.Areas.Admin.Controllers
             try
             {
                 // Folder for multiple images
-                var uploadImageFolderPath = Path.Combine(_environment.WebRootPath, "customer", "upload", "voca", "bai " + viewModel.Ten_bai.ToString(), "image");
+                var uploadImageFolderPath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "voca", "bai " + viewModel.Ten_bai.ToString(), "image");
                 Directory.CreateDirectory(uploadImageFolderPath); 
 
                 // Folder for mã bài từ vựng image
-                var uploadImageMavocaFolderPath = Path.Combine(_environment.WebRootPath, "customer", "upload", "voca", "bai " + viewModel.Ten_bai.ToString(), "imageMaVoca");
+                var uploadImageMavocaFolderPath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "voca", "bai " + viewModel.Ten_bai.ToString(), "imageMaVoca");
                 Directory.CreateDirectory(uploadImageMavocaFolderPath); 
 
                 var allowedImageExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
@@ -77,7 +76,7 @@ namespace ToeicWeb.Areas.Admin.Controllers
                                 await formFile.CopyToAsync(stream);
                             }
 
-                            var relativeFilePath = Path.Combine("customer", "upload", "voca", "bai " + viewModel.Ten_bai.ToString(), "image", fileNameFul).Replace("\\", "/");
+                            var relativeFilePath = Path.Combine("adminn", "upload", "voca", "bai " + viewModel.Ten_bai.ToString(), "image", fileNameFul).Replace("\\", "/");
                             fileImagePaths.Add(relativeFilePath, fileName);
                         }
                     }
@@ -103,12 +102,12 @@ namespace ToeicWeb.Areas.Admin.Controllers
                             await viewModel.ImageFileMavoca.CopyToAsync(stream);
                         }
 
-                        var relativeFilePathMavoca = Path.Combine("customer", "upload", "voca", "bai " + viewModel.Ten_bai.ToString(), "imageMaVoca", fileNameFul).Replace("\\", "/");
+                        var relativeFilePathMavoca = Path.Combine("adminn", "upload", "voca", "bai " + viewModel.Ten_bai.ToString(), "imageMaVoca", fileNameFul).Replace("\\", "/");
                         ImageMavocaFilePath = relativeFilePathMavoca;
                     }
                 }
 
-                var uploadAudioFolderPath = Path.Combine(_environment.WebRootPath, "customer", "upload", "voca", "bai " + viewModel.Ten_bai.ToString(), "audio");
+                var uploadAudioFolderPath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "voca", "bai " + viewModel.Ten_bai.ToString(), "audio");
                 Directory.CreateDirectory(uploadAudioFolderPath);
 
                 var allowedAudioExtensions = new[] { ".mp3" };
@@ -147,7 +146,7 @@ namespace ToeicWeb.Areas.Admin.Controllers
                                 await formFile.CopyToAsync(stream);
                             }
 
-                            var relativeFilePath = Path.Combine("customer", "upload", "voca", "bai " + viewModel.Ten_bai.ToString(), "audio", fileNameFul).Replace("\\", "/");
+                            var relativeFilePath = Path.Combine("adminn", "upload", "voca", "bai " + viewModel.Ten_bai.ToString(), "audio", fileNameFul).Replace("\\", "/");
                             fileAudioPaths.Add(relativeFilePath, fileName);
                         }
                     }
@@ -160,7 +159,7 @@ namespace ToeicWeb.Areas.Admin.Controllers
                     return Json(new { success = false, message = "File không được chọn hoặc không có dữ liệu" });
                 }
 
-                string uploadsExcelFolder = Path.Combine(_environment.WebRootPath, "customer", "upload", "voca", "bai " + viewModel.Ten_bai.ToString(), "excel");
+                string uploadsExcelFolder = Path.Combine(_environment.WebRootPath, "adminn", "upload", "voca", "bai " + viewModel.Ten_bai.ToString(), "excel");
                 if (!Directory.Exists(uploadsExcelFolder))
                 {
                     Directory.CreateDirectory(uploadsExcelFolder);
@@ -255,13 +254,17 @@ namespace ToeicWeb.Areas.Admin.Controllers
             var baituvung = _db.Mabaituvungs.Find(id);
             if (baituvung != null)
             {
+                var oldFolderBasePath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "voca","bai "+  baituvung.Ten_bai.ToString());
+                if (Directory.Exists(oldFolderBasePath))
+                {
+                    Directory.Delete(oldFolderBasePath, true);
+                }
                 _db.Mabaituvungs.Remove(baituvung);
                 _db.SaveChanges();
                 return Json(new { success = true, message = "Xóa thành công" });
             }
             return Json(new { success = false, message = "Có lỗi khi xóa" });
-        }   
-      
+        }
         #endregion
     }
 }

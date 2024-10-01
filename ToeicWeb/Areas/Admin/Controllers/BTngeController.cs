@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using OfficeOpenXml;
 using Toeic.DataAccess;
 using Toeic.Models;
@@ -37,7 +38,7 @@ namespace ToeicWeb.Areas.Admin.Controllers
         [HttpPost]
         public async Task<JsonResult> Create(CauhoiBTngeVM viewModel)
         {
-            var uploadImageFolderPath = Path.Combine(_environment.WebRootPath, "customer", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString(), "image");
+            var uploadImageFolderPath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString(), "image");
             Directory.CreateDirectory(uploadImageFolderPath);
 
 
@@ -63,13 +64,13 @@ namespace ToeicWeb.Areas.Admin.Controllers
                         await formFile.CopyToAsync(stream);
                     }
 
-                    var relativeFilePath = Path.Combine("customer", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString(), "image", fileNameFul).Replace("\\", "/");
+                    var relativeFilePath = Path.Combine("adminn", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString(), "image", fileNameFul).Replace("\\", "/");
                     fileImagePaths.Add(relativeFilePath, fileName);
                 }
             }
 
 
-            var uploadAudioFolderPath = Path.Combine(_environment.WebRootPath, "customer", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString(), "audio");
+            var uploadAudioFolderPath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString(), "audio");
             Directory.CreateDirectory(uploadAudioFolderPath);
 
             var allowedAudioExtensions = new[] { ".mp3" };
@@ -109,7 +110,7 @@ namespace ToeicWeb.Areas.Admin.Controllers
                         await formFile.CopyToAsync(stream);
                     }
 
-                    var relativeFilePath = Path.Combine("customer", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString(), "audio", fileNameFul).Replace("\\", "/");
+                    var relativeFilePath = Path.Combine("adminn", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString(), "audio", fileNameFul).Replace("\\", "/");
                     fileAudioPaths.Add(relativeFilePath, fileName);
                 }
             }
@@ -126,8 +127,8 @@ namespace ToeicWeb.Areas.Admin.Controllers
 
             try
             {
-                // Lưu file vào thư mục wwwroot/customer/upload
-                string uploadsExcelFolder = Path.Combine(_environment.WebRootPath, "customer", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString(), "excel");
+                // Lưu file vào thư mục wwwroot/adminn/upload
+                string uploadsExcelFolder = Path.Combine(_environment.WebRootPath, "adminn", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString(), "excel");
                 if (!Directory.Exists(uploadsExcelFolder))
                 {
                     Directory.CreateDirectory(uploadsExcelFolder);
@@ -154,7 +155,9 @@ namespace ToeicWeb.Areas.Admin.Controllers
                             {
                                 Tieu_de = viewModel.Tieu_de,
                                 Part = viewModel.Part,
-                                FilePath = excelFilePath
+                                ExcelFilePath = excelFilePath,
+                                ImageFolderPath = uploadImageFolderPath,
+                                AudioFolderPath = uploadAudioFolderPath
                             };
                             _db.Mabaitapnges.Add(mabainge);
                             await _db.SaveChangesAsync();
@@ -216,8 +219,327 @@ namespace ToeicWeb.Areas.Admin.Controllers
 
         #region API CALLS
 
+        public async Task<JsonResult> Edit(int id)
+        {
+            // Tìm bài tập đọc theo ID
+            var baitapnge = await _db.Mabaitapnges.FindAsync(id);
+            if (baitapnge == null)
+            {
+                return Json(new { success = false, message = "Không tìm thấy bài tập đọc" });
+            }
+
+            // Lấy đường dẫn file Excel từ cơ sở dữ liệu
+            var filePath = baitapnge.ExcelFilePath; // Giả sử bạn lưu đường dẫn file trong thuộc tính FilePath
+
+            // Kiểm tra xem file có tồn tại hay không
+            bool fileExists = !string.IsNullOrEmpty(filePath) && System.IO.File.Exists(filePath);
+
+            // Trả về thông tin của bài tập đọc và đường dẫn file Excel
+            return Json(new
+            {
+                success = true,
+                data = baitapnge,
+                filePath = fileExists ? filePath : null // Nếu file tồn tại, trả về đường dẫn, nếu không thì trả về null
+            });
+        }
 
 
+        [HttpPost]
+        public async Task<JsonResult> Update(CauhoiBTngeVM viewModel)
+        {
+            // Tìm đối tượng Ma_bai_tap_nge cần cập nhật
+            var mabainge = await _db.Mabaitapnges.FindAsync(viewModel.Id);
+            if (mabainge == null)
+            {
+                return Json(new { success = false, message = "Bài nghe không tồn tại." });
+            }
+
+            // Kiểm tra xem có thay đổi tiêu đề (Tieu_de) hoặc Part không
+            bool tieuDeChanged = mabainge.Tieu_de != viewModel.Tieu_de;
+            bool partChanged = mabainge.Part != viewModel.Part;
+
+            // Đường dẫn cũ cho Image, Audio và Excel
+            var oldImageFolderPath = mabainge.ImageFolderPath;
+            var oldAudioFolderPath = mabainge.AudioFolderPath;
+            var oldExcelFilePath = mabainge.ExcelFilePath;
+            var oldExcelFileName = Path.GetFileName(oldExcelFilePath);
+            // Nếu Tieu_de hoặc Part thay đổi, cần tạo các thư mục mới
+            if (tieuDeChanged || partChanged)
+            {
+                // Tạo đường dẫn mới
+                var newFolderBasePath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString());
+                Directory.CreateDirectory(newFolderBasePath);
+
+
+                var newImageFolderPath = Path.Combine(newFolderBasePath, "image");
+                var newAudioFolderPath = Path.Combine(newFolderBasePath, "audio");
+                var newExcelFolderPath = Path.Combine(newFolderBasePath, "excel");
+
+
+
+                // Tạo thư mục mới nếu chưa có
+                Directory.CreateDirectory(newImageFolderPath);
+                Directory.CreateDirectory(newAudioFolderPath);
+                Directory.CreateDirectory(newExcelFolderPath);
+
+
+                // Chuyển các file hình ảnh
+                if (Directory.Exists(oldImageFolderPath))
+                {
+                    foreach (var filePath in Directory.GetFiles(oldImageFolderPath))
+                    {
+                        var fileName = Path.GetFileName(filePath);
+                        var newFilePath = Path.Combine(newImageFolderPath, fileName);
+                        System.IO.File.Move(filePath, newFilePath);
+                    }
+                }
+
+                // Chuyển các file âm thanh
+                if (Directory.Exists(oldAudioFolderPath))
+                {
+                    foreach (var filePath in Directory.GetFiles(oldAudioFolderPath))
+                    {
+                        var fileName = Path.GetFileName(filePath);
+                        var newFilePath = Path.Combine(newAudioFolderPath, fileName);
+                        System.IO.File.Move(filePath, newFilePath);
+                    }
+                }
+
+                if (!System.IO.File.Exists(mabainge.ExcelFilePath))
+                {
+                    return Json(new { success = false, message = "File Excel không tồn tại." });
+                }
+
+
+                // Chuyển file Excel
+                if (System.IO.File.Exists(oldExcelFilePath))
+                {
+                    var newExcelFilePath = Path.Combine(newExcelFolderPath, oldExcelFileName);
+                    System.IO.File.Move(oldExcelFilePath, newExcelFilePath);
+                    mabainge.ExcelFilePath = newExcelFilePath;
+                }
+
+                // Xóa folder cũ
+                var oldFolderBasePath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "part " + mabainge.Part.ToString(), mabainge.Tieu_de.ToString());
+                if (Directory.Exists(oldFolderBasePath))
+                {
+                    Directory.Delete(oldFolderBasePath, true);
+                }
+
+                // Cập nhật các đường dẫn mới trong database
+                mabainge.Tieu_de = viewModel.Tieu_de;
+                mabainge.Part = viewModel.Part;
+
+                // Cập nhật đường dẫn trong database
+                mabainge.ImageFolderPath = newImageFolderPath;
+                mabainge.AudioFolderPath = newAudioFolderPath;
+
+
+                _db.Mabaitapnges.Update(mabainge);
+                await _db.SaveChangesAsync();
+
+            }
+
+            // Xử lý Image (nếu có file mới)
+            var allowedImageExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+            Dictionary<string, string> fileImagePaths = new Dictionary<string, string>();
+            if (viewModel.ImageFile != null && viewModel.ImageFile.Any())
+            {
+
+                var FolderBasePath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "part " + mabainge.Part.ToString(), mabainge.Tieu_de.ToString(), "image");
+                var ImageFiles = Directory.GetFiles(FolderBasePath);
+                foreach (var img in ImageFiles)
+                {
+                    if (System.IO.File.Exists(img))
+                    {
+                        System.IO.File.Delete(img);
+                    }
+                }
+
+                foreach (var formFile in viewModel.ImageFile)
+                {
+                    var fileExtension = Path.GetExtension(formFile.FileName).ToLowerInvariant();
+                    if (string.IsNullOrEmpty(fileExtension) || !allowedImageExtensions.Contains(fileExtension))
+                    {
+                        return Json(new { success = false, message = "Invalid file extension for images. Allowed extensions are: " + string.Join(", ", allowedImageExtensions) });
+                    }
+
+                    if (formFile.Length > 0)
+                    {
+                        var fileName = Path.GetFileNameWithoutExtension(formFile.FileName);
+                        var fileNameFul = fileName + fileExtension;
+                        var filePath = Path.Combine(mabainge.ImageFolderPath, fileNameFul);
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await formFile.CopyToAsync(stream);
+                        }
+
+                        var relativeFilePath = Path.Combine("adminn", "upload", "part " + mabainge.Part.ToString(), mabainge.Tieu_de.ToString(), "image", fileNameFul).Replace("\\", "/");
+                        fileImagePaths.Add(relativeFilePath, fileName);
+                    }
+                }
+            }
+
+            // Xử lý Audio (nếu có file mới)
+            var allowedAudioExtensions = new[] { ".mp3" };
+            var allowedAudioMimeTypes = new[] { "audio/mpeg" };
+            Dictionary<string, string> fileAudioPaths = new Dictionary<string, string>();
+            if (viewModel.AudioFile != null && viewModel.AudioFile.Any())
+            {
+                var FolderBasePath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "part " + mabainge.Part.ToString(), mabainge.Tieu_de.ToString(), "audio");
+                var AudioFiles = Directory.GetFiles(FolderBasePath);
+                foreach (var audio in AudioFiles)
+                {
+                    if (System.IO.File.Exists(audio))
+                    {
+                        System.IO.File.Delete(audio);
+                    }
+                }
+
+
+                foreach (var formFile in viewModel.AudioFile)
+                {
+                    var fileExtension = Path.GetExtension(formFile.FileName).Trim().ToLowerInvariant();
+                    var mimeType = formFile.ContentType.ToLowerInvariant();
+
+                    if (string.IsNullOrEmpty(fileExtension) || !allowedAudioExtensions.Contains(fileExtension))
+                    {
+                        return Json(new { success = false, message = "Invalid file extension for audio. Allowed extensions are: " + string.Join(", ", allowedAudioExtensions) });
+                    }
+
+                    if (!allowedAudioMimeTypes.Contains(mimeType))
+                    {
+                        return Json(new { success = false, message = "Invalid MIME type for audio. Allowed MIME types are: " + string.Join(", ", allowedAudioMimeTypes) });
+                    }
+
+                    if (formFile.Length > 0)
+                    {
+                        var fileName = Path.GetFileNameWithoutExtension(formFile.FileName).Trim();
+                        var fileNameFul = fileName + fileExtension;
+                        var filePath = Path.Combine(mabainge.AudioFolderPath, fileNameFul);
+
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await formFile.CopyToAsync(stream);
+                        }
+
+                        var relativeFilePath = Path.Combine("adminn", "upload", "part " + mabainge.Part.ToString(), mabainge.Tieu_de.ToString(), "audio", fileNameFul).Replace("\\", "/");
+                        fileAudioPaths.Add(relativeFilePath, fileName);
+                    }
+                }
+            }
+
+            // Xử lý Excel (nếu có file mới)
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            if (viewModel.ExcelFile != null && viewModel.ExcelFile.Length > 0)
+            {
+
+                // Xóa file excel cũ
+                if (!string.IsNullOrEmpty(mabainge.ExcelFilePath))
+                {
+                    if (System.IO.File.Exists(mabainge.ExcelFilePath))
+                    {
+                        System.IO.File.Delete(mabainge.ExcelFilePath);
+                    }
+                }
+
+                // Lưu file Excel mới
+                string uploadsExcelFolder = Path.Combine(_environment.WebRootPath, "adminn", "upload", "part " + mabainge.Part.ToString(), mabainge.Tieu_de.ToString(), "excel");
+                string newExcelFilePath = Path.Combine(uploadsExcelFolder, viewModel.ExcelFile.FileName);
+                using (var fileStream = new FileStream(newExcelFilePath, FileMode.Create))
+                {
+                    await viewModel.ExcelFile.CopyToAsync(fileStream);
+                }
+
+                mabainge.ExcelFilePath = newExcelFilePath;
+                var cauhoiList = _db.Cauhoibaitapnges.Where(c => c.Ma_bai_tap_ngeId == mabainge.Id).ToList();
+
+                // Xử lý file Excel
+                using (var stream = new MemoryStream())
+                {
+                    await viewModel.ExcelFile.CopyToAsync(stream);
+                    using (var package = new ExcelPackage(stream))
+                    {
+                        var worksheet = package.Workbook.Worksheets.First();
+                        int row = 2;
+                        foreach (var cauhoi in cauhoiList)
+                        {
+                            if (row <= worksheet.Dimension.Rows)
+                            {
+                                cauhoi.Thu_tu_cau = worksheet.Cells[row, 1].Value != null ? Convert.ToInt32(worksheet.Cells[row, 1].Value) : 0;
+                                cauhoi.Cau_hoi = worksheet.Cells[row, 2].Value?.ToString() ?? string.Empty;
+                                cauhoi.Dap_an_1 = worksheet.Cells[row, 5].Value?.ToString() ?? string.Empty;
+                                cauhoi.Dap_an_2 = worksheet.Cells[row, 6].Value?.ToString() ?? string.Empty;
+                                cauhoi.Dap_an_3 = worksheet.Cells[row, 7].Value?.ToString() ?? string.Empty;
+                                cauhoi.Dap_an_4 = worksheet.Cells[row, 8].Value?.ToString() ?? string.Empty;
+                                cauhoi.Dap_an_dung = worksheet.Cells[row, 9].Value?.ToString() ?? string.Empty;
+                                cauhoi.Giai_thich = worksheet.Cells[row, 10].Value?.ToString() ?? string.Empty;
+
+                                // Cập nhật đường dẫn audio và image từ file Excel nếu cần
+                                var audioDict = fileAudioPaths.ToDictionary(x => x.Key, x => x.Value);
+                                var imageDict = fileImagePaths.ToDictionary(x => x.Key, x => x.Value);
+
+                                cauhoi.Audio = audioDict.ContainsValue(worksheet.Cells[row, 3].Value?.ToString()) ? audioDict[worksheet.Cells[row, 3].Value.ToString()] : null;
+                                cauhoi.Image = imageDict.ContainsValue(worksheet.Cells[row, 4].Value?.ToString()) ? imageDict[worksheet.Cells[row, 4].Value.ToString()] : null;
+
+                                row++;
+                            }
+                            _db.Cauhoibaitapnges.Update(cauhoi);
+                        }
+                        await _db.SaveChangesAsync();
+                    }
+                }
+            }
+            else
+            {
+                using (var stream = new FileStream(mabainge.ExcelFilePath, FileMode.Open, FileAccess.Read))
+                {
+                    using (var package = new ExcelPackage(stream))
+                    {
+                        var worksheet = package.Workbook.Worksheets.FirstOrDefault();
+                        if (worksheet == null)
+                        {
+                            return Json(new { success = false, message = "Không tìm thấy sheet trong file Excel" });
+                        }
+
+                        var cauhoiList = _db.Cauhoibaitapnges.Where(c => c.Ma_bai_tap_ngeId == mabainge.Id).ToList();
+
+
+                        if (!fileAudioPaths.IsNullOrEmpty() || !fileImagePaths.IsNullOrEmpty())
+                        {
+                            int row = 2;
+                            foreach (var cauhoi in cauhoiList)
+                            {
+                                if (row <= worksheet.Dimension.Rows)
+                                {
+                                    for (int i = 0; i < fileAudioPaths.Count; i++)
+                                    {
+                                        if (worksheet.Cells[row, 3].Value?.ToString() == fileAudioPaths.ElementAt(i).Value)
+                                        {
+                                            cauhoi.Audio = fileAudioPaths.ElementAt(i).Key;
+                                        }
+                                    }
+
+                                    for (int i = 0; i < fileImagePaths.Count; i++)
+                                    {
+                                        if (worksheet.Cells[row, 4].Value?.ToString() == fileImagePaths.ElementAt(i).Value)
+                                        {
+                                            cauhoi.Image = fileImagePaths.ElementAt(i).Key;
+                                        }
+                                    }
+
+                                    row++;
+                                }
+                                _db.Cauhoibaitapnges.Update(cauhoi);
+                            }
+                        }
+                        await _db.SaveChangesAsync();
+                    }
+                }
+            }
+
+            return Json(new { success = true, message = "Cập nhật bài nghe thành công!" });
+        }
 
 
         [HttpGet]
@@ -234,6 +556,12 @@ namespace ToeicWeb.Areas.Admin.Controllers
             var baitapnge = _db.Mabaitapnges.Find(id);
             if (baitapnge != null)
             {
+                var oldFolderBasePath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "part " + baitapnge.Part.ToString(), baitapnge.Tieu_de.ToString());
+                if (Directory.Exists(oldFolderBasePath))
+                {
+                    Directory.Delete(oldFolderBasePath, true);
+                }
+
                 _db.Mabaitapnges.Remove(baitapnge);
                 _db.SaveChanges();
                 return Json(new { success = true, message = "Xóa thành công" });

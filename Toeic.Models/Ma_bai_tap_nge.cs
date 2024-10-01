@@ -11,7 +11,9 @@ namespace Toeic.Models
 
         public string Tieu_de { get; set; }
 
-        public string? FilePath { get; set; }
+        public string ExcelFilePath { get; set; }
+        public string? ImageFolderPath { get; set; }
+        public string AudioFolderPath { get; set; }
 
         public ICollection<Cau_hoi_bai_tap_nge> CauHoiBaiTapNges { get; set; }
     }

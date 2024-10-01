@@ -39,7 +39,7 @@ function loadDataTable() {
 // Edit data
 function Edit(id) {
     $.ajax({
-        url: '/Admin/BTdoc/Edit?id=' + id,
+        url: '/Admin/BTnge/Edit?id=' + id,
         type: 'GET',
         contentType: 'application/json; charset=utf-8',
         datatype: 'json',
@@ -49,8 +49,8 @@ function Edit(id) {
             } else if (response.success === false) {
                 alert(response.message);
             } else {
-                $('#BaitapdocModal').modal('show');
-                $('#modalTitle').text('Sửa bài tập đọc');
+                $('#BaitapngeModal').modal('show');
+                $('#modalTitle').text('Sửa bài tập nghe');
                 $('#Save').css('display', 'none');
                 $('#Update').css('display', 'block');
 
@@ -80,15 +80,10 @@ function Edit(id) {
 
 // Update data
 function Update() {
-    var result = Validate();
-    if (!result) {
-        return false;
-    }
-
     var formData = new FormData();
     var tieuDe = $('#Tieu_de').val();
     var part = $('#Part').val();
-    var excelFile = $('#NewExcelFile')[0].files[0];  // Lấy file excel từ input
+    var excelFile = $('#NewExcelFile').get(0).files[0];  // Lấy file excel từ input
 
     var id = $('#Id').val();  // Lấy id từ trường ẩn
 
@@ -97,11 +92,27 @@ function Update() {
     formData.append('part', part);
 
     if (excelFile) {
-        formData.append('FileExcel', excelFile);
+        formData.append('ExcelFile', excelFile);
     }
 
+    var newImageFiles = $('#NewImageFile').get(0).files;
+
+    if (newImageFiles.length > 0) {
+        for (var i = 0; i < newImageFiles.length; i++) {
+            formData.append('ImageFile', newImageFiles[i]);
+        }
+    }
+
+    var newAudioFiles = $('#NewAudioFile').get(0).files;
+    if (newAudioFiles.length > 0) {
+        for (var i = 0; i < newAudioFiles.length; i++) {
+            formData.append('AudioFile', newAudioFiles[i]);
+        }
+    }
+
+
     $.ajax({
-        url: '/Admin/BTdoc/Update',
+        url: '/Admin/BTnge/Update',
         type: 'POST',
         data: formData,
         processData: false,

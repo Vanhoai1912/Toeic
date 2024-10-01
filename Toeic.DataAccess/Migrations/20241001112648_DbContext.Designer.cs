@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Toeic.DataAccess;
 
@@ -11,9 +12,11 @@ using Toeic.DataAccess;
 namespace Toeic.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241001112648_DbContext")]
+    partial class DbContext
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -287,6 +290,23 @@ namespace Toeic.DataAccess.Migrations
                     b.HasIndex("Ma_bai_tap_docId");
 
                     b.ToTable("Cauhoibaitapdocs");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Bai_doc = "",
+                            Cau_hoi = "H",
+                            Dap_an_1 = "A",
+                            Dap_an_2 = "B",
+                            Dap_an_3 = "C",
+                            Dap_an_4 = "D",
+                            Dap_an_dung = "A",
+                            Giai_thich = "A ĐÚNG",
+                            IsCorrect = false,
+                            Ma_bai_tap_docId = 1,
+                            Thu_tu_cau = 101
+                        });
                 });
 
             modelBuilder.Entity("Toeic.Models.Cau_hoi_bai_tap_nge", b =>
@@ -350,6 +370,24 @@ namespace Toeic.DataAccess.Migrations
                     b.HasIndex("Ma_bai_tap_ngeId");
 
                     b.ToTable("Cauhoibaitapnges");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Audio = "",
+                            Cau_hoi = "H",
+                            Dap_an_1 = "A",
+                            Dap_an_2 = "B",
+                            Dap_an_3 = "C",
+                            Dap_an_4 = "D",
+                            Dap_an_dung = "A",
+                            Giai_thich = "A ĐÚNG",
+                            Image = "",
+                            IsCorrect = false,
+                            Ma_bai_tap_ngeId = 1,
+                            Thu_tu_cau = 1
+                        });
                 });
 
             modelBuilder.Entity("Toeic.Models.Ma_bai_ngu_phap", b =>
@@ -393,6 +431,29 @@ namespace Toeic.DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Mabaitapdocs");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            FilePath = "",
+                            Part = 5,
+                            Tieu_de = "Tiêu đề"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            FilePath = "",
+                            Part = 6,
+                            Tieu_de = "Tiêu đề"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            FilePath = "",
+                            Part = 7,
+                            Tieu_de = "Tiêu đề"
+                        });
                 });
 
             modelBuilder.Entity("Toeic.Models.Ma_bai_tap_nge", b =>
@@ -403,15 +464,7 @@ namespace Toeic.DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AudioFolderPath")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ExcelFilePath")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ImageFolderPath")
+                    b.Property<string>("FilePath")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Part")
@@ -424,6 +477,32 @@ namespace Toeic.DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Mabaitapnges");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Part = 1,
+                            Tieu_de = "Tiêu đề"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Part = 2,
+                            Tieu_de = "Tiêu đề"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Part = 3,
+                            Tieu_de = "Tiêu đề"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Part = 4,
+                            Tieu_de = "Tiêu đề"
+                        });
                 });
 
             modelBuilder.Entity("Toeic.Models.Ma_bai_tu_vung", b =>

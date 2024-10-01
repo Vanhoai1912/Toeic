@@ -49,7 +49,7 @@ namespace Toeic.Areas.Admin.Controllers
             try
             {
                 // Lưu file vào thư mục wwwroot/adminn/upload
-                string uploadsFolder = Path.Combine(_environment.WebRootPath, "adminn", "upload");
+                string uploadsFolder = Path.Combine(_environment.WebRootPath, "adminn", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString(), "excel");
                 if (!Directory.Exists(uploadsFolder))
                 {
                     Directory.CreateDirectory(uploadsFolder);
@@ -75,7 +75,7 @@ namespace Toeic.Areas.Admin.Controllers
                             {
                                 Tieu_de = viewModel.Tieu_de,
                                 Part = viewModel.Part,
-                                FilePath = Path.Combine("adminn", "upload", viewModel.ExcelFile.FileName) // Lưu đường dẫn file
+                                FilePath = filePath
                             };
                             _db.Mabaitapdocs.Add(mabaidoc);
                             await _db.SaveChangesAsync();
@@ -110,8 +110,6 @@ namespace Toeic.Areas.Admin.Controllers
                 return Json(new { success = false, message = $"Lỗi khi thêm bài đọc mới: {ex.Message}" });
             }
         }
-
-        #region API CALLS
         [HttpGet]
         public async Task<JsonResult> Edit(int id)
         {
@@ -167,6 +165,7 @@ namespace Toeic.Areas.Admin.Controllers
 
                 // Lưu file mới vào thư mục wwwroot/adminn/upload
                 string uploadsFolder = Path.Combine(_environment.WebRootPath, "adminn", "upload");
+
                 if (!Directory.Exists(uploadsFolder))
                 {
                     Directory.CreateDirectory(uploadsFolder);
@@ -221,8 +220,7 @@ namespace Toeic.Areas.Admin.Controllers
 
             return Json(new { success = true, message = "Sửa bài đọc thành công" });
         }
-
-
+        #region API CALLS
         [HttpGet]
         public IActionResult GetAll()
         {
@@ -237,6 +235,11 @@ namespace Toeic.Areas.Admin.Controllers
             var baitapdoc = _db.Mabaitapdocs.Find(id);
             if(baitapdoc != null)
             {
+                var oldFolderBasePath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "part " + baitapdoc.Part.ToString(), baitapdoc.Tieu_de.ToString());
+                if (Directory.Exists(oldFolderBasePath))
+                {
+                    Directory.Delete(oldFolderBasePath, true);
+                }
                 _db.Mabaitapdocs.Remove(baitapdoc);
                 _db.SaveChanges();
                 return Json(new { success = true, message = "Xóa thành công" });

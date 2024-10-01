@@ -284,6 +284,7 @@
 								
 							</a>
 							<!--end:Menu item-->
+							
 							<!--begin:Menu item-->
 							<div data-kt-menu-trigger="click" class="menu-item here show menu-accordion">
 								<!--begin:Menu link-->
@@ -294,6 +295,40 @@
 										<span class="path2"></span>
 										<span class="path3"></span>
 										<span class="path4"></span>
+										</i>
+									</span>
+									<a class="menu-title">Quản lý đề thi đọc</a>
+								</span>
+								<!--end:Menu link-->
+							</div>
+							<!--end:Menu item-->
+							<!--begin:Menu item-->
+							<div data-kt-menu-trigger="click" class="menu-item here show menu-accordion">
+								<!--begin:Menu link-->
+								<span class="menu-link">
+									<span class="menu-icon">
+										<i class="bi bi-headphones" style="font-size: 18px">
+											<span class="path1"></span>
+											<span class="path2"></span>
+											<span class="path3"></span>
+											<span class="path4"></span>
+										</i>
+									</span>
+									<a class="menu-title">Quản lý đề thi nghe</a>
+								</span>
+								<!--end:Menu link-->
+							</div>
+							<!--end:Menu item-->
+							<!--begin:Menu item-->
+							<div data-kt-menu-trigger="click" class="menu-item here show menu-accordion">
+								<!--begin:Menu link-->
+								<span class="menu-link">
+									<span class="menu-icon">
+										<i class="bi bi-bookmarks" style="font-size: 18px">
+											<span class="path1"></span>
+											<span class="path2"></span>
+											<span class="path3"></span>
+											<span class="path4"></span>
 										</i>
 									</span>
 									<a class="menu-title">Quản lý đề thi</a>
@@ -320,21 +355,21 @@
 							<!--end:Menu item-->
 
 							<!--begin:Menu item-->
-							<div data-kt-menu-trigger="click" class="menu-item here show menu-accordion">
+							<a asp-area="Admin" asp-controller="Grammar" asp-action="Index" class="menu-item here show menu-accordion">
 								<!--begin:Menu link-->
 								<span class="menu-link">
 									<span class="menu-icon">
-										<i class="bi bi-archive" style="font-size: 18px"></i>
+										<i class="bi bi-archive" style="font-size: 18px">
 										<span class="path1"></span>
 										<span class="path2"></span>
 										<span class="path3"></span>
 										<span class="path4"></span>
 										</i>
 									</span>
-									<a class="menu-title">Quản lý bài ngữ pháp</a>
+									<span class="menu-title">Quản lý bài ngữ pháp</span>
 								</span>
 								<!--end:Menu link-->
-							</div>
+							</a>
 							<!--end:Menu item-->
 							<!--begin:Menu item-->
 							<a asp-area="Admin" asp-controller="User" asp-action="Index" class="menu-item here show menu-accordion">
@@ -439,6 +474,8 @@
 
 	<script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
 
+	//tinymce
+	<script src="https://cdn.tiny.cloud/1/5weexrakaozekr7dhxstxxzjmv6vr2zrrwhmd6qzx82uya6i/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
 	<script src="//cdn.datatables.net/2.1.5/js/dataTables.min.js" asp-append-version="true"></script>
 
 	<script src="~/adminn/js/script.js"></script>
