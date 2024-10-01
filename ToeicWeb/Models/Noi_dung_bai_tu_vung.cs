@@ -6,7 +6,9 @@ namespace ToeicWeb.Models
     public class Noi_dung_bai_tu_vung
     {
         [Key]
-        public int Id { get; set; } 
+        public int Id { get; set; }
+
+        public int So_thu_tu {  get; set; }
 
         public string Tu_vung { get; set; }
 

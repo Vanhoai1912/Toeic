@@ -482,6 +482,82 @@ namespace ToeicWeb.Migrations
                         });
                 });
 
+            modelBuilder.Entity("ToeicWeb.Models.Ma_bai_tu_vung", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("FilePath")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Ten_bai")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Mabaituvungs");
+                });
+
+            modelBuilder.Entity("ToeicWeb.Models.Noi_dung_bai_tu_vung", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Audio")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Ma_bai_tu_vungId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Nghia")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phien_am")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("So_thu_tu")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Tu_dong_nghia")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Tu_trai_nghia")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Tu_vung")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Vi_du")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Ma_bai_tu_vungId");
+
+                    b.ToTable("Noidungbaituvungs");
+                });
+
             modelBuilder.Entity("ToeicWeb.Models.ApplicationUser", b =>
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
@@ -566,6 +642,17 @@ namespace ToeicWeb.Migrations
                     b.Navigation("Ma_bai_tap_nge");
                 });
 
+            modelBuilder.Entity("ToeicWeb.Models.Noi_dung_bai_tu_vung", b =>
+                {
+                    b.HasOne("ToeicWeb.Models.Ma_bai_tu_vung", "Ma_bai_tu_vung")
+                        .WithMany("Noidungbaituvungs")
+                        .HasForeignKey("Ma_bai_tu_vungId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Ma_bai_tu_vung");
+                });
+
             modelBuilder.Entity("ToeicWeb.Models.Ma_bai_tap_doc", b =>
                 {
                     b.Navigation("CauHoiBaiTapDocs");
@@ -574,6 +661,11 @@ namespace ToeicWeb.Migrations
             modelBuilder.Entity("ToeicWeb.Models.Ma_bai_tap_nge", b =>
                 {
                     b.Navigation("CauHoiBaiTapNges");
+                });
+
+            modelBuilder.Entity("ToeicWeb.Models.Ma_bai_tu_vung", b =>
+                {
+                    b.Navigation("Noidungbaituvungs");
                 });
 #pragma warning restore 612, 618
         }

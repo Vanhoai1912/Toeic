@@ -10,7 +10,7 @@ namespace ToeicWeb.Models
 
         public string Noi_dung { get; set; }
 
-        public string ImageUrl { get; set; }
+        public string? ImageUrl { get; set; }
 
         public int Ma_bai_ngu_phapId { get; set; }
         [ForeignKey("Ma_bai_ngu_phapId")]

@@ -1,0 +1,61 @@
+﻿@model ToeicWeb.Models.ViewModels.BaituvungVM
+
+<!-- Tiêu đề -->
+<div class="col-12 text-center">
+    <h2>@Model.Mabaituvung.Ten_bai</h2>
+    @* <button class="btn btn-secondary">Thoát</button> *@
+</div>
+<div class="container my-5">
+    <div class="row">
+        <!-- Repeat this block for each item -->
+        @for (int i = 0; i < Model.Noidungbaituvungs.Count; i++)
+        {
+            <div class="col-12 mb-4">
+                <div class="card p-3 shadow-sm">
+                    <div class="row">
+                        <!-- Left side: Image and number -->
+                        <div class="col-md-2 text-center d-flex flex-column align-items-center justify-content-center">
+                            <div class="circle bg-warning text-white rounded-circle mb-3" style="width: 50px; height: 50px;">
+                                <span class="fs-4 d-inline-block pt-2">@Model.Noidungbaituvungs[i].So_thu_tu</span> <!-- Replace with the number -->
+                            </div>
+                            <img src="~/@Model.Noidungbaituvungs[i].ImageUrl" alt="Vocabulary Image" class="img-fluid rounded" style="max-height: 120px; object-fit: cover;">
+                        </div>
+
+                        <!-- Right side: Content -->
+                        <div class="col-md-10">
+                            <div class="d-flex flex-column">
+                                <!-- Word and Pronunciation -->
+                                <div class="mb-2">
+                                    <a href="#" class="text-decoration-none text-primary fs-5 fw-bold">@Model.Noidungbaituvungs[i].Tu_vung</a> <!-- Replace with word -->
+                                    <span class="text-danger">@Model.Noidungbaituvungs[i].Phien_am</span> <!-- Replace with pronunciation -->
+                                </div>
+
+                                
+                                <p class="mb-1">
+                                    <strong>@Model.Noidungbaituvungs[i].Nghia</strong>  <!-- Replace with word type -->
+                                </p>
+                                <p class="mb-1">
+                                    <strong>@Model.Noidungbaituvungs[i].Vi_du</strong>  <!-- Replace with example in English -->
+                                </p>
+                                <p class="mb-1">
+                                    <strong>@Model.Noidungbaituvungs[i].Tu_dong_nghia</strong>  <!-- Replace with Vietnamese translation -->
+                                </p>
+                                <p class="mb-1">
+                                    <strong>@Model.Noidungbaituvungs[i].Tu_trai_nghia</strong>  <!-- Replace with Vietnamese translation -->
+                                </p>
+
+                                <!-- Audio Player -->
+                                <div class="d-flex align-items-center">
+                                    <audio controls class="me-3">
+                                        <source src="@Url.Content("~/" + Model.Noidungbaituvungs[i].Audio)" type="audio/mpeg" />
+                                    </audio>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

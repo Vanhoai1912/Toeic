@@ -9,6 +9,10 @@ namespace ToeicWeb.Models
 
         public string Ten_bai {  get; set; }
 
-        public string ImageUrl { get; set; }
+        public string? ImageUrl { get; set; }
+
+        public string? FilePath { get; set; }
+
+        public ICollection<Noi_dung_bai_tu_vung> Noidungbaituvungs { get; set; }
     }
 }

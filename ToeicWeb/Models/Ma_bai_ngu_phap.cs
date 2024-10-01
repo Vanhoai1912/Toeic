@@ -9,6 +9,6 @@ namespace ToeicWeb.Models
 
         public string Ten_bai { get; set; }
 
-        public string ImageUrl { get; set; }
+        public string? ImageUrl { get; set; }
     }
 }

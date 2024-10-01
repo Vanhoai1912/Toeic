@@ -1,5 +1,7 @@
 using System.Diagnostics;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using ToeicWeb.Data;
 using ToeicWeb.Models;
 
 namespace ToeicWeb.Areas.Customer.Controllers
@@ -7,10 +9,12 @@ namespace ToeicWeb.Areas.Customer.Controllers
     [Area("Customer")]
     public class HomeController : Controller
     {
+        private readonly ApplicationDbContext _db;
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger,UserManager<IdentityUser> userManager, ApplicationDbContext db, RoleManager<IdentityRole> roleManager)
         {
+            _db = db;
             _logger = logger;
         }
 
@@ -19,16 +23,8 @@ namespace ToeicWeb.Areas.Customer.Controllers
             return View();
         }
 
-        public IActionResult Details()
-        {
-            ViewData["NavbarType"] = "_NavbarBack"; 
-            return View();
-        }
+       
 
-        public IActionResult Vocabulary()
-        {
-            return View();
-        }
 
         public IActionResult Grammar()
         {

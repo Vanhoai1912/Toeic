@@ -18,7 +18,8 @@ namespace ToeicWeb.Data
         public virtual DbSet<Cau_hoi_bai_tap_doc> Cauhoibaitapdocs { get; set; }
         public virtual DbSet<Ma_bai_tap_nge> Mabaitapnges { get; set; }
         public virtual DbSet<Cau_hoi_bai_tap_nge> Cauhoibaitapnges { get; set; }
-
+        public virtual DbSet<Ma_bai_tu_vung> Mabaituvungs { get; set; }
+        public virtual DbSet<Noi_dung_bai_tu_vung> Noidungbaituvungs { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
