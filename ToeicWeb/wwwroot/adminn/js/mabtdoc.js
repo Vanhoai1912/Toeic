@@ -1,9 +1,40 @@
 ﻿var dataTable;
 
-$(document).ready(function () {
+$(window).on('load', function () {
     loadDataTable();
 });
 
+// Read data
+function loadDataTable() {
+    if ($.fn.dataTable.isDataTable('#tblData')) {
+        $('#tblData').DataTable().destroy();
+    }
+    dataTable = $('#tblData').DataTable({
+        "ajax": {
+            "url": "/Admin/BTdoc/GetAll"
+        },
+        "columns": [
+            { "data": "id", "width": "25%", "className": "text-start" },
+            { "data": "tieu_de", "width": "30%" },
+            { "data": "part", "width": "15%", "className": "text-start" },
+
+            {
+                "data": "id",
+                "render": function (data) {
+                    return `
+                        <div class="w-75 btn-group" role="group">
+                        <a href="#" onclick="Edit(${data})"
+                        class="btn btn-primary ms-2"> <i class="bi bi-pencil-square"></i> Edit</a>
+                        <a onClick=Delete('/Admin/BTdoc/Delete/${data}')
+                        class="btn btn-danger ms-2"> <i class="bi bi-trash-fill"></i> Delete</a>
+                    </div>
+                    `;
+                },
+                "width": "40%"
+            }
+        ]
+    });
+}
 
 
 // Edit
@@ -176,37 +207,6 @@ function HideModal() {
     $('#BaitapdocModal').modal('hide');
 }
 
-// Read data
-function loadDataTable() {
-    if ($.fn.dataTable.isDataTable('#tblData')) {
-        $('#tblData').DataTable().destroy();
-    }
-    dataTable = $('#tblData').DataTable({
-        "ajax": {
-            "url": "/Admin/BTdoc/GetAll"
-        },
-        "columns": [
-            { "data": "id", "width": "25%", "className": "text-start" },
-            { "data": "tieu_de", "width": "30%" },
-            { "data": "part", "width": "15%", "className": "text-start" },
-
-            {
-                "data": "id",
-                "render": function (data) {
-                    return `
-                        <div class="w-75 btn-group" role="group">
-                        <a href="#" onclick="Edit(${data})"
-                        class="btn btn-primary ms-2"> <i class="bi bi-pencil-square"></i> Edit</a>
-                        <a onClick=Delete('/Admin/BTdoc/Delete/${data}')
-                        class="btn btn-danger ms-2"> <i class="bi bi-trash-fill"></i> Delete</a>
-                    </div>
-                    `;
-                },
-                "width": "40%"
-            }
-        ]
-    });
-}
 
 function ClearData() {
     $('#Part').val('');
