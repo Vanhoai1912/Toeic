@@ -14,7 +14,12 @@ namespace ToeicWeb.Areas.Admin.Controllers
         {
             return View();
         }
+        [HttpGet]
+        public IActionResult GetData()
+        {
+            var data = new { message = "Hello from the server!" };
+            return Json(data);
+        }
 
-        
     }
 }

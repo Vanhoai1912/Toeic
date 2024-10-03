@@ -55,10 +55,9 @@
                     <label for="NewImageFileGra" class="d-flex align-items-center fs-5 fw-semibold mb-2">
                         <span class="required">Ảnh bài ngữ pháp</span>
                     </label>
-                    <input type="file" class="form-control" id="NewImageFileGra" name="ImageFileGra" accept="image/*" />
+                    <input type="file" class="form-control" id="NewImageFileGra" name="ImageFileGrammar" accept="image/*" />
                     <span id="ImageFileGraError" class="text-danger"></span>
                 </div>
-                
                 <div class="mb-2">
                     <label for="Noi_dung" class="d-flex align-items-center fs-5 fw-semibold mb-2">
                         <span class="required">Nội dung</span>
@@ -76,15 +75,27 @@
     </div>
 </div>
 
-
+             
 
 @section Scripts {
-    <script>
-        tinymce.init({
-            selector: 'textarea',
-          plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',
-          toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat',
-        });
-    </script>
+   
     <script src="~/adminn/js/mabaigrammar.js"></script>
+    <script>
+   tinymce.init({
+    selector: '#Noi_dung',
+    setup: function(editor) {
+        editor.on('input', function () {
+            if (editor.getContent().trim() !== "") {
+                editor.getContainer().style.border = "1px solid lightgrey"; 
+                $('#Noi_dungError').text('').hide(); 
+            } else {
+                editor.getContainer().style.border = "1px solid red"; 
+            }
+        });
+    },
+    plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',
+    toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat',
+});
+
+</script>
 }

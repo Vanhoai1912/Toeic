@@ -43,22 +43,19 @@ namespace ToeicWeb.Areas.Admin.Controllers
         {
             try
             {
+                // Tạo đường dẫn thư mục lưu hình ảnh bài ngữ pháp
                 var uploadImageGraFolderPath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "grammar", "bai " + viewModel.Ten_bai.ToString(), "imageGra");
                 Directory.CreateDirectory(uploadImageGraFolderPath);
 
                 var allowedImageExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
-
-                var ImageGraFilePath = "";
+                var fileFathImage = "";
+                // Kiểm tra và xử lý tệp hình ảnh
                 if (viewModel.ImageFileGrammar != null)
                 {
                     var fileExtension = Path.GetExtension(viewModel.ImageFileGrammar.FileName).ToLowerInvariant();
-                    if (string.IsNullOrEmpty(fileExtension) || !allowedImageExtensions.Contains(fileExtension))
+                    if (!string.IsNullOrEmpty(fileExtension) && allowedImageExtensions.Contains(fileExtension))
                     {
-                        return Json(new { success = false, message = "Invalid file extension for mã bài ngữ pháp image. Allowed extensions are: " + string.Join(", ", allowedImageExtensions) });
-                    }
-
-                    if (viewModel.ImageFileGrammar.Length > 0)
-                    {
+                        // Lưu tệp hình ảnh lên máy chủ
                         var fileName = Path.GetFileNameWithoutExtension(viewModel.ImageFileGrammar.FileName);
                         var fileNameFul = fileName + fileExtension;
                         var filePath = Path.Combine(uploadImageGraFolderPath, fileNameFul);
@@ -66,20 +63,22 @@ namespace ToeicWeb.Areas.Admin.Controllers
                         {
                             await viewModel.ImageFileGrammar.CopyToAsync(stream);
                         }
-
-                        var relativeFilePathGra = Path.Combine("adminn", "upload", "grammar", "bai " + viewModel.Ten_bai.ToString(), "imageGra", fileNameFul).Replace("\\", "/");
-                        ImageGraFilePath = relativeFilePathGra;
+                        // Lưu đường dẫn tương đối để sử dụng trong ứng dụng web
+                        string relativeFilePathGra = Path.Combine("adminn", "upload", "grammar", "bai " + viewModel.Ten_bai.ToString(), "imageGra", fileNameFul).Replace("\\", "/");
+                        fileFathImage = relativeFilePathGra;
                     }
                 }
 
+                // Kiểm tra bài ngữ pháp trong cơ sở dữ liệu
                 var mabainguphap = _db.Mabainguphaps.FirstOrDefault(c => c.Ten_bai == viewModel.Ten_bai);
 
                 if (mabainguphap == null)
                 {
+                    // Tạo mới bản ghi Ma_bai_ngu_phap
                     mabainguphap = new Ma_bai_ngu_phap
                     {
                         Ten_bai = viewModel.Ten_bai,
-                        ImageUrl = ImageGraFilePath
+                        ImageUrl = fileFathImage // Lưu đường dẫn thư mục ảnh của bài ngữ pháp
                     };
                     _db.Mabainguphaps.Add(mabainguphap);
                     await _db.SaveChangesAsync();
@@ -89,7 +88,7 @@ namespace ToeicWeb.Areas.Admin.Controllers
                 var noidung = new Noi_dung_bai_ngu_phap
                 {
                     Noi_dung = viewModel.Noi_dung,  // Gán nội dung từ viewModel
-                    Ma_bai_ngu_phapId = mabainguphap.Id
+                    Ma_bai_ngu_phapId = mabainguphap.Id,
                 };
 
                 _db.Noidungbainguphaps.Add(noidung);
@@ -99,12 +98,13 @@ namespace ToeicWeb.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception to help diagnose the issue
+                // Ghi log lỗi để dễ chẩn đoán
                 Console.WriteLine($"Error in Create: {ex}");
                 var innerException = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
                 return Json(new { success = false, message = $"Lỗi khi thêm bài ngữ pháp mới: {innerException}" });
             }
         }
+
 
         #region API CALLS
         [HttpGet]
@@ -121,6 +121,11 @@ namespace ToeicWeb.Areas.Admin.Controllers
             var bainguphap = _db.Mabainguphaps.Find(id);
             if (bainguphap != null)
             {
+                var oldFolderBasePath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "grammar", "bai " + bainguphap.Ten_bai.ToString());
+                if (Directory.Exists(oldFolderBasePath))
+                {
+                    Directory.Delete(oldFolderBasePath, true);
+                }
                 _db.Mabainguphaps.Remove(bainguphap);
                 _db.SaveChanges();
                 return Json(new { success = true, message = "Xóa thành công" });

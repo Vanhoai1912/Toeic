@@ -79,7 +79,7 @@ function Create() {
     var newImageFileGra = $('#NewImageFileGra').get(0).files[0];
 
     if (newImageFileGra) {
-        formData.append('ImageFileGra', newImageFileGra);
+        formData.append('ImageFileGrammar', newImageFileGra);
     }
 
     // Lấy nội dung từ TinyMCE
@@ -112,7 +112,6 @@ function Create() {
 }
 
 
-
 function Validate() {
     var isValid = true;
 
@@ -125,17 +124,16 @@ function Validate() {
         $('#Ten_baiError').text('').hide();
     }
 
-    // Kiểm tra nội dung từ TinyMCE
     var noi_dung_value = tinymce.get('Noi_dung').getContent();
     if (noi_dung_value.trim() == "") {
-        $('#Noi_dung').css('border-color', 'Red');
+        tinymce.get('Noi_dung').getContainer().style.border = "1px solid red";
         $('#Noi_dungError').text('Vui lòng nhập nội dung.').show();
         isValid = false;
     } else {
-        $('#Noi_dung').css('border-color', 'lightgrey');
+        tinymce.get('Noi_dung').getContainer().style.border = "1px solid lightgrey";
         $('#Noi_dungError').text('').hide();
     }
-
+    
     var newImageFileGraInput = $('#NewImageFileGra').get(0);
     if (newImageFileGraInput && newImageFileGraInput.files.length === 0) {
         $('#NewImageFileGra').css('border-color', 'Red');
@@ -151,6 +149,7 @@ function Validate() {
 
 
 
+
 $('#btnAdd').click(function () {
     $('#BaigrammarModal').modal('show');
     $('#modalTitle').text('Thêm bài ngữ pháp mới');
@@ -163,23 +162,25 @@ function HideModal() {
     $('#BaigrammarModal').modal('hide');
 }
 
+
 function ClearData() {
     $('#Ten_bai').val('');
-    $('#Noi_dung').val('');
-
+    tinymce.get('Noi_dung').setContent(''); // Xóa nội dung TinyMCE
     $('#NewImageFileGra').val('');
 
-    
-    // Ẩn các lỗi và khôi phục lại màu 
+    // Ẩn các lỗi và khôi phục lại màu border
     $('#Ten_baiError').text('').hide();
     $('#Noi_dungError').text('').hide();
     $('#ImageFileGraError').text('').hide();
 
     $('#Ten_bai').css('border-color', 'lightgrey');
-    $('#Noi_dung').css('border-color', 'lightgrey');
     $('#NewImageFileGra').css('border-color', 'lightgrey');
 
+    // Khôi phục viền cho nội dung
+    tinymce.get('Noi_dung').getContainer().style.border = "1px solid lightgrey"; // Khôi phục màu border cho TinyMCE
 }
+
+
 
 $('#Ten_bai').on('input', function () {
     if ($(this).val().trim() !== "") {
@@ -188,12 +189,6 @@ $('#Ten_bai').on('input', function () {
     }
 });
 
-$('#Noi_dung').on('input', function () {
-    if ($(this).val().trim() !== "") {
-        $('#Noi_dung').css('border-color', 'lightgrey');
-        $('#Noi_dungError').text('').hide();
-    }
-});
 
 $('#NewImageFileGra').on('change', function () {
     if (this.files.length > 0) {
@@ -201,6 +196,7 @@ $('#NewImageFileGra').on('change', function () {
         $('#ImageFileGraError').text('').hide();
     }
 });
+
 
 
 

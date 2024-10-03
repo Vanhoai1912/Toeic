@@ -1,6 +1,4 @@
-﻿    @using Toeic.Utility
-
-<!DOCTYPE html>
+﻿@using Toeic.Utility
 
 <nav class="navbar navbar-expand-sm navbar-toggleable-sm border-bottom box-shadow mb-5 bg-secondary">
     <div class="container-fluid">
@@ -10,42 +8,36 @@
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+        <div class="navbar-collapse collapse d-sm-inline-flex justify-content-start">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item m-sm-2 fs-6 fw-bold text-d">
-                    <a class="nav-link nav-linkH" asp-area="Customer" asp-controller="Home" asp-action="Index">
-                        <i class="bi bi-house-door-fill fst-normal "> Home</i>
-                    </a>
-
-                </li>
-                <li class="nav-item m-sm-2 fs-6 fw-bold text-d">
-                    <a class="nav-link nav-linkH" asp-area="Customer" asp-controller="Voca" asp-action="Index">
-                        <i class="bi bi-translate fst-normal "> Vocabulary</i>
+                    <a href="#" class="nav-link nav-linkH active" id="homeLink">
+                        <i class="bi bi-house-door-fill fst-normal"> Home</i>
                     </a>
                 </li>
                 <li class="nav-item m-sm-2 fs-6 fw-bold text-d">
-                    <a class="nav-link nav-linkH" asp-area="Customer" asp-controller="Grammar" asp-action="Index">
-                        <i class="bi bi-book fst-normal ">Grammar</i>
+                    <a href="#" class="nav-link nav-linkH" id="vocabularyLink">
+                        <i class="bi bi-translate fst-normal"> Vocabulary</i>
+                    </a>
+                </li>
+                <li class="nav-item m-sm-2 fs-6 fw-bold text-d">
+                    <a href="#" class="nav-link nav-linkH" id="grammarLink">
+                        <i class="bi bi-book fst-normal"> Grammar</i>
                     </a>
                 </li>
                 @if (User.IsInRole(SD.Role_Admin) || User.IsInRole(SD.Role_Employee))
                 {
                     <li class="nav-item m-sm-2 fw-bold text-d">
-                        <a class="nav-link nav-linkH" asp-area="Admin" asp-controller="HomeAdmin" asp-action="Index">
-                            <i class="bi bi-person-lines-fill fst-normal "> Admin</i>
+                        <a href="#" class="nav-link nav-linkH" id="adminLink">
+                            <i class="bi bi-person-lines-fill fst-normal"> Admin</i>
                         </a>
                     </li>
                 }
             </ul>
-                <ul class="navbar-nav flex-grow-1 d-md-flex justify-content-end">
-                <li class="nav-item m-sm-2 fs-6 fw-bold text-d">
-                    <a class="nav-link nav-H">
-                        <i class="bi-brightness-high-fill fst-normal " id="toggleDark">Giao diện</i>
-                    </a>
-                </li>
-            </ul>
-            <partial name="_LoginPartial"/>
+            <div class="d-flex justify-content-end">
+                <partial name="_LoginPartial" />
+                
+            </div>
         </div>
     </div>
-
 </nav>
