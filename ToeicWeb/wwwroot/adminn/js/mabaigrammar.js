@@ -51,7 +51,7 @@ function Delete(url) {
                 type: 'DELETE',
                 success: function (data) {
                     if (data.success) {
-                        
+
                         Swal.fire({
                             title: "Đã xóa!",
                             text: "Tập tin đã bị xóa.",
@@ -70,6 +70,28 @@ function Delete(url) {
 }
 
 function Create() {
+    // Kiểm tra và khởi tạo TinyMCE nếu chưa khởi tạo
+    if (!tinymce.get('Noi_dung')) {
+        tinymce.init({
+            selector: '#Noi_dung',
+            setup: function (editor) {
+                editor.on('change', function () {
+                    editor.save();  // Cập nhật nội dung textarea
+                });
+            },
+            init_instance_callback: function (editor) {
+                // Khi TinyMCE đã sẵn sàng, gọi hàm xử lý
+                handleCreate();
+            }
+        });
+    } else {
+        // Nếu TinyMCE đã được khởi tạo, gọi trực tiếp
+        handleCreate();
+    }
+}
+
+function handleCreate() {
+    // Xác minh dữ liệu từ form
     var result = Validate();
     if (!result) {
         return false;
@@ -112,6 +134,28 @@ function Create() {
 }
 
 
+function initTinyMCE() {
+    if (tinymce.get('Noi_dung')) {
+        tinymce.get('Noi_dung').remove();  // Hủy bỏ nếu đã tồn tại
+    }
+
+    tinymce.init({
+        selector: '#Noi_dung',
+        setup: function (editor) {
+            editor.on('input', function () {
+                if (editor.getContent().trim() !== "") {
+                    editor.getContainer().style.border = "1px solid lightgrey";
+                    $('#Noi_dungError').text('').hide();
+                } else {
+                    editor.getContainer().style.border = "1px solid red";
+                }
+            });
+        },
+        plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',
+        toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat',
+    });
+}
+
 function Validate() {
     var isValid = true;
 
@@ -124,16 +168,25 @@ function Validate() {
         $('#Ten_baiError').text('').hide();
     }
 
-    var noi_dung_value = tinymce.get('Noi_dung').getContent();
-    if (noi_dung_value.trim() == "") {
-        tinymce.get('Noi_dung').getContainer().style.border = "1px solid red";
-        $('#Noi_dungError').text('Vui lòng nhập nội dung.').show();
-        isValid = false;
+
+    // Kiểm tra nội dung từ TinyMCE sau khi khởi tạo
+    var editor = tinymce.get('Noi_dung');
+    if (editor) {
+        var noi_dung_value = editor.getContent();
+
+        if (noi_dung_value.trim() == "") {
+            editor.getContainer().style.border = "1px solid red";
+            $('#Noi_dungError').text('Vui lòng nhập nội dung.').show();
+            isValid = false;
+        } else {
+            editor.getContainer().style.border = "1px solid lightgrey";
+            $('#Noi_dungError').text('').hide();
+        }
     } else {
-        tinymce.get('Noi_dung').getContainer().style.border = "1px solid lightgrey";
-        $('#Noi_dungError').text('').hide();
+        console.error('Editor TinyMCE chưa được khởi tạo hoặc không tìm thấy.');
     }
-    
+
+
     var newImageFileGraInput = $('#NewImageFileGra').get(0);
     if (newImageFileGraInput && newImageFileGraInput.files.length === 0) {
         $('#NewImageFileGra').css('border-color', 'Red');

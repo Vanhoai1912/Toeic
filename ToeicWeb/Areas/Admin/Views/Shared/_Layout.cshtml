@@ -481,7 +481,6 @@
                         url: url,
                         type: 'GET',
                         success: function (data) {
-                            console.log("Data received:", data); // Ghi lại phản hồi
                             var parsed = $(data).find('#content').html();
                             $('#content').html(parsed);
 
@@ -508,7 +507,6 @@
                         url: event.state.path,
                         type: 'GET',
                         success: function (data) {
-                            console.log("Data received on popstate:", data); // Ghi lại phản hồi
                             var parsed = $(data).find('#content').html();
                             $('#content').html(parsed);
 
@@ -549,6 +547,7 @@
                     case '/Admin/Grammar/Index':
                         $.getScript('@Url.Content("~/adminn/js/mabaigrammar.js")', function () {
                             loadDataTable();
+                            initTinyMCE();
                         });
                         break;
                     case '/Admin/User/Index':
@@ -557,12 +556,13 @@
                         });
                         break;
                     case '/Admin/BThi/Index':
-                        $.getScript('@Url.Content("~/adminn/js/bthi.js")', function() {
+                        $.getScript('@Url.Content("~/adminn/js/bthi.js")', function () {
                             loadDataTable();
                         });
                         break;
                 }
             }
+
 
             // Cập nhật lớp active cho menu sau khi tải nội dung mới
             function updateActiveMenuItem(linkElement) {
