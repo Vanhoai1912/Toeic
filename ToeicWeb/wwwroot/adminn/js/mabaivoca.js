@@ -119,6 +119,135 @@ function Create() {
     });
 }
 
+// Edit data
+function Edit(id) {
+    $.ajax({
+        url: '/Admin/Voca/Edit?id=' + id,
+        type: 'GET',
+        contentType: 'application/json; charset=utf-8',
+        datatype: 'json',
+        success: function (response) {
+            if (response == null || response == undefined) {
+                alert('Không thể đọc dữ liệu');
+            } else if (response.success === false) {
+                alert(response.message);
+            } else {
+
+                // Lưu dữ liệu ban đầu
+                originalData = {
+                    ten_bai: response.data.ten_bai,
+                };
+
+                $('#BaivocaModal').modal('show');
+                $('#modalTitle').text('Sửa bài từ vựng');
+                $('#Save').css('display', 'none');
+                $('#Update').css('display', 'block');
+
+                // Điền các giá trị vào modal
+                $('#Id').val(response.data.id);
+                $('#Ten_bai').val(response.data.ten_bai);
+
+                // Hiển thị thông tin file Excel hiện tại nếu có
+                if (response.filePath) {
+                    var fileName = response.filePath.split('\\').pop().split('/').pop();
+                    $('#ExcelFile').text(fileName);
+                    $('#ExcelFileInfo').show();
+                } else {
+                    $('#ExcelFileInfo').hide();
+                }
+
+                // Hiển thị số file ảnh đã thêm
+                if (response.numberOfImages) {
+                    $('#ImageFiles').text(response.numberOfImages);
+                    $('#NumberOfImages').show();
+                } else {
+                    $('#NumberOfImages').hide();
+                }
+
+                // Hiển thị số file nghe đã thêm
+                if (response.numberOfAudios) {
+                    $('#AudioFiles').text(response.numberOfAudios);
+                    $('#NumberOfAudios').show();
+                } else {
+                    $('#NumberOfAudios').hide();
+                }
+
+                // Reset phần input file mới
+                $('#NewExcelFile').val('');
+                $('#NewImageFile').val('');
+                $('#NewAudioFile').val('');
+
+
+            }
+        },
+        error: function () {
+            alert('Không thể đọc dữ liệu');
+        }
+    });
+}
+
+// Update data
+function Update() {
+    var tenbai = $('#Ten_bai').val();
+    var excelFile = $('#NewExcelFile').get(0).files[0];  // Lấy file excel từ input
+    var newImageFiles = $('#NewImageFile').get(0).files;
+    var newAudioFiles = $('#NewAudioFile').get(0).files;
+
+    var id = $('#Id').val();  // Lấy id từ trường ẩn
+
+    // Kiểm tra có thay đổi nào không
+    var isChanged = true;
+    if (tenbai != originalData.ten_bai || (excelFile !== undefined && excelFile !== null) ||
+        newImageFiles.length > 0 || newAudioFiles.length > 0) {
+        isChanged = false;
+    }
+    if (isChanged) {
+        toastr.info("Không có thay đổi nào để cập nhật");
+        return;
+    }
+
+    var formData = new FormData();
+    formData.append('id', id);
+    formData.append('ten_bai', tenbai);
+
+    if (excelFile) {
+        formData.append('ExcelFile', excelFile);
+    }
+
+    if (newImageFiles.length > 0) {
+        for (var i = 0; i < newImageFiles.length; i++) {
+            formData.append('ImageFile', newImageFiles[i]);
+        }
+    }
+
+    if (newAudioFiles.length > 0) {
+        for (var i = 0; i < newAudioFiles.length; i++) {
+            formData.append('AudioFile', newAudioFiles[i]);
+        }
+    }
+
+
+    $.ajax({
+        url: '/Admin/Voca/Update',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (data) {
+            if (data.success) {
+                HideModal();
+                loadDataTable();
+                toastr.success(data.message);
+            } else {
+                toastr.error(data.message);
+            }
+        },
+        error: function () {
+            alert('Lỗi khi cập nhật dữ liệu');
+        }
+    });
+}
+
 function Validate() {
     var isValid = true;
 
@@ -184,6 +313,9 @@ $('#btnAdd').click(function () {
 function HideModal() {
     ClearData();
     $('#BaivocaModal').modal('hide');
+    $('#ExcelFileInfo').hide();
+    $('#NumberOfImages').hide();
+    $('#NumberOfAudios').hide();
 }
 
 function ClearData() {

@@ -11,7 +11,9 @@ namespace Toeic.Models
 
         public string? ImageUrl { get; set; }
 
-        public string? FilePath { get; set; }
+        public string ExcelFilePath { get; set; }
+        public string? ImageFolderPath { get; set; }
+        public string AudioFolderPath { get; set; }
 
         public ICollection<Noi_dung_bai_tu_vung> Noidungbaituvungs { get; set; }
     }
