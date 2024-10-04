@@ -217,8 +217,6 @@ namespace ToeicWeb.Areas.Admin.Controllers
             }
         }
 
-        #region API CALLS
-
         public async Task<JsonResult> Edit(int id)
         {
             // Tìm bài tập đọc theo ID
@@ -242,7 +240,6 @@ namespace ToeicWeb.Areas.Admin.Controllers
                 filePath = fileExists ? filePath : null // Nếu file tồn tại, trả về đường dẫn, nếu không thì trả về null
             });
         }
-
 
         [HttpPost]
         public async Task<JsonResult> Update(CauhoiBTngeVM viewModel)
@@ -462,6 +459,7 @@ namespace ToeicWeb.Areas.Admin.Controllers
 
                 mabainge.ExcelFilePath = newExcelFilePath;
                 var cauhoiList = _db.Cauhoibaitapnges.Where(c => c.Ma_bai_tap_ngeId == mabainge.Id).ToList();
+                _db.Cauhoibaitapnges.RemoveRange(cauhoiList);
 
                 // Xử lý file Excel
                 using (var stream = new MemoryStream())
@@ -471,78 +469,80 @@ namespace ToeicWeb.Areas.Admin.Controllers
                     {
                         var worksheet = package.Workbook.Worksheets.First();
                         int row = 2;
-                        foreach (var cauhoi in cauhoiList)
+                        while (row <= worksheet.Dimension.Rows)
                         {
-                            if (row <= worksheet.Dimension.Rows)
+                            var cauhoi = new Cau_hoi_bai_tap_nge
                             {
-                                cauhoi.Thu_tu_cau = worksheet.Cells[row, 1].Value != null ? Convert.ToInt32(worksheet.Cells[row, 1].Value) : 0;
-                                cauhoi.Cau_hoi = worksheet.Cells[row, 2].Value?.ToString() ?? string.Empty;
-                                cauhoi.Dap_an_1 = worksheet.Cells[row, 5].Value?.ToString() ?? string.Empty;
-                                cauhoi.Dap_an_2 = worksheet.Cells[row, 6].Value?.ToString() ?? string.Empty;
-                                cauhoi.Dap_an_3 = worksheet.Cells[row, 7].Value?.ToString() ?? string.Empty;
-                                cauhoi.Dap_an_4 = worksheet.Cells[row, 8].Value?.ToString() ?? string.Empty;
-                                cauhoi.Dap_an_dung = worksheet.Cells[row, 9].Value?.ToString() ?? string.Empty;
-                                cauhoi.Giai_thich = worksheet.Cells[row, 10].Value?.ToString() ?? string.Empty;
+                                Thu_tu_cau = worksheet.Cells[row, 1].Value != null ? Convert.ToInt32(worksheet.Cells[row, 1].Value) : 0,
+                                Cau_hoi = worksheet.Cells[row, 2].Value?.ToString() ?? string.Empty,
+                                Dap_an_1 = worksheet.Cells[row, 5].Value?.ToString() ?? string.Empty,
+                                Dap_an_2 = worksheet.Cells[row, 6].Value?.ToString() ?? string.Empty,
+                                Dap_an_3 = worksheet.Cells[row, 7].Value?.ToString() ?? string.Empty,
+                                Dap_an_4 = worksheet.Cells[row, 8].Value?.ToString() ?? string.Empty,
+                                Dap_an_dung = worksheet.Cells[row, 9].Value?.ToString() ?? string.Empty,
+                                Giai_thich = worksheet.Cells[row, 10].Value?.ToString() ?? string.Empty,
+                                Ma_bai_tap_ngeId = mabainge.Id
+                            };
 
-
-                                if (fileAudioPaths.Count > 0)
+                            if (fileAudioPaths.Count > 0)
+                            {
+                                for (int i = 0; i < fileAudioPaths.Count; i++)
                                 {
-                                    for (int i = 0; i < fileAudioPaths.Count; i++)
+                                    if (worksheet.Cells[row, 3].Value?.ToString() == fileAudioPaths.ElementAt(i).Value)
                                     {
-                                        if (worksheet.Cells[row, 3].Value?.ToString() == fileAudioPaths.ElementAt(i).Value)
-                                        {
-                                            cauhoi.Audio = fileAudioPaths.ElementAt(i).Key;
-                                        }
+                                        cauhoi.Audio = fileAudioPaths.ElementAt(i).Key;
                                     }
                                 }
-                                else
-                                {
-                                    var audioFolderPath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString(), "audio");
-                                    if (Directory.Exists(audioFolderPath))
-                                    {
-                                        foreach (var filePath in Directory.GetFiles(audioFolderPath))
-                                        {
-                                            var fileName = Path.GetFileName(filePath);
-                                            var newFilePath = Path.Combine("adminn", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString(), "audio", fileName);
-                                            if (worksheet.Cells[row, 3].Value?.ToString() == fileName)
-                                            {
-                                                cauhoi.Audio = newFilePath;
-                                            }
-                                        }
-                                    }
-                                }
-
-
-                                //
-                                if (fileImagePaths.Count > 0)
-                                {
-                                    for (int i = 0; i < fileImagePaths.Count; i++)
-                                    {
-                                        if (worksheet.Cells[row, 4].Value?.ToString() == fileImagePaths.ElementAt(i).Value)
-                                        {
-                                            cauhoi.Image = fileImagePaths.ElementAt(i).Key;
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    var imageFolderPath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString(), "image");
-                                    if (Directory.Exists(imageFolderPath))
-                                    {
-                                        foreach (var filePath in Directory.GetFiles(imageFolderPath))
-                                        {
-                                            var fileName = Path.GetFileName(filePath);
-                                            var newFilePath = Path.Combine("adminn", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString(), "image", fileName);
-                                            if (worksheet.Cells[row, 3].Value?.ToString() == fileName)
-                                            {
-                                                cauhoi.Image = newFilePath;
-                                            }
-                                        }
-                                    }
-                                }
-
-                                row++;
                             }
+                            else
+                            {
+                                var audioFolderPath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString(), "audio");
+                                if (Directory.Exists(audioFolderPath))
+                                {
+                                    foreach (var filePath in Directory.GetFiles(audioFolderPath))
+                                    {
+                                        var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
+                                        var fileName = Path.GetFileName(filePath);
+                                        var newFilePath = Path.Combine("adminn", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString(), "audio", fileName);
+                                        if (worksheet.Cells[row, 3].Value?.ToString() == fileNameWithoutExtension)
+                                        {
+                                            cauhoi.Audio = newFilePath;
+                                        }
+                                    }
+                                }
+                            }
+
+
+                            //
+                            if (fileImagePaths.Count > 0)
+                            {
+                                for (int i = 0; i < fileImagePaths.Count; i++)
+                                {
+                                    if (worksheet.Cells[row, 4].Value?.ToString() == fileImagePaths.ElementAt(i).Value)
+                                    {
+                                        cauhoi.Image = fileImagePaths.ElementAt(i).Key;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                var imageFolderPath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString(), "image");
+                                if (Directory.Exists(imageFolderPath))
+                                {
+                                    foreach (var filePath in Directory.GetFiles(imageFolderPath))
+                                    {
+                                        var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
+                                        var fileName = Path.GetFileName(filePath);
+                                        var newFilePath = Path.Combine("adminn", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString(), "image", fileName);
+                                        if (worksheet.Cells[row, 4].Value?.ToString() == fileNameWithoutExtension)
+                                        {
+                                            cauhoi.Image = newFilePath;
+                                        }
+                                    }
+                                }
+                            }
+
+                            row++;
                             _db.Cauhoibaitapnges.Update(cauhoi);
                         }
                         await _db.SaveChangesAsync();
@@ -587,9 +587,10 @@ namespace ToeicWeb.Areas.Admin.Controllers
                                         {
                                             foreach (var filePath in Directory.GetFiles(audioFolderPath))
                                             {
+                                                var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
                                                 var fileName = Path.GetFileName(filePath);
                                                 var newFilePath = Path.Combine("adminn", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString(), "audio", fileName);
-                                                if (worksheet.Cells[row, 3].Value?.ToString() == fileName)
+                                                if (worksheet.Cells[row, 3].Value?.ToString() == fileNameWithoutExtension)
                                                 {
                                                     cauhoi.Audio = newFilePath;
                                                 }
@@ -616,9 +617,10 @@ namespace ToeicWeb.Areas.Admin.Controllers
                                         {
                                             foreach (var filePath in Directory.GetFiles(imageFolderPath))
                                             {
+                                                var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
                                                 var fileName = Path.GetFileName(filePath);
                                                 var newFilePath = Path.Combine("adminn", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString(), "image", fileName);
-                                                if (worksheet.Cells[row, 3].Value?.ToString() == fileName)
+                                                if (worksheet.Cells[row, 4].Value?.ToString() == fileNameWithoutExtension)
                                                 {
                                                     cauhoi.Image = newFilePath;
                                                 }
@@ -642,6 +644,8 @@ namespace ToeicWeb.Areas.Admin.Controllers
             return Json(new { success = true, message = "Cập nhật bài nghe thành công!" });
         }
 
+
+        #region API CALLS
 
         [HttpGet]
         public IActionResult GetAll()

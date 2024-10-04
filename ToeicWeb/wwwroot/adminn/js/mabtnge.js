@@ -36,137 +36,6 @@ function loadDataTable() {
     });
 }
 
-// Edit data
-function Edit(id) {
-    $.ajax({
-        url: '/Admin/BTnge/Edit?id=' + id,
-        type: 'GET',
-        contentType: 'application/json; charset=utf-8',
-        datatype: 'json',
-        success: function (response) {
-            if (response == null || response == undefined) {
-                alert('Không thể đọc dữ liệu');
-            } else if (response.success === false) {
-                alert(response.message);
-            } else {
-                $('#BaitapngeModal').modal('show');
-                $('#modalTitle').text('Sửa bài tập nghe');
-                $('#Save').css('display', 'none');
-                $('#Update').css('display', 'block');
-
-                // Điền các giá trị vào modal
-                $('#Id').val(response.data.id);
-                $('#Tieu_de').val(response.data.tieu_de);
-                $('#Part').val(response.data.part);
-
-                // Hiển thị thông tin file Excel hiện tại nếu có
-                if (response.data.filePath) {
-                    var fileName = response.data.filePath.split('\\').pop().split('/').pop();
-                    $('#ExcelFile').text(fileName);
-                    $('#ExcelFileInfo').show();
-                } else {
-                    $('#ExcelFileInfo').hide();
-                }
-
-                // Reset phần input file mới
-                $('#NewExcelFile').val('');
-            }
-        },
-        error: function () {
-            alert('Không thể đọc dữ liệu');
-        }
-    });
-}
-
-// Update data
-function Update() {
-    var formData = new FormData();
-    var tieuDe = $('#Tieu_de').val();
-    var part = $('#Part').val();
-    var excelFile = $('#NewExcelFile').get(0).files[0];  // Lấy file excel từ input
-
-    var id = $('#Id').val();  // Lấy id từ trường ẩn
-
-    formData.append('id', id);
-    formData.append('tieu_de', tieuDe);
-    formData.append('part', part);
-
-    if (excelFile) {
-        formData.append('ExcelFile', excelFile);
-    }
-
-    var newImageFiles = $('#NewImageFile').get(0).files;
-
-    if (newImageFiles.length > 0) {
-        for (var i = 0; i < newImageFiles.length; i++) {
-            formData.append('ImageFile', newImageFiles[i]);
-        }
-    }
-
-    var newAudioFiles = $('#NewAudioFile').get(0).files;
-    if (newAudioFiles.length > 0) {
-        for (var i = 0; i < newAudioFiles.length; i++) {
-            formData.append('AudioFile', newAudioFiles[i]);
-        }
-    }
-
-
-    $.ajax({
-        url: '/Admin/BTnge/Update',
-        type: 'POST',
-        data: formData,
-        processData: false,
-        contentType: false,
-        success: function (data) {
-            if (data.success) {
-                HideModal();
-                loadDataTable();
-                toastr.success(data.message);
-            } else {
-                toastr.error(data.message);
-            }
-        },
-        error: function () {
-            alert('Lỗi khi cập nhật dữ liệu');
-        }
-    });
-}
-
-// Delete data
-function Delete(url) {
-    Swal.fire({
-        title: 'Bạn có chắc chắn muốn xóa không?',
-        text: "Bạn sẽ không thể hoàn tác!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            $.ajax({
-                url: url,
-                type: 'DELETE',
-                success: function (data) {
-                    if (data.success) {
-                        
-                        Swal.fire({
-                            title: "Đã xóa!",
-                            text: "Tập tin đã bị xóa.",
-                            icon: "success"
-                        });
-                        dataTable.ajax.reload();
-                        //clearFormData();
-                    }
-                    else {
-                        toastr.error(data.message);
-                    }
-                }
-            })
-        }
-    })
-}
-
 // Create data
 function Create() {
     var result = Validate();
@@ -213,6 +82,174 @@ function Create() {
             toastr.error(xhr.responseJSON ? xhr.responseJSON.message : 'An error occurred.');
         }
     });
+}
+
+// Edit data
+function Edit(id) {
+    $.ajax({
+        url: '/Admin/BTnge/Edit?id=' + id,
+        type: 'GET',
+        contentType: 'application/json; charset=utf-8',
+        datatype: 'json',
+        success: function (response) {
+            if (response == null || response == undefined) {
+                alert('Không thể đọc dữ liệu');
+            } else if (response.success === false) {
+                alert(response.message);
+            } else {
+
+                // Lưu dữ liệu ban đầu
+                originalData = {
+                    tieu_de: response.data.tieu_de,
+                    part: response.data.part
+                };
+
+                $('#BaitapngeModal').modal('show');
+                $('#modalTitle').text('Sửa bài tập nghe');
+                $('#Save').css('display', 'none');
+                $('#Update').css('display', 'block');
+
+                // Điền các giá trị vào modal
+                $('#Id').val(response.data.id);
+                $('#Tieu_de').val(response.data.tieu_de);
+                $('#Part').val(response.data.part);
+
+                // Hiển thị thông tin file Excel hiện tại nếu có
+                if (response.filePath) {
+                    var fileName = response.filePath.split('\\').pop().split('/').pop();
+                    $('#ExcelFile').text(fileName);
+                    $('#ExcelFileInfo').show();
+                } else {
+                    $('#ExcelFileInfo').hide();
+                }
+
+                // Hiển thị số file ảnh đã thêm
+                if (response.numberOfImages) {
+                    $('#ImageFiles').text(response.numberOfImages);
+                    $('#NumberOfImages').show();
+                } else {
+                    $('#NumberOfImages').hide();
+                }
+
+                // Hiển thị số file nghe đã thêm
+                if (response.numberOfAudios) {
+                    $('#AudioFiles').text(response.numberOfAudios);
+                    $('#NumberOfAudios').show();
+                } else {
+                    $('#NumberOfAudios').hide();
+                }
+
+                // Reset phần input file mới
+                $('#NewExcelFile').val('');
+                $('#NewImageFile').val('');
+                $('#NewAudioFile').val('');
+
+
+            }
+        },
+        error: function () {
+            alert('Không thể đọc dữ liệu');
+        }
+    });
+}
+
+// Update data
+function Update() {
+    var tieuDe = $('#Tieu_de').val();
+    var part = $('#Part').val();
+    var excelFile = $('#NewExcelFile').get(0).files[0];  // Lấy file excel từ input
+    var newImageFiles = $('#NewImageFile').get(0).files;
+    var newAudioFiles = $('#NewAudioFile').get(0).files;
+
+    var id = $('#Id').val();  // Lấy id từ trường ẩn
+
+    // Kiểm tra có thay đổi nào không
+    var isChanged = true;
+    if (tieuDe != originalData.tieu_de || part != originalData.part || (excelFile !== undefined && excelFile !== null) ||
+        newImageFiles.length > 0 || newAudioFiles.length > 0) {
+        isChanged = false;
+    }
+    if (isChanged) {
+        toastr.info("Không có thay đổi nào để cập nhật");
+        return;
+    }
+
+    var formData = new FormData();
+    formData.append('id', id);
+    formData.append('tieu_de', tieuDe);
+    formData.append('part', part);
+
+    if (excelFile) {
+        formData.append('ExcelFile', excelFile);
+    }
+
+    if (newImageFiles.length > 0) {
+        for (var i = 0; i < newImageFiles.length; i++) {
+            formData.append('ImageFile', newImageFiles[i]);
+        }
+    }
+
+    if (newAudioFiles.length > 0) {
+        for (var i = 0; i < newAudioFiles.length; i++) {
+            formData.append('AudioFile', newAudioFiles[i]);
+        }
+    }
+
+
+    $.ajax({
+        url: '/Admin/BTnge/Update',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (data) {
+            if (data.success) {
+                HideModal();
+                loadDataTable();
+                toastr.success(data.message);
+            } else {
+                toastr.error(data.message);
+            }
+        },
+        error: function () {
+            alert('Lỗi khi cập nhật dữ liệu');
+        }
+    });
+}
+
+// Delete data
+function Delete(url) {
+    Swal.fire({
+        title: 'Bạn có chắc chắn muốn xóa không?',
+        text: "Bạn sẽ không thể hoàn tác!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: url,
+                type: 'DELETE',
+                success: function (data) {
+                    if (data.success) {
+
+                        Swal.fire({
+                            title: "Đã xóa!",
+                            text: "Tập tin đã bị xóa.",
+                            icon: "success"
+                        });
+                        dataTable.ajax.reload();
+                        clearFormData();
+                    }
+                    else {
+                        toastr.error(data.message);
+                    }
+                }
+            })
+        }
+    })
 }
 
 function Validate() {
@@ -269,6 +306,9 @@ $('#btnAdd').click(function () {
 function HideModal() {
     ClearData();
     $('#BaitapngeModal').modal('hide');
+    $('#ExcelFileInfo').hide();
+    $('#NumberOfImages').hide();
+    $('#NumberOfAudios').hide();
 }
 
 function ClearData() {

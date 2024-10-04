@@ -1,100 +1,73 @@
 ﻿@model Toeic.Models.ViewModels.TracNghiemViewModel
 
 
-<!-- Tiêu đề -->
 <div class="col-12 text-center">
     <h2>@Model.BaiTap.Tieu_de</h2>
 </div>
 
 <div class="container rounded-4" style="max-width: 1220px; box-shadow: 0 2px 4px rgba(0, 0, 0, .08), 0 4px 12px rgba(0, 0, 0, .08); margin-left: -6rem;">
-    <p class="mt-xxl-3">
-        <span class="badge rounded-4 bg-primary mt-3">
-            Part @Model.BaiTap.Part
-        </span>
-    </p>
-    <form asp-action="ResultDetailPart7" method="post" id="tracNghiemForm">
-        <input type="hidden" name="baiTapId" value="@Model.CauHoiList.FirstOrDefault()?.Ma_bai_tap_docId" />
+    
+    <div class="row">
+        <p class="mt-xxl-3">
+            <span class="badge rounded-4 bg-primary">
+                Part @Model.BaiTap.Part
+            </span>
+        </p>
+            @{
+                // Khởi tạo một danh sách để lưu trữ các tên ảnh đã hiển thị
+                List<string> displayedImages = new List<string>();
+            }
 
-        <!-- Vòng lặp qua các câu hỏi -->
-        @foreach (var question in Model.CauHoiList)
-        {
-            <div class="row" style="margin-bottom: 30px;">
-
-                <!-- Đường cắt ngang phía trên câu hỏi nếu có bài đọc -->
-                @if (!string.IsNullOrEmpty(question.Bai_doc) && Model.BaiDocs.ContainsKey(question.Bai_doc))
+            <form asp-action="ResultDetailPart7" method="post" id="tracNghiemForm">
+                <input type="hidden" name="baiTapId" value="@Model.BaiTap.Id" />
+                @for (int i = 0; i < Model.CauHoiList.Count; i++)
                 {
-                    <hr style="border: 1px solid #ccc; margin-bottom: 20px;" />
-                }
+                    <div class="question-block" id="question_@Model.CauHoiList[i].Id" style="padding: 10px;">
 
-                <!-- Cột bên trái: Bài đọc -->
-                <div class="col-md-6" style="border-right: 1px solid #ddd; padding-right: 30px;">
-                    @if (!string.IsNullOrEmpty(question.Bai_doc) && Model.BaiDocs.ContainsKey(question.Bai_doc))
-                    {
-                        <div class="reading-passage" style="margin-top: 20px;">
-                            @{
-                                // Xác định vị trí của câu hiện tại trong danh sách câu hỏi
-                                var startIndex = Model.CauHoiList.IndexOf(question);
-                                var endIndex = startIndex; // Biến endIndex để xác định câu kết thúc
-
-                                // Tìm câu tiếp theo có bài đọc
-                                for (int i = startIndex + 1; i < Model.CauHoiList.Count; i++)
-                                {
-                                    if (!string.IsNullOrEmpty(Model.CauHoiList[i].Bai_doc) && Model.BaiDocs.ContainsKey(Model.CauHoiList[i].Bai_doc))
-                                    {
-                                        endIndex = i - 1; // Kết thúc trước câu tiếp theo có bài đọc
-                                        break;
-                                    }
-                                }
-
-                                // Nếu không tìm thấy câu tiếp theo có bài đọc, lấy đến cuối danh sách
-                                if (endIndex == startIndex)
-                                {
-                                    endIndex = Model.CauHoiList.Count - 1;
-                                }
-                            }
-
-                            <!-- Hiển thị phạm vi câu hỏi -->
-                            <h5>Questions @question.Thu_tu_cau - @Model.CauHoiList[endIndex].Thu_tu_cau</h5>
-
-                            <!-- Hiển thị bài đọc -->
-                            <p>@Model.BaiDocs[question.Bai_doc]</p> <!-- Hiển thị nội dung bài đọc -->
-                        </div>
-                    }
-                </div>
-
-
-
-                <!-- Cột bên phải: Câu hỏi -->
-                <div class="col-md-6" style="padding-left: 30px;">
-                    <div class="question-block" id="question_@question.Id" style="padding: 10px;">
-                        <p><b>@question.Thu_tu_cau. @question.Cau_hoi</b></p>
-
-                        @{
-                            var options = new[] {
-                    new { Letter = "A", Text = question.Dap_an_1 },
-                    new { Letter = "B", Text = question.Dap_an_2 },
-                    new { Letter = "C", Text = question.Dap_an_3 },
-                    new { Letter = "D", Text = question.Dap_an_4 }
-                    };
-                        }
-
-                        @for (int j = 0; j < options.Length; j++)
+                        @* Hiển thị hình ảnh nếu có và nếu chưa được hiển thị *@
+                        @if (!string.IsNullOrEmpty(Model.CauHoiList[i].Image_bai_doc) && !displayedImages.Contains(Model.CauHoiList[i].Image_bai_doc))
                         {
-                            <div>
-                                <input type="radio" name="cauHoi_@question.Id" value="@options[j].Text" onchange="markAsSelected(@question.Id)" />
-                                <label>@options[j].Letter. @options[j].Text</label>
+                            // Thêm tên ảnh vào danh sách đã hiển thị
+                            displayedImages.Add(Model.CauHoiList[i].Image_bai_doc);
+
+                            @* Thêm đường kẻ ngang để phân biệt bài đọc mới *@
+                            <hr />
+
+                            <div class="box-image w-75 h-50">
+                                <img src="~/@Model.CauHoiList[i].Image_bai_doc" alt="Question Image" />
                             </div>
                         }
 
-                        <input type="hidden" name="questionIds" value="@question.Id" />
+                        <div class="my-3"><b>@Model.CauHoiList[i].Thu_tu_cau</b></div>
+
+                        @* Lấy danh sách các đáp án *@
+                        @{
+                            var options = new[]
+                            {
+                    new { Letter = "A", Text = Model.CauHoiList[i].Dap_an_1 },
+                    new { Letter = "B", Text = Model.CauHoiList[i].Dap_an_2 },
+                    new { Letter = "C", Text = Model.CauHoiList[i].Dap_an_3 },
+                    new { Letter = "D", Text = Model.CauHoiList[i].Dap_an_4 }
+                    };
+                        }
+
+                        @* Hiển thị các lựa chọn đáp án *@
+                        @for (int j = 0; j < options.Length; j++)
+                        {
+                            <div>
+                                <input type="radio" name="cauHoi_@Model.CauHoiList[i].Id" value="@options[j].Text" onchange="markAsSelected(@Model.CauHoiList[i].Id)" />
+                                <label>@options[j].Letter. @options[j].Text.</label>
+                            </div>
+                        }
+
+                        @* Input ẩn để đánh dấu câu hỏi đã được hiển thị *@
+                        <input type="hidden" name="questionIds" value="@Model.CauHoiList[i].Id" />
                     </div>
-                </div>
-            </div>
-        }
-    </form>
+                }
+            </form>
+
+    </div>
 </div>
-
-
 
 
 

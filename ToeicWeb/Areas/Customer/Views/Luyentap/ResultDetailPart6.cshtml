@@ -13,46 +13,26 @@
             </span>
         </p>
 
-        <!-- Vòng lặp qua các câu hỏi -->
+        @{
+            // Khởi tạo một danh sách để lưu trữ các tên ảnh đã hiển thị
+            List<string> displayedImages = new List<string>();
+        }
         @foreach (var question in Model.CauHoiList)
         {
-            <div class="row question-row" style="margin-bottom: 30px;">
-                 <!-- Đường cắt ngang phía trên câu hỏi nếu có bài đọc -->
-                @if (!string.IsNullOrEmpty(question.Bai_doc) && Model.BaiDocs.ContainsKey(question.Bai_doc))
+            <div class="question-row" style="margin-bottom: 30px;">
+                <!-- Đường cắt ngang phía trên bài đọc nếu có -->
+                @if (!string.IsNullOrEmpty(question.Image_bai_doc)) // Kiểm tra nếu có ảnh bài đọc
                 {
-                    <hr style="border: 1px solid #ccc; margin-bottom: 20px;" />
-                }
-                <!-- Cột bên trái: Bài đọc (chỉ hiển thị nếu có bài đọc) -->
-                @if (!string.IsNullOrEmpty(question.Bai_doc) && Model.BaiDocs.ContainsKey(question.Bai_doc))
-                {
-                    <div class="col-md-6 reading-column" style="border-right: 1px solid #ddd; padding-right: 30px; position: relative;">
-                         <div class="reading-passage" style="margin-top: 20px;">
-                            @{
-                                // Xác định vị trí của câu hiện tại trong danh sách câu hỏi
-                                var startIndex = Model.CauHoiList.IndexOf(question);
-                                var endIndex = startIndex; // Biến endIndex để xác định câu kết thúc
+                    // Kiểm tra nếu ảnh đã được hiển thị chưa
+                    if (!displayedImages.Contains(question.Image_bai_doc))
+                    {
+                        <hr style="border: 1px solid #ccc; margin-bottom: 20px;" /> <!-- Đường cắt ngang trên bài đọc -->
 
-                                // Tìm câu tiếp theo có bài đọc
-                                for (int i = startIndex + 1; i < Model.CauHoiList.Count; i++)
-                                {
-                                    if (!string.IsNullOrEmpty(Model.CauHoiList[i].Bai_doc) && Model.BaiDocs.ContainsKey(Model.CauHoiList[i].Bai_doc))
-                                    {
-                                        endIndex = i - 1; // Kết thúc trước câu tiếp theo có bài đọc
-                                        break;
-                                    }
-                                }
-
-                                // Nếu không tìm thấy câu tiếp theo có bài đọc, lấy đến cuối danh sách
-                                if (endIndex == startIndex)
-                                {
-                                    endIndex = Model.CauHoiList.Count - 1;
-                                }
-                            }
-
-                            <!-- Hiển thị phạm vi câu hỏi -->
-                            <h5>Questions @question.Thu_tu_cau - @Model.CauHoiList[endIndex].Thu_tu_cau</h5>
-                            <p>@Model.BaiDocs[question.Bai_doc]</p> <!-- Hiển thị bài đọc tương ứng -->
-
+                        <div class="reading-passage" style="margin-top: 20px;">
+                            <h5>Bài đọc</h5>
+                            <div class="box-image w-75 h-50">
+                                <img src="~/@question.Image_bai_doc" alt="Question Image" />
+                            </div>
                             <!-- Giải thích đáp án bài đọc -->
                             <div class="mt-2">
                                 <div class="toggle-explanation" onclick="toggleExplanation('readingExplanation_@question.Id')" style="cursor: pointer; color: #3b4f95; text-decoration: none;">
@@ -60,68 +40,61 @@
                                 </div>
                                 <div class="explanation-content mt-2" id="readingExplanation_@question.Id">
                                     <div class="">
-                                        @question.Giai_thich
+                                        @question.Giai_thich_bai_doc
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                }
-                else
-                {
-                    <!-- Nếu không có bài đọc, tạo một cột trống bên trái để câu hỏi luôn nằm bên phải -->
-                    <div class="col-md-6" style="border-right: 1px solid #ddd; padding-right: 30px;">
-                        <!-- Cột trống -->
-                    </div>
+
+                        // Thêm tên ảnh vào danh sách đã hiển thị
+                        displayedImages.Add(question.Image_bai_doc);
+                    }
                 }
 
-                <!-- Cột bên phải: Câu hỏi -->
-                <div class="col-md-6" style="padding-left: 30px;">
-                    <div class="question-block" id="question_@question.Id" style="padding: 10px; border-bottom: 1px solid #ddd;">
-                        <!-- Hiển thị số câu và nội dung câu hỏi -->
-                        <p><b>@question.Thu_tu_cau. @question.Cau_hoi</b></p>
+                <!-- Câu hỏi -->
+                <div class="question-block" id="question_@question.Id">
+                    <!-- Hiển thị số câu và nội dung câu hỏi -->
+                    <p><b>@question.Thu_tu_cau. @question.Cau_hoi</b></p>
 
-                        <!-- Đáp án (A, B, C, D) -->
-                        @{
-                            var options = new[] {
-                                new { Letter = "A", Text = question.Dap_an_1 },
-                                new { Letter = "B", Text = question.Dap_an_2 },
-                                new { Letter = "C", Text = question.Dap_an_3 },
-                                new { Letter = "D", Text = question.Dap_an_4 }
-                            };
+                    <!-- Đáp án (A, B, C, D) -->
+                    @{
+                        var options = new[] {
+                new { Letter = "A", Text = question.Dap_an_1 },
+                new { Letter = "B", Text = question.Dap_an_2 },
+                new { Letter = "C", Text = question.Dap_an_3 },
+                new { Letter = "D", Text = question.Dap_an_4 }
+                };
 
-                            var userAnswered = !string.IsNullOrEmpty(question.UserAnswer);
-                        }
+                        var userAnswered = !string.IsNullOrEmpty(question.UserAnswer);
+                    }
 
-                        @for (int j = 0; j < options.Length; j++)
-                        {
-                            var option = options[j];
-                            var isCorrectAnswer = string.Equals(option.Text, question.Dap_an_dung, StringComparison.OrdinalIgnoreCase);
-                            var isUserAnswer = string.Equals(option.Text, question.UserAnswer, StringComparison.OrdinalIgnoreCase);
+                    @for (int j = 0; j < options.Length; j++)
+                    {
+                        var option = options[j];
+                        var isCorrectAnswer = string.Equals(option.Text, question.Dap_an_dung, StringComparison.OrdinalIgnoreCase);
+                        var isUserAnswer = string.Equals(option.Text, question.UserAnswer, StringComparison.OrdinalIgnoreCase);
 
-                            <div>
-                                <!-- Hiển thị đáp án với màu tương ứng -->
-                                <span style="color: @(userAnswered && isUserAnswer ? (isCorrectAnswer ? "green" : "#e69a9c") : (userAnswered && isCorrectAnswer ? "green" : "black")); font-weight: @(userAnswered && (isUserAnswer || isCorrectAnswer) ? "bold" : "normal");">
-                                    <input type="radio" name="cauHoi_@question.Id" value="@option.Text" disabled @(isUserAnswer ? "checked" : "") />
-                                    @option.Letter. @option.Text
-                                </span>
-                            </div>
-                        }
+                        <div>
+                            <!-- Hiển thị đáp án với màu tương ứng -->
+                            <span style="color: @(userAnswered && isUserAnswer ? (isCorrectAnswer ? "green" : "#e69a9c") : (userAnswered && isCorrectAnswer ? "green" : "black")); font-weight: @(userAnswered && (isUserAnswer || isCorrectAnswer) ? "bold" : "normal");">
+                                <input type="radio" name="cauHoi_@question.Id" value="@option.Text" disabled @(isUserAnswer ? "checked" : "") />
+                                @option.Letter. @option.Text
+                            </span>
+                        </div>
+                    }
 
-                        <!-- Đáp án đúng -->
-                        <p><strong>Đáp án đúng:</strong> <span style="color:green; font-weight: bold">@question.Dap_an_dung</span></p>
+                    <!-- Đáp án đúng -->
+                    <p><strong>Đáp án đúng:</strong> <span style="color:green; font-weight: bold">@question.Dap_an_dung</span></p>
 
-                        <div class="mt-2">
-                            <div class="toggle-explanation" onclick="toggleExplanation('explanation_@question.Id')" style="cursor: pointer; color: #3b4f95; text-decoration: none;">
-                                Giải thích chi tiết đáp án <i class="bi bi-chevron-down"></i>
-                            </div>
-                            <div class="explanation-content mt-2" id="explanation_@question.Id">
-                                <div class="">
-                                    @question.Giai_thich <!-- Assuming you have an explanation field -->
-                                </div>
+                    <div class="mt-2">
+                        <div class="toggle-explanation" onclick="toggleExplanation('explanation_@question.Id')" style="cursor: pointer; color: #3b4f95; text-decoration: none;">
+                            Giải thích chi tiết đáp án <i class="bi bi-chevron-down"></i>
+                        </div>
+                        <div class="explanation-content mt-2" id="explanation_@question.Id">
+                            <div class="">
+                                @question.Giai_thich <!-- Assuming you have an explanation field -->
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>

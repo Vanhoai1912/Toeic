@@ -12,5 +12,7 @@ namespace Toeic.Models.ViewModels
         public int Part { get; set; }
         public List<Ma_bai_tap_doc> Mabaitapdocs { get; set; }
         public Ma_bai_tap_doc MaBaiTapDoc { get; set; }
+
+        public List<IFormFile> Image_bai_doc { get; set; }
     }
 }

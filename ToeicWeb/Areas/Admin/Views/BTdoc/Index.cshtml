@@ -78,6 +78,19 @@
                     <input type="file" class="form-control" id="NewExcelFile" />
                     <span id="ExcelFileError" class="text-danger"></span>
                 </div>
+
+                <!-- Input cho nhiều file ảnh -->
+                <div class="mb-2">
+                    <label for="NewImageFile" class="d-flex align-items-center fs-5 fw-semibold mb-2">
+                        <span class="required">File ảnh bài đọc</span>
+                    </label>
+                    <div id="NumberOfImages" class="mb-2" style="display:none">
+                        <p>File ảnh đã thêm: <span id="ImageFiles"></span></p>
+                    </div>
+                    <input type="file" class="form-control" id="NewImageFile" name="ImageFile" accept="image/*" multiple />
+                    <span id="ImageFileError" class="text-danger"></span>
+                </div>
+
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" data-bs-dismiss="modal" onclick="HideModal();">Hủy</button>

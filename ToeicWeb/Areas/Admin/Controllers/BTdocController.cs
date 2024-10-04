@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using OfficeOpenXml;
+using System.Linq;
 using Toeic.DataAccess;
 using Toeic.Models;
 using Toeic.Models.ViewModels;
@@ -41,6 +43,37 @@ namespace Toeic.Areas.Admin.Controllers
         [HttpPost]
         public async Task<JsonResult> Create(CauhoiBTdocVM viewModel)
         {
+            var uploadImageFolderPath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString(), "image");
+            Directory.CreateDirectory(uploadImageFolderPath);
+
+
+            //Lưu đường dẫn file Image
+            var allowedImageExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+
+            var fileImageBDPaths = new Dictionary<string, string>();
+            foreach (var formFile in viewModel.Image_bai_doc)
+            {
+                var fileExtension = Path.GetExtension(formFile.FileName).ToLowerInvariant();
+                if (string.IsNullOrEmpty(fileExtension) || !allowedImageExtensions.Contains(fileExtension))
+                {
+                    return Json(new { success = false, message = "Invalid file extension for images. Allowed extensions are: " + string.Join(", ", allowedImageExtensions) });
+                }
+
+                if (formFile.Length > 0)
+                {
+                    var fileName = Path.GetFileNameWithoutExtension(formFile.FileName);
+                    var fileNameFul = fileName + fileExtension;
+                    var filePath = Path.Combine(uploadImageFolderPath, fileNameFul);
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await formFile.CopyToAsync(stream);
+                    }
+
+                    var relativeFilePath = Path.Combine("adminn", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString(), "image", fileNameFul).Replace("\\", "/");
+                    fileImageBDPaths.Add(relativeFilePath, fileName);
+                }
+            }
+
             if (viewModel.ExcelFile == null || viewModel.ExcelFile.Length == 0)
             {
                 return Json(new { success = false, message = "File không được chọn hoặc không có dữ liệu" });
@@ -55,8 +88,8 @@ namespace Toeic.Areas.Admin.Controllers
                     Directory.CreateDirectory(uploadsFolder);
                 }
 
-                string filePath = Path.Combine(uploadsFolder, viewModel.ExcelFile.FileName);
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                string excelFilePath = Path.Combine(uploadsFolder, viewModel.ExcelFile.FileName);
+                using (var fileStream = new FileStream(excelFilePath, FileMode.Create))
                 {
                     await viewModel.ExcelFile.CopyToAsync(fileStream);
                 }
@@ -75,7 +108,8 @@ namespace Toeic.Areas.Admin.Controllers
                             {
                                 Tieu_de = viewModel.Tieu_de,
                                 Part = viewModel.Part,
-                                FilePath = filePath
+                                ExcelFilePath = excelFilePath,
+                                ImageBDFolderPath = uploadImageFolderPath
                             };
                             _db.Mabaitapdocs.Add(mabaidoc);
                             await _db.SaveChangesAsync();
@@ -83,7 +117,7 @@ namespace Toeic.Areas.Admin.Controllers
 
                         for (int row = 2; row <= worksheet.Dimension.Rows; row++)
                         {
-                            var product = new Cau_hoi_bai_tap_doc
+                            var cauhoi = new Cau_hoi_bai_tap_doc
                             {
                                 Thu_tu_cau = worksheet.Cells[row, 1].Value != null ? Convert.ToInt32(worksheet.Cells[row, 1].Value) : 0,
                                 Cau_hoi = worksheet.Cells[row, 2].Value?.ToString() ?? string.Empty,
@@ -93,10 +127,18 @@ namespace Toeic.Areas.Admin.Controllers
                                 Dap_an_4 = worksheet.Cells[row, 6].Value?.ToString() ?? string.Empty,
                                 Dap_an_dung = worksheet.Cells[row, 7].Value?.ToString() ?? string.Empty,
                                 Giai_thich = worksheet.Cells[row, 8].Value?.ToString() ?? string.Empty,
-                                Bai_doc = worksheet.Cells[row, 9].Value?.ToString() ?? string.Empty,
+                                Giai_thich_bai_doc = worksheet.Cells[row, 10].Value?.ToString() ?? string.Empty,
                                 Ma_bai_tap_docId = mabaidoc.Id
                             };
-                            _db.Cauhoibaitapdocs.Add(product);
+                            for (int i = 0; i < fileImageBDPaths.Count; i++)
+                            {
+                                if (worksheet.Cells[row, 9].Value?.ToString() == fileImageBDPaths.ElementAt(i).Value)
+                                {
+                                    cauhoi.Image_bai_doc = fileImageBDPaths.ElementAt(i).Key;
+                                }
+                            }
+
+                            _db.Cauhoibaitapdocs.Add(cauhoi);
                         }
 
                         await _db.SaveChangesAsync();
@@ -110,6 +152,7 @@ namespace Toeic.Areas.Admin.Controllers
                 return Json(new { success = false, message = $"Lỗi khi thêm bài đọc mới: {ex.Message}" });
             }
         }
+
         [HttpGet]
         public async Task<JsonResult> Edit(int id)
         {
@@ -121,7 +164,7 @@ namespace Toeic.Areas.Admin.Controllers
             }
 
             // Lấy đường dẫn file Excel từ cơ sở dữ liệu
-            var filePath = baitapdoc.FilePath; // Giả sử bạn lưu đường dẫn file trong thuộc tính FilePath
+            var filePath = baitapdoc.ExcelFilePath; // Giả sử bạn lưu đường dẫn file trong thuộc tính FilePath
 
             // Kiểm tra xem file có tồn tại hay không
             bool fileExists = !string.IsNullOrEmpty(filePath) && System.IO.File.Exists(filePath);
@@ -135,68 +178,163 @@ namespace Toeic.Areas.Admin.Controllers
             });
         }
 
-
         [HttpPost]
-        public async Task<JsonResult> Update(int id, string tieu_de, int part, IFormFile FileExcel)
+        public async Task<JsonResult> Update(CauhoiBTdocVM viewModel)
         {
             // Tìm bài tập đọc cần cập nhật
-            var baitapdoc = await _db.Mabaitapdocs.FindAsync(id);
+            var baitapdoc = await _db.Mabaitapdocs.FindAsync(viewModel.Id);
             if (baitapdoc == null)
             {
                 return Json(new { success = false, message = "Không tìm thấy bài tập đọc" });
             }
 
-            // Cập nhật thông tin tiêu đề và part
-            baitapdoc.Tieu_de = tieu_de;
-            baitapdoc.Part = part;
+            // Kiểm tra xem có thay đổi tiêu đề (Tieu_de) hoặc Part không
+            bool tieuDeChanged = baitapdoc.Tieu_de != viewModel.Tieu_de;
+            bool partChanged = baitapdoc.Part != viewModel.Part;
 
-            // Kiểm tra file Excel
-            if (FileExcel != null && FileExcel.Length > 0)
+            var oldExcelFilePath = baitapdoc.ExcelFilePath;
+            var oldImageBDFolderPath = baitapdoc.ImageBDFolderPath;
+            var oldExcelFileName = Path.GetFileName(oldExcelFilePath);
+            // Nếu Tieu_de hoặc Part thay đổi, cần tạo các thư mục mới
+            if (tieuDeChanged || partChanged)
             {
-                // Xóa file Excel cũ nếu tồn tại
-                if (!string.IsNullOrEmpty(baitapdoc.FilePath))
+                // Tạo đường dẫn mới
+                var newFolderBasePath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString());
+                Directory.CreateDirectory(newFolderBasePath);
+
+
+                var newImageBDFolderPath = Path.Combine(newFolderBasePath, "image");
+                var newExcelFolderPath = Path.Combine(newFolderBasePath, "excel");
+
+                // Tạo thư mục mới nếu chưa có
+                Directory.CreateDirectory(newImageBDFolderPath);
+                Directory.CreateDirectory(newExcelFolderPath);
+
+                // Chuyển các file hình ảnh
+                if (Directory.Exists(oldImageBDFolderPath))
                 {
-                    string oldFilePath = Path.Combine(_environment.WebRootPath, baitapdoc.FilePath);
-                    if (System.IO.File.Exists(oldFilePath))
+                    foreach (var filePath in Directory.GetFiles(oldImageBDFolderPath))
                     {
-                        System.IO.File.Delete(oldFilePath);
+                        var fileName = Path.GetFileName(filePath);
+                        var newFilePath = Path.Combine(newImageBDFolderPath, fileName);
+                        System.IO.File.Move(filePath, newFilePath);
                     }
                 }
 
-                // Lưu file mới vào thư mục wwwroot/adminn/upload
-                string uploadsFolder = Path.Combine(_environment.WebRootPath, "adminn", "upload");
-
-                if (!Directory.Exists(uploadsFolder))
+                if (!System.IO.File.Exists(baitapdoc.ExcelFilePath))
                 {
-                    Directory.CreateDirectory(uploadsFolder);
+                    return Json(new { success = false, message = "File Excel không tồn tại." });
                 }
 
-                string filePath = Path.Combine(uploadsFolder, FileExcel.FileName);
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                // Chuyển file Excel
+                if (System.IO.File.Exists(oldExcelFilePath))
                 {
-                    await FileExcel.CopyToAsync(fileStream);
+                    var newExcelFilePath = Path.Combine(newExcelFolderPath, oldExcelFileName);
+                    System.IO.File.Move(oldExcelFilePath, newExcelFilePath);
+                    baitapdoc.ExcelFilePath = newExcelFilePath;
                 }
 
-                // Cập nhật đường dẫn file trong cơ sở dữ liệu
-                baitapdoc.FilePath = Path.Combine("adminn", "upload", FileExcel.FileName);
+                // Xóa folder cũ
+                var oldFolderBasePath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "part " + baitapdoc.Part.ToString(), baitapdoc.Tieu_de.ToString());
+                if (Directory.Exists(oldFolderBasePath))
+                {
+                    Directory.Delete(oldFolderBasePath, true);
+                }
 
-                // Xóa các câu hỏi cũ trong bảng Câu hỏi bài tập đọc
-                var oldQuestions = _db.Cauhoibaitapdocs.Where(q => q.Ma_bai_tap_docId == baitapdoc.Id);
-                _db.Cauhoibaitapdocs.RemoveRange(oldQuestions);
-                await _db.SaveChangesAsync();
+                // Cập nhật các đường dẫn mới trong database
+                baitapdoc.Tieu_de = viewModel.Tieu_de;
+                baitapdoc.Part = viewModel.Part;
 
-                // Đọc dữ liệu từ file Excel và thêm câu hỏi mới
+                // Cập nhật đường dẫn trong database
+                baitapdoc.ImageBDFolderPath = newImageBDFolderPath;
+            }
+
+            // Xử lý Image (nếu có file mới)
+            var allowedImageExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+            Dictionary<string, string> fileImageBDPaths = new Dictionary<string, string>();
+            if (viewModel.Image_bai_doc != null && viewModel.Image_bai_doc.Any())
+            {
+                // Xóa đường Image cũ trong database
+                var cauhoiList = _db.Cauhoibaitapdocs.Where(c => c.Ma_bai_tap_docId == baitapdoc.Id).ToList();
+                foreach (var cauhoi in cauhoiList)
+                {
+                    cauhoi.Image_bai_doc = null;
+                }
+
+
+                var FolderBasePath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "part " + baitapdoc.Part.ToString(), baitapdoc.Tieu_de.ToString(), "image");
+                var ImageFiles = Directory.GetFiles(FolderBasePath);
+
+                foreach (var img in ImageFiles)
+                {
+                    if (System.IO.File.Exists(img))
+                    {
+                        System.IO.File.Delete(img);
+                    }
+                }
+
+                foreach (var formFile in viewModel.Image_bai_doc)
+                {
+                    var fileExtension = Path.GetExtension(formFile.FileName).ToLowerInvariant();
+                    if (string.IsNullOrEmpty(fileExtension) || !allowedImageExtensions.Contains(fileExtension))
+                    {
+                        return Json(new { success = false, message = "Invalid file extension for images. Allowed extensions are: " + string.Join(", ", allowedImageExtensions) });
+                    }
+
+                    if (formFile.Length > 0)
+                    {
+                        var fileName = Path.GetFileNameWithoutExtension(formFile.FileName);
+                        var fileNameFul = fileName + fileExtension;
+                        var filePath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "part " + viewModel.Part, viewModel.Tieu_de, "image", fileNameFul);
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await formFile.CopyToAsync(stream);
+                        }
+
+                        var relativeFilePath = Path.Combine("adminn", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString(), "image", fileNameFul).Replace("\\", "/");
+                        fileImageBDPaths.Add(relativeFilePath, fileName);
+                    }
+                }
+            }
+
+            // Xử lý Excel (nếu có file mới)
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            if (viewModel.ExcelFile != null && viewModel.ExcelFile.Length > 0)
+            {
+
+                // Xóa file excel cũ
+                if (!string.IsNullOrEmpty(baitapdoc.ExcelFilePath))
+                {
+                    if (System.IO.File.Exists(baitapdoc.ExcelFilePath))
+                    {
+                        System.IO.File.Delete(baitapdoc.ExcelFilePath);
+                    }
+                }
+
+                // Lưu file Excel mới
+                string uploadsExcelFolder = Path.Combine(_environment.WebRootPath, "adminn", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString(), "excel");
+                string newExcelFilePath = Path.Combine(uploadsExcelFolder, viewModel.ExcelFile.FileName);
+                using (var fileStream = new FileStream(newExcelFilePath, FileMode.Create))
+                {
+                    await viewModel.ExcelFile.CopyToAsync(fileStream);
+                }
+
+                baitapdoc.ExcelFilePath = newExcelFilePath;
+                var cauhoiList = _db.Cauhoibaitapdocs.Where(c => c.Ma_bai_tap_docId == baitapdoc.Id).ToList();
+                _db.Cauhoibaitapdocs.RemoveRange(cauhoiList);
+
+
+                // Xử lý file Excel
                 using (var stream = new MemoryStream())
                 {
-                    await FileExcel.CopyToAsync(stream);
+                    await viewModel.ExcelFile.CopyToAsync(stream);
                     using (var package = new ExcelPackage(stream))
                     {
-                        var worksheet = package.Workbook.Worksheets[0]; // Sheet đầu tiên
-                        int rowCount = worksheet.Dimension.Rows;
-
-                        for (int row = 2; row <= rowCount; row++) // Bắt đầu từ dòng 2 để bỏ qua tiêu đề
+                        var worksheet = package.Workbook.Worksheets.First();
+                        int row = 2;
+                        while (row <= worksheet.Dimension.Rows)
                         {
-                            var question = new Cau_hoi_bai_tap_doc
+                            var cauhoi = new Cau_hoi_bai_tap_doc
                             {
                                 Thu_tu_cau = worksheet.Cells[row, 1].Value != null ? Convert.ToInt32(worksheet.Cells[row, 1].Value) : 0,
                                 Cau_hoi = worksheet.Cells[row, 2].Value?.ToString() ?? string.Empty,
@@ -206,20 +344,111 @@ namespace Toeic.Areas.Admin.Controllers
                                 Dap_an_4 = worksheet.Cells[row, 6].Value?.ToString() ?? string.Empty,
                                 Dap_an_dung = worksheet.Cells[row, 7].Value?.ToString() ?? string.Empty,
                                 Giai_thich = worksheet.Cells[row, 8].Value?.ToString() ?? string.Empty,
-                                Bai_doc = worksheet.Cells[row, 9].Value?.ToString() ?? string.Empty,
+                                Giai_thich_bai_doc = worksheet.Cells[row, 10].Value?.ToString() ?? string.Empty,
                                 Ma_bai_tap_docId = baitapdoc.Id
                             };
-                            _db.Cauhoibaitapdocs.Add(question);
+                            //
+                            if (fileImageBDPaths.Count > 0)
+                            {
+                                for (int i = 0; i < fileImageBDPaths.Count; i++)
+                                {
+                                    if (worksheet.Cells[row, 9].Value?.ToString() == fileImageBDPaths.ElementAt(i).Value)
+                                    {
+                                        cauhoi.Image_bai_doc = fileImageBDPaths.ElementAt(i).Key;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                var imageFolderPath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString(), "image");
+                                if (Directory.Exists(imageFolderPath))
+                                {
+                                    foreach (var filePath in Directory.GetFiles(imageFolderPath))
+                                    {
+                                        var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
+                                        var fileName = Path.GetFileName(filePath);
+                                        var newFilePath = Path.Combine("adminn", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString(), "image", fileName);
+                                        if (worksheet.Cells[row, 9].Value?.ToString() == fileNameWithoutExtension)
+                                        {
+                                            cauhoi.Image_bai_doc = newFilePath;
+                                        }
+                                    }
+                                }
+                            }
+
+                            row++;
+                            _db.Cauhoibaitapdocs.Update(cauhoi);
                         }
+                        await _db.SaveChangesAsync();
                     }
                 }
             }
+            else
+            {
+                using (var stream = new FileStream(baitapdoc.ExcelFilePath, FileMode.Open, FileAccess.Read))
+                {
+                    using (var package = new ExcelPackage(stream))
+                    {
+                        var worksheet = package.Workbook.Worksheets.FirstOrDefault();
+                        if (worksheet == null)
+                        {
+                            return Json(new { success = false, message = "Không tìm thấy sheet trong file Excel" });
+                        }
 
+                        var cauhoiList = _db.Cauhoibaitapdocs.Where(c => c.Ma_bai_tap_docId == baitapdoc.Id).ToList();
+
+
+                        if (!fileImageBDPaths.IsNullOrEmpty())
+                        {
+                            int row = 2;
+                            foreach (var cauhoi in cauhoiList)
+                            {
+                                if (row <= worksheet.Dimension.Rows)
+                                {
+
+                                    //
+                                    if (fileImageBDPaths.Count > 0)
+                                    {
+                                        for (int i = 0; i < fileImageBDPaths.Count; i++)
+                                        {
+                                            if (worksheet.Cells[row, 9].Value?.ToString() == fileImageBDPaths.ElementAt(i).Value)
+                                            {
+                                                cauhoi.Image_bai_doc = fileImageBDPaths.ElementAt(i).Key;
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        var imageFolderPath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString(), "image");
+                                        if (Directory.Exists(imageFolderPath))
+                                        {
+                                            foreach (var filePath in Directory.GetFiles(imageFolderPath))
+                                            {
+                                                var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
+                                                var fileName = Path.GetFileName(filePath);
+                                                var newFilePath = Path.Combine("adminn", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString(), "image", fileName);
+                                                if (worksheet.Cells[row, 9].Value?.ToString() == fileNameWithoutExtension)
+                                                {
+                                                    cauhoi.Image_bai_doc = newFilePath;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    row++;
+                                    _db.Cauhoibaitapdocs.Update(cauhoi);
+                                }
+                            }
+                        }
+                        await _db.SaveChangesAsync();
+                    }
+                }
+            }
             _db.Mabaitapdocs.Update(baitapdoc);
             await _db.SaveChangesAsync();
 
-            return Json(new { success = true, message = "Sửa bài đọc thành công" });
+            return Json(new { success = true, message = "Cập nhật bài nghe thành công!" });
         }
+
         #region API CALLS
         [HttpGet]
         public IActionResult GetAll()

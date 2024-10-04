@@ -10,7 +10,7 @@ namespace Toeic.Models
 
         public string? Cau_hoi { get; set; }
 
-        public string Dap_an_dung {  get; set; }
+        public string Dap_an_dung { get; set; }
 
         public string Dap_an_1 { get; set; }
 
@@ -21,10 +21,9 @@ namespace Toeic.Models
         public string Dap_an_4 { get; set; }
 
         public string Giai_thich { get; set; }
-
-        public string? Giai_thich_bai_doc { get; set; }
-
+        public string? Image_bai_doc { get; set; }
         public string? Bai_doc { get; set; }
+        public string? Giai_thich_bai_doc { get; set; }
 
         public int Thu_tu_cau { get; set; }
 
@@ -32,8 +31,7 @@ namespace Toeic.Models
         [ForeignKey("Ma_bai_tap_docId")]
         public Ma_bai_tap_doc Ma_bai_tap_doc { get; set; }
 
-        // Fields for storing result-related information
-        public string? UserAnswer { get; set; } // User's selected answer
-        public bool IsCorrect { get; set; } // Whether the user's answer is correct
+        public string? UserAnswer { get; set; }
+        public bool IsCorrect { get; set; } 
     }
 }
