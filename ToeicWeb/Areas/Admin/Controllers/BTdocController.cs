@@ -51,26 +51,29 @@ namespace Toeic.Areas.Admin.Controllers
             var allowedImageExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
 
             var fileImageBDPaths = new Dictionary<string, string>();
-            foreach (var formFile in viewModel.Image_bai_doc)
+            if (viewModel.Image_bai_doc != null)
             {
-                var fileExtension = Path.GetExtension(formFile.FileName).ToLowerInvariant();
-                if (string.IsNullOrEmpty(fileExtension) || !allowedImageExtensions.Contains(fileExtension))
+                foreach (var formFile in viewModel.Image_bai_doc)
                 {
-                    return Json(new { success = false, message = "Invalid file extension for images. Allowed extensions are: " + string.Join(", ", allowedImageExtensions) });
-                }
-
-                if (formFile.Length > 0)
-                {
-                    var fileName = Path.GetFileNameWithoutExtension(formFile.FileName);
-                    var fileNameFul = fileName + fileExtension;
-                    var filePath = Path.Combine(uploadImageFolderPath, fileNameFul);
-                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    var fileExtension = Path.GetExtension(formFile.FileName).ToLowerInvariant();
+                    if (string.IsNullOrEmpty(fileExtension) || !allowedImageExtensions.Contains(fileExtension))
                     {
-                        await formFile.CopyToAsync(stream);
+                        return Json(new { success = false, message = "Invalid file extension for images. Allowed extensions are: " + string.Join(", ", allowedImageExtensions) });
                     }
 
-                    var relativeFilePath = Path.Combine("adminn", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString(), "image", fileNameFul).Replace("\\", "/");
-                    fileImageBDPaths.Add(relativeFilePath, fileName);
+                    if (formFile.Length > 0)
+                    {
+                        var fileName = Path.GetFileNameWithoutExtension(formFile.FileName);
+                        var fileNameFul = fileName + fileExtension;
+                        var filePath = Path.Combine(uploadImageFolderPath, fileNameFul);
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await formFile.CopyToAsync(stream);
+                        }
+
+                        var relativeFilePath = Path.Combine("adminn", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString(), "image", fileNameFul).Replace("\\", "/");
+                        fileImageBDPaths.Add(relativeFilePath, fileName);
+                    }
                 }
             }
 
@@ -163,21 +166,25 @@ namespace Toeic.Areas.Admin.Controllers
                 return Json(new { success = false, message = "Không tìm thấy bài tập đọc" });
             }
 
-            // Lấy đường dẫn file Excel từ cơ sở dữ liệu
-            var filePath = baitapdoc.ExcelFilePath; // Giả sử bạn lưu đường dẫn file trong thuộc tính FilePath
+            // Lấy số file ảnh trong folder
+            var imageFiles = Directory.GetFiles(baitapdoc.ImageBDFolderPath);
+            int numberOfImages = imageFiles.Length;
 
-            // Kiểm tra xem file có tồn tại hay không
-            bool fileExists = !string.IsNullOrEmpty(filePath) && System.IO.File.Exists(filePath);
+            // Lấy đường dẫn file Excel từ cơ sở dữ liệu
+            var filePath = baitapdoc.ExcelFilePath;
+
+            var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", filePath.Replace("/", "\\"));
+            bool fileExists = !string.IsNullOrEmpty(filePath) && System.IO.File.Exists(fullPath);
 
             // Trả về thông tin của bài tập đọc và đường dẫn file Excel
             return Json(new
             {
                 success = true,
                 data = baitapdoc,
-                filePath = fileExists ? filePath : null // Nếu file tồn tại, trả về đường dẫn, nếu không thì trả về null
+                filePath = fileExists ? filePath : null, // Nếu file tồn tại, trả về đường dẫn, nếu không thì trả về null
+                numberOfImages = numberOfImages
             });
         }
-
         [HttpPost]
         public async Task<JsonResult> Update(CauhoiBTdocVM viewModel)
         {
@@ -187,14 +194,21 @@ namespace Toeic.Areas.Admin.Controllers
             {
                 return Json(new { success = false, message = "Không tìm thấy bài tập đọc" });
             }
-
-            // Kiểm tra xem có thay đổi tiêu đề (Tieu_de) hoặc Part không
+            // Kiểm tra xem có thay đổi tiêu đề (Tieu_de), Part, ExcelFile hoặc Image không
             bool tieuDeChanged = baitapdoc.Tieu_de != viewModel.Tieu_de;
             bool partChanged = baitapdoc.Part != viewModel.Part;
+            bool excelChanged = viewModel.ExcelFile != null && viewModel.ExcelFile.Length > 0;
+            bool imageChanged = viewModel.Image_bai_doc != null && viewModel.Image_bai_doc.Any();
+
 
             var oldExcelFilePath = baitapdoc.ExcelFilePath;
             var oldImageBDFolderPath = baitapdoc.ImageBDFolderPath;
             var oldExcelFileName = Path.GetFileName(oldExcelFilePath);
+            // Kiểm tra nếu không có thay đổi
+            if (!tieuDeChanged && !partChanged && !excelChanged && !imageChanged)
+            {
+                return Json(new { success = false, message = "Không có thay đổi nào được thực hiện" });
+            }
             // Nếu Tieu_de hoặc Part thay đổi, cần tạo các thư mục mới
             if (tieuDeChanged || partChanged)
             {

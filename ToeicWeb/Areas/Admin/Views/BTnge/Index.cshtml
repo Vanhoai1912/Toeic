@@ -84,6 +84,9 @@
                     <label for="NewImageFile" class="d-flex align-items-center fs-5 fw-semibold mb-2">
                         <span class="required">File ảnh</span>
                     </label>
+                    <div id="NumberOfImages" class="mb-2" style="display:none">
+                        <p>File ảnh đã thêm: <span id="ImageFiles"></span></p>
+                    </div>
                     <input type="file" class="form-control" id="NewImageFile" name="ImageFile" accept="image/*" multiple />
                     <span id="ImageFileError" class="text-danger"></span>
                 </div>
@@ -93,6 +96,9 @@
                     <label for="NewAudioFile" class="d-flex align-items-center fs-5 fw-semibold mb-2">
                         <span class="required">File nghe</span>
                     </label>
+                    <div id="NumberOfAudios" class="mb-2" style="display:none">
+                        <p>File nghe đã thêm: <span id="AudioFiles"></span></p>
+                    </div>
                     <input type="file" class="form-control" id="NewAudioFile" name="AudioFile" accept="audio/*" multiple />
                     <span id="AudioFileError" class="text-danger"></span>
                 </div>

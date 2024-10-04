@@ -4,38 +4,6 @@ $(document).ready(function () {
     loadDataTable();
 });
 
-// Read data
-function loadDataTable() {
-    if ($.fn.dataTable.isDataTable('#tblData')) {
-        $('#tblData').DataTable().destroy();
-    }
-    dataTable = $('#tblData').DataTable({
-        "ajax": {
-            "url": "/Admin/BTnge/GetAll"
-        },
-        "columns": [
-            { "data": "id", "width": "25%", "className": "text-start" },
-            { "data": "tieu_de", "width": "30%" },
-            { "data": "part", "width": "15%", "className": "text-start" },
-
-            {
-                "data": "id",
-                "render": function (data) {
-                    return `
-                        <div class="w-75 btn-group" role="group">
-                        <a href="#" onclick="Edit(${data})"
-                        class="btn btn-primary ms-2"> <i class="bi bi-pencil-square"></i> Edit</a>
-                        <a onClick=Delete('/Admin/BTnge/Delete/${data}')
-                        class="btn btn-danger ms-2"> <i class="bi bi-trash-fill"></i> Delete</a>
-                    </div>
-                    `;
-                },
-                "width": "40%"
-            }
-        ]
-    });
-}
-
 // Create data
 function Create() {
     var result = Validate();
@@ -216,7 +184,6 @@ function Update() {
         }
     });
 }
-
 // Delete data
 function Delete(url) {
     Swal.fire({
@@ -250,6 +217,38 @@ function Delete(url) {
             })
         }
     })
+}
+
+// Read data
+function loadDataTable() {
+    if ($.fn.dataTable.isDataTable('#tblData')) {
+        $('#tblData').DataTable().destroy();
+    }
+    dataTable = $('#tblData').DataTable({
+        "ajax": {
+            "url": "/Admin/BTnge/GetAll"
+        },
+        "columns": [
+            { "data": "id", "width": "25%", "className": "text-start" },
+            { "data": "tieu_de", "width": "30%" },
+            { "data": "part", "width": "15%", "className": "text-start" },
+
+            {
+                "data": "id",
+                "render": function (data) {
+                    return `
+                        <div class="w-75 btn-group" role="group">
+                        <a href="#" onclick="Edit(${data})"
+                        class="btn btn-primary ms-2"> <i class="bi bi-pencil-square"></i> Edit</a>
+                        <a onClick=Delete('/Admin/BTnge/Delete/${data}')
+                        class="btn btn-danger ms-2"> <i class="bi bi-trash-fill"></i> Delete</a>
+                    </div>
+                    `;
+                },
+                "width": "40%"
+            }
+        ]
+    });
 }
 
 function Validate() {

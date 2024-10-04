@@ -226,6 +226,14 @@ namespace ToeicWeb.Areas.Admin.Controllers
                 return Json(new { success = false, message = "Không tìm thấy bài tập đọc" });
             }
 
+            // Lấy số file ảnh trong folder
+            var imageFiles = Directory.GetFiles(baitapnge.ImageFolderPath);
+            int numberOfImages = imageFiles.Length;
+
+            // Lấy số file nghe trong folder
+            var audioFiles = Directory.GetFiles(baitapnge.AudioFolderPath);
+            int numberOfAudios = audioFiles.Length;
+
             // Lấy đường dẫn file Excel từ cơ sở dữ liệu
             var filePath = baitapnge.ExcelFilePath; // Giả sử bạn lưu đường dẫn file trong thuộc tính FilePath
 
@@ -237,7 +245,9 @@ namespace ToeicWeb.Areas.Admin.Controllers
             {
                 success = true,
                 data = baitapnge,
-                filePath = fileExists ? filePath : null // Nếu file tồn tại, trả về đường dẫn, nếu không thì trả về null
+                filePath = fileExists ? filePath : null, // Nếu file tồn tại, trả về đường dẫn, nếu không thì trả về null
+                numberOfImages = numberOfImages,
+                numberOfAudios = numberOfAudios
             });
         }
 
@@ -251,15 +261,25 @@ namespace ToeicWeb.Areas.Admin.Controllers
                 return Json(new { success = false, message = "Bài nghe không tồn tại." });
             }
 
-            // Kiểm tra xem có thay đổi tiêu đề (Tieu_de) hoặc Part không
+            // Kiểm tra xem có thay đổi 
             bool tieuDeChanged = mabainge.Tieu_de != viewModel.Tieu_de;
             bool partChanged = mabainge.Part != viewModel.Part;
+            bool excelChanged = viewModel.ExcelFile != null && viewModel.ExcelFile.Length > 0;
+            bool imageChanged = viewModel.ImageFile != null && viewModel.ImageFile.Any();
+            bool audioChanged = viewModel.AudioFile != null && viewModel.AudioFile.Any();
+            // Kiểm tra nếu không có thay đổi
+            if (!tieuDeChanged && !partChanged && !excelChanged && !imageChanged && !audioChanged)
+            {
+                return Json(new { success = false, message = "Không có thay đổi nào được thực hiện" });
+            }
 
             // Đường dẫn cũ cho Image, Audio và Excel
             var oldImageFolderPath = mabainge.ImageFolderPath;
             var oldAudioFolderPath = mabainge.AudioFolderPath;
             var oldExcelFilePath = mabainge.ExcelFilePath;
             var oldExcelFileName = Path.GetFileName(oldExcelFilePath);
+
+
             // Nếu Tieu_de hoặc Part thay đổi, cần tạo các thư mục mới
             if (tieuDeChanged || partChanged)
             {

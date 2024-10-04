@@ -3,9 +3,44 @@
 $(document).ready(function () {
     loadDataTable();
 });
+// Read data
+function loadDataTable() {
+    if ($.fn.dataTable.isDataTable('#tblData')) {
+        $('#tblData').DataTable().destroy();
+    }
+    dataTable = $('#tblData').DataTable({
+        "ajax": {
+            "url": "/Admin/BTdoc/GetAll"
+        },
+        "columns": [
+            { "data": "id", "width": "25%", "className": "text-start" },
+            { "data": "tieu_de", "width": "30%" },
+            { "data": "part", "width": "15%", "className": "text-start" },
+
+            {
+                "data": "id",
+                "render": function (data) {
+                    return `
+                        <div class="w-75 btn-group" role="group">
+                        <a href="#" onclick="Edit(${data})"
+                        class="btn btn-primary ms-2"> <i class="bi bi-pencil-square"></i> Edit</a>
+                        <a onClick=Delete('/Admin/BTdoc/Delete/${data}')
+                        class="btn btn-danger ms-2"> <i class="bi bi-trash-fill"></i> Delete</a>
+                    </div>
+                    `;
+                },
+                "width": "40%"
+            }
+        ]
+    });
+}
 
 // Create data
 function Create() {
+    var result = Validate();
+    if (!result) {
+        return false;
+    }
     var formData = new FormData();
     var newExcelFile = $('#NewExcelFile').get(0).files[0];
     var newImageFiles = $('#NewImageFile').get(0).files;
@@ -13,10 +48,12 @@ function Create() {
     if (newExcelFile) {
         formData.append('ExcelFile', newExcelFile);
     }
-    for (var i = 0; i < newImageFiles.length; i++) {
-        formData.append('Image_bai_doc', newImageFiles[i]);
+   
+    if (newImageFiles.length > 0) {
+        for (var i = 0; i < newImageFiles.length; i++) {
+            formData.append('Image_bai_doc', newImageFiles[i]);
+        }
     }
-
     formData.append('Tieu_de', $('#Tieu_de').val());
     formData.append('Part', $('#Part').val());
 
@@ -101,7 +138,6 @@ function Edit(id) {
         }
     });
 }
-
 
 //Update data
 function Update() {
@@ -207,37 +243,7 @@ function HideModal() {
     $('#NumberOfImages').hide();
 }
 
-// Read data
-function loadDataTable() {
-    if ($.fn.dataTable.isDataTable('#tblData')) {
-        $('#tblData').DataTable().destroy();
-    }
-    dataTable = $('#tblData').DataTable({
-        "ajax": {
-            "url": "/Admin/BTdoc/GetAll"
-        },
-        "columns": [
-            { "data": "id", "width": "25%", "className": "text-start" },
-            { "data": "tieu_de", "width": "30%" },
-            { "data": "part", "width": "15%", "className": "text-start" },
 
-            {
-                "data": "id",
-                "render": function (data) {
-                    return `
-                        <div class="w-75 btn-group" role="group">
-                        <a href="#" onclick="Edit(${data})"
-                        class="btn btn-primary ms-2"> <i class="bi bi-pencil-square"></i> Edit</a>
-                        <a onClick=Delete('/Admin/BTdoc/Delete/${data}')
-                        class="btn btn-danger ms-2"> <i class="bi bi-trash-fill"></i> Delete</a>
-                    </div>
-                    `;
-                },
-                "width": "40%"
-            }
-        ]
-    });
-}
 
 function ClearData() {
     $('#Part').val('');
