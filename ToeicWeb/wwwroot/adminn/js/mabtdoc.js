@@ -1,7 +1,11 @@
 ﻿var dataTable;
 
 $(document).ready(function () {
+    $('#BaitapdocModal').on('hide.bs.modal', function () {
+        HideModal();
+    });
     loadDataTable();
+
 });
 // Read data
 function loadDataTable() {
@@ -236,14 +240,19 @@ $('#btnAdd').click(function () {
     $('#Update').css('display', 'none');
 });
 
+let isHidingModall = false;
+
 function HideModal() {
+    if (isHidingModall) return; // Ngăn chặn vòng lặp
+    isHidingModall = true;
+
     ClearData();
     $('#BaitapdocModal').modal('hide');
     $('#ExcelFileInfo').hide();
     $('#NumberOfImages').hide();
+
+    isHidingModall = false; // Đặt lại biến cờ
 }
-
-
 
 function ClearData() {
     $('#Part').val('');

@@ -42,6 +42,10 @@ namespace ToeicWeb.Areas.Admin.Controllers
         [HttpPost]
         public async Task<JsonResult> Create(BaituvungVM viewModel)
         {
+            // Folder for mã bài từ vựng image
+            var uploadImageMavocaFolderPath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "voca", "bai " + viewModel.Ten_bai.ToString(), "imageMaVoca");
+            Directory.CreateDirectory(uploadImageMavocaFolderPath);
+
             var uploadImageFolderPath = Path.Combine(_environment.WebRootPath, "adminn", "upload","voca", "bai " + viewModel.Ten_bai.ToString(), "image");
             Directory.CreateDirectory(uploadImageFolderPath);
 
@@ -73,6 +77,30 @@ namespace ToeicWeb.Areas.Admin.Controllers
                 }
             }
 
+            // File ảnh mã bài từ vựng
+            var ImageMavocaFilePath = "";
+            if (viewModel.ImageFileMavoca != null)
+            {
+                var fileExtension = Path.GetExtension(viewModel.ImageFileMavoca.FileName).ToLowerInvariant();
+                if (string.IsNullOrEmpty(fileExtension) || !allowedImageExtensions.Contains(fileExtension))
+                {
+                    return Json(new { success = false, message = "Invalid file extension for mã bài từ vựng image. Allowed extensions are: " + string.Join(", ", allowedImageExtensions) });
+                }
+
+                if (viewModel.ImageFileMavoca.Length > 0)
+                {
+                    var fileName = Path.GetFileNameWithoutExtension(viewModel.ImageFileMavoca.FileName);
+                    var fileNameFul = fileName + fileExtension;
+                    var filePath = Path.Combine(uploadImageMavocaFolderPath, fileNameFul);
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await viewModel.ImageFileMavoca.CopyToAsync(stream);
+                    }
+
+                    var relativeFilePathMavoca = Path.Combine("adminn", "upload", "voca", "bai " + viewModel.Ten_bai.ToString(), "imageMaVoca", fileNameFul).Replace("\\", "/");
+                    ImageMavocaFilePath = relativeFilePathMavoca;
+                }
+            }
 
             var uploadAudioFolderPath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "voca", "bai " + viewModel.Ten_bai.ToString(), "audio");
             Directory.CreateDirectory(uploadAudioFolderPath);
@@ -160,7 +188,8 @@ namespace ToeicWeb.Areas.Admin.Controllers
                                 Ten_bai = viewModel.Ten_bai,
                                 ExcelFilePath = excelFilePath,
                                 ImageFolderPath = uploadImageFolderPath,
-                                AudioFolderPath = uploadAudioFolderPath
+                                AudioFolderPath = uploadAudioFolderPath,
+                                ImageUrl = ImageMavocaFilePath
                             };
                             _db.Mabaituvungs.Add(matuvung);
                             await _db.SaveChangesAsync();
@@ -229,13 +258,19 @@ namespace ToeicWeb.Areas.Admin.Controllers
 
             bool fileExists = !string.IsNullOrEmpty(filePath) && System.IO.File.Exists(filePath);
 
+            var filePathImageVoca = baituvung.ImageUrl;
+
+            // Bỏ qua kiểm tra File.Exists nếu đây là URL web
+            bool fileExist = !string.IsNullOrEmpty(filePathImageVoca);
+
             return Json(new
             {
                 success = true,
                 data = baituvung,
                 filePath = fileExists ? filePath : null, 
                 numberOfImages = numberOfImages,
-                numberOfAudios = numberOfAudios
+                numberOfAudios = numberOfAudios,
+                filePathImageVoca = fileExist ? filePathImageVoca : null
             });
         }
 

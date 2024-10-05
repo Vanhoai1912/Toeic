@@ -1,8 +1,14 @@
 ﻿var dataTable;
 
 $(document).ready(function () {
+    // Khi modal bị ẩn, gọi hàm HideModal để xóa dữ liệu
+    $('#BaivocaModal').on('hide.bs.modal', function () {
+        HideModal();
+    });
     loadDataTable();
+
 });
+
 
 // Read data
 function loadDataTable() {
@@ -156,6 +162,16 @@ function Edit(id) {
                     $('#ExcelFileInfo').hide();
                 }
 
+                // Hiển thị file ảnh voca
+                if (response.filePathImageVoca) {
+                    var fileNameVoca = response.filePathImageVoca.split('\\').pop().split('/').pop(); // Sử dụng đúng biến filePathImageVoca
+                    $('#ImageFileMavoca').text(fileNameVoca);
+                    $('#ImageVocaFileInfo').show();
+                } else {
+                    $('#ImageVocaFileInfo').hide();
+                }
+
+
                 // Hiển thị số file ảnh đã thêm
                 if (response.numberOfImages) {
                     $('#ImageFiles').text(response.numberOfImages);
@@ -174,6 +190,7 @@ function Edit(id) {
 
                 // Reset phần input file mới
                 $('#NewExcelFile').val('');
+                $('#NewImageFileMavoca').val('');
                 $('#NewImageFile').val('');
                 $('#NewAudioFile').val('');
 
@@ -303,6 +320,8 @@ function Validate() {
     return isValid;
 }
 
+
+
 $('#btnAdd').click(function () {
     $('#BaivocaModal').modal('show');
     $('#modalTitle').text('Thêm bài từ vựng mới');
@@ -310,13 +329,22 @@ $('#btnAdd').click(function () {
     $('#Update').css('display', 'none');
 });
 
+let isHidingModal = false; // Khai báo biến chỉ một lần
+
 function HideModal() {
+    if (isHidingModal) return; // Ngăn chặn vòng lặp
+    isHidingModal = true;
+
     ClearData();
     $('#BaivocaModal').modal('hide');
     $('#ExcelFileInfo').hide();
+    $('#ImageVocaFileInfo').hide();
     $('#NumberOfImages').hide();
     $('#NumberOfAudios').hide();
+
+    isHidingModal = false; // Đặt lại biến cờ
 }
+
 
 function ClearData() {
     $('#Ten_bai').val('');
@@ -328,7 +356,6 @@ function ClearData() {
     
     // Ẩn các lỗi và khôi phục lại màu 
     $('#Ten_baiError').text('').hide();
-    $('#PartError').text('').hide();
     $('#ExcelFileError').text('').hide();
     $('#ImageFileError').text('').hide();
     $('#AudioFileError').text('').hide();

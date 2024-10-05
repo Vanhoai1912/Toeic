@@ -1,6 +1,9 @@
 ﻿var dataTable;
 
 $(document).ready(function () {
+    $('#BaitapngeModal').on('hide.bs.modal', function () {
+        HideModal();
+    });
     loadDataTable();
 });
 
@@ -302,14 +305,20 @@ $('#btnAdd').click(function () {
     $('#Update').css('display', 'none');
 });
 
+let isHidingModalll = false;
+
 function HideModal() {
+    if (isHidingModalll) return; // Ngăn chặn vòng lặp
+    isHidingModalll = true;
+
     ClearData();
     $('#BaitapngeModal').modal('hide');
     $('#ExcelFileInfo').hide();
     $('#NumberOfImages').hide();
     $('#NumberOfAudios').hide();
-}
 
+    isHidingModalll = false; // Đặt lại biến cờ
+}
 function ClearData() {
     $('#Tieu_de').val('');
     $('#Part').val('');
