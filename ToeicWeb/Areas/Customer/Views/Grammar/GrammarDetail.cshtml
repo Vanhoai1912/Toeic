@@ -2,24 +2,21 @@
 
 <!-- Tiêu đề -->
 <div class="col-12 text-center">
-    <h2 style="color:#b10021;"> @Model.Mabainguphap.Ten_bai</h2>
+    <h2 style="color:#b10021;"> @Model.Ten_bai</h2>  <!-- Hiển thị tiêu đề bài từ ViewModel -->
 </div>
-
 
 <div class="container rounded-4" style="max-width: 1300px;box-shadow: 0 2px 4px rgba(0, 0, 0, .08), 0 4px 12px rgba(0, 0, 0, .08)">
     <div class="row">
-        <!-- Repeat this block for each item -->
-        @for (int i = 0; i < Model.Noidungbainguphaps.Count; i++)
+        <!-- Kiểm tra và hiển thị nội dung -->
+        @if (!string.IsNullOrEmpty(Model.Noi_dung))
         {
             <div class="col-12 mb-4">
                 <div class="p-3 mt-5">
                     <div class="row">
-
-                        <!-- Right side: Content -->
                         <div class="col-md-10">
                             <div class="d-flex flex-column">
                                 <p class="mb-1 custom-text">
-                                    @Html.Raw(Model.Noidungbainguphaps[i].Noi_dung)  <!-- Replace with word type -->
+                                    @Html.Raw(Model.Noi_dung)  <!-- Hiển thị nội dung bài ngữ pháp -->
                                 </p>
                             </div>
                         </div>
@@ -27,8 +24,15 @@
                 </div>
             </div>
         }
+        else
+        {
+            <div class="col-12 text-center">
+                <p class="custom-text">Không có nội dung nào để hiển thị.</p>
+            </div>
+        }
     </div>
 </div>
+
 <style>
     .custom-text {
         color: black !important;

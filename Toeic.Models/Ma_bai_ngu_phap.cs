@@ -8,10 +8,10 @@ namespace Toeic.Models
         public int Id { get; set; }
 
         public string Ten_bai { get; set; }
+        public string Noi_dung { get; set; }
 
         public string? ImageUrl { get; set; }
 
-        public ICollection<Noi_dung_bai_ngu_phap> Noidungbainguphaps { get; set; }
 
     }
 }

@@ -3,12 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
-
 namespace Toeic.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class DbContext : Migration
+    public partial class Data : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -61,6 +59,7 @@ namespace Toeic.DataAccess.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Ten_bai = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Noi_dung = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
@@ -76,7 +75,8 @@ namespace Toeic.DataAccess.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Part = table.Column<int>(type: "int", nullable: false),
                     Tieu_de = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FilePath = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    ExcelFilePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ImageBDFolderPath = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -91,7 +91,9 @@ namespace Toeic.DataAccess.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Part = table.Column<int>(type: "int", nullable: false),
                     Tieu_de = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FilePath = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    ExcelFilePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ImageFolderPath = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AudioFolderPath = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -106,7 +108,9 @@ namespace Toeic.DataAccess.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Ten_bai = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FilePath = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    ExcelFilePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ImageFolderPath = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AudioFolderPath = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -220,27 +224,6 @@ namespace Toeic.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Noidungbainguphaps",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Noi_dung = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Ma_bai_ngu_phapId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Noidungbainguphaps", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Noidungbainguphaps_Mabainguphaps_Ma_bai_ngu_phapId",
-                        column: x => x.Ma_bai_ngu_phapId,
-                        principalTable: "Mabainguphaps",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Cauhoibaitapdocs",
                 columns: table => new
                 {
@@ -253,8 +236,8 @@ namespace Toeic.DataAccess.Migrations
                     Dap_an_3 = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Dap_an_4 = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Giai_thich = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Image_bai_doc = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Giai_thich_bai_doc = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Bai_doc = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Thu_tu_cau = table.Column<int>(type: "int", nullable: false),
                     Ma_bai_tap_docId = table.Column<int>(type: "int", nullable: false),
                     UserAnswer = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -331,37 +314,6 @@ namespace Toeic.DataAccess.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.InsertData(
-                table: "Mabaitapdocs",
-                columns: new[] { "Id", "FilePath", "Part", "Tieu_de" },
-                values: new object[,]
-                {
-                    { 1, "", 5, "Tiêu đề" },
-                    { 2, "", 6, "Tiêu đề" },
-                    { 3, "", 7, "Tiêu đề" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "Mabaitapnges",
-                columns: new[] { "Id", "FilePath", "Part", "Tieu_de" },
-                values: new object[,]
-                {
-                    { 1, null, 1, "Tiêu đề" },
-                    { 2, null, 2, "Tiêu đề" },
-                    { 3, null, 3, "Tiêu đề" },
-                    { 4, null, 4, "Tiêu đề" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "Cauhoibaitapdocs",
-                columns: new[] { "Id", "Bai_doc", "Cau_hoi", "Dap_an_1", "Dap_an_2", "Dap_an_3", "Dap_an_4", "Dap_an_dung", "Giai_thich", "Giai_thich_bai_doc", "IsCorrect", "Ma_bai_tap_docId", "Thu_tu_cau", "UserAnswer" },
-                values: new object[] { 1, "", "H", "A", "B", "C", "D", "A", "A ĐÚNG", null, false, 1, 101, null });
-
-            migrationBuilder.InsertData(
-                table: "Cauhoibaitapnges",
-                columns: new[] { "Id", "Audio", "Cau_hoi", "Dap_an_1", "Dap_an_2", "Dap_an_3", "Dap_an_4", "Dap_an_dung", "Giai_thich", "Image", "IsCorrect", "Ma_bai_tap_ngeId", "Thu_tu_cau", "Transcript", "UserAnswer" },
-                values: new object[] { 1, "", "H", "A", "B", "C", "D", "A", "A ĐÚNG", "", false, 1, 1, null, null });
-
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -412,11 +364,6 @@ namespace Toeic.DataAccess.Migrations
                 column: "Ma_bai_tap_ngeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Noidungbainguphaps_Ma_bai_ngu_phapId",
-                table: "Noidungbainguphaps",
-                column: "Ma_bai_ngu_phapId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Noidungbaituvungs_Ma_bai_tu_vungId",
                 table: "Noidungbaituvungs",
                 column: "Ma_bai_tu_vungId");
@@ -447,7 +394,7 @@ namespace Toeic.DataAccess.Migrations
                 name: "Cauhoibaitapnges");
 
             migrationBuilder.DropTable(
-                name: "Noidungbainguphaps");
+                name: "Mabainguphaps");
 
             migrationBuilder.DropTable(
                 name: "Noidungbaituvungs");
@@ -463,9 +410,6 @@ namespace Toeic.DataAccess.Migrations
 
             migrationBuilder.DropTable(
                 name: "Mabaitapnges");
-
-            migrationBuilder.DropTable(
-                name: "Mabainguphaps");
 
             migrationBuilder.DropTable(
                 name: "Mabaituvungs");

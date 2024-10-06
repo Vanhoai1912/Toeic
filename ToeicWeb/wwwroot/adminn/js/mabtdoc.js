@@ -240,18 +240,18 @@ $('#btnAdd').click(function () {
     $('#Update').css('display', 'none');
 });
 
-let isHidingModall = false;
+var isHidingModal = false; // Khai báo biến chỉ một lần
 
 function HideModal() {
-    if (isHidingModall) return; // Ngăn chặn vòng lặp
-    isHidingModall = true;
+    if (isHidingModal) return; // Ngăn chặn vòng lặp
+    isHidingModal = true;
 
     ClearData();
     $('#BaitapdocModal').modal('hide');
     $('#ExcelFileInfo').hide();
     $('#NumberOfImages').hide();
 
-    isHidingModall = false; // Đặt lại biến cờ
+    isHidingModal = false; // Đặt lại biến cờ
 }
 
 function ClearData() {

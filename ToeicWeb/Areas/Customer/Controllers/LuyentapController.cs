@@ -736,18 +736,12 @@ namespace ToeicWeb.Areas.Customer.Controllers
             var cauHoiList = baiTap.CauHoiBaiTapDocs
                                    .OrderBy(c => c.Thu_tu_cau)
                                    .ToList();
-            // Lấy các bài đọc liên quan từ danh sách câu hỏi
-            var baiDocs = cauHoiList
-                .Where(c => !string.IsNullOrEmpty(c.Bai_doc))
-                .Select(c => c.Bai_doc)
-                .Distinct()
-                .ToList();
+         
 
             var viewModel = new TracNghiemViewModel
             {
                 BaiTap = baiTap,
                 CauHoiList = cauHoiList,
-                BaiDocs = baiDocs.ToDictionary(doc => doc, doc => doc)
             };
 
             ViewData["NavbarType"] = "_NavbarBack";
@@ -846,12 +840,6 @@ namespace ToeicWeb.Areas.Customer.Controllers
                 }
             }
 
-            // Lấy các bài đọc liên quan từ danh sách câu hỏi
-            var baiDocs = cauHoiList
-                .Where(c => !string.IsNullOrEmpty(c.Bai_doc))
-                .Select(c => c.Bai_doc)
-                .Distinct()
-                .ToList();
 
             // Create the view model
             var viewModel = new TracNghiemViewModel
@@ -859,7 +847,6 @@ namespace ToeicWeb.Areas.Customer.Controllers
                 BaiTap = baiTap,  // Store exercise details
                 CauHoiList = cauHoiList,  // Store the list of questions and their results
                 TotalTime = form["TotalTime"], // If you are tracking time
-                BaiDocs = baiDocs.ToDictionary(doc => doc, doc => doc)
 
             };
 
@@ -893,18 +880,12 @@ namespace ToeicWeb.Areas.Customer.Controllers
             var cauHoiList = baiTap.CauHoiBaiTapDocs
                                    .OrderBy(c => c.Thu_tu_cau)
                                    .ToList();
-            // Lấy các bài đọc liên quan từ danh sách câu hỏi
-            var baiDocs = cauHoiList
-                .Where(c => !string.IsNullOrEmpty(c.Bai_doc))
-                .Select(c => c.Bai_doc)
-                .Distinct()
-                .ToList();
+         
 
             var viewModel = new TracNghiemViewModel
             {
                 BaiTap = baiTap,
                 CauHoiList = cauHoiList,
-                BaiDocs = baiDocs.ToDictionary(doc => doc, doc => doc)
             };
 
             ViewData["NavbarType"] = "_NavbarBack";
@@ -1003,12 +984,7 @@ namespace ToeicWeb.Areas.Customer.Controllers
                 }
             }
 
-            // Lấy các bài đọc liên quan từ danh sách câu hỏi
-            var baiDocs = cauHoiList
-                .Where(c => !string.IsNullOrEmpty(c.Bai_doc))
-                .Select(c => c.Bai_doc)
-                .Distinct()
-                .ToList();
+          
 
             // Create the view model
             var viewModel = new TracNghiemViewModel
@@ -1016,7 +992,6 @@ namespace ToeicWeb.Areas.Customer.Controllers
                 BaiTap = baiTap,  // Store exercise details
                 CauHoiList = cauHoiList,  // Store the list of questions and their results
                 TotalTime = form["TotalTime"], // If you are tracking time
-                BaiDocs = baiDocs.ToDictionary(doc => doc, doc => doc)
 
             };
 

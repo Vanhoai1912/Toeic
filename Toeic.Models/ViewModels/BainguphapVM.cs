@@ -14,7 +14,12 @@ namespace Toeic.Models.ViewModels
         public string Noi_dung { get; set; }
         public List<Ma_bai_ngu_phap> Mabainguphaps { get; set; }
         public Ma_bai_ngu_phap Mabainguphap { get; set; }
-        public List<Noi_dung_bai_ngu_phap> Noidungbainguphaps { get; set; }
+
+        // Thêm trường để hiển thị đường dẫn ảnh
+        public string ImageUrl { get; set; }
+
+        // Chỉ dùng khi upload ảnh mới
         public IFormFile ImageFileGrammar { get; set; }
     }
+
 }

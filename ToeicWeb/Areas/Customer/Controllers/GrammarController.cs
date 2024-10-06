@@ -26,24 +26,31 @@ namespace ToeicWeb.Areas.Customer.Controllers
         [HttpGet]
         public async Task<IActionResult> GrammarDetail(int mabainguphapId)
         {
+            // Tìm bài ngữ pháp theo ID
             var mabai = await _db.Mabainguphaps.FindAsync(mabainguphapId);
             if (mabai == null)
             {
                 return NotFound();
             }
 
-            var noidunglist = await _db.Noidungbainguphaps
-                                           .Where(c => c.Ma_bai_ngu_phapId == mabainguphapId)
-                                           .ToListAsync();
-
+            // Tạo ViewModel với dữ liệu từ Mabainguphap
             var viewModel = new BainguphapVM
             {
-                Mabainguphap = mabai,
-                Noidungbainguphaps = noidunglist
+                Id = mabai.Id,
+                Ten_bai = mabai.Ten_bai,
+                ImageFileGrammar = null, // Không cần thiết, nhưng có thể để lại nếu cần
+                Noi_dung = mabai.Noi_dung, // Lấy nội dung từ Mabainguphap
+                Mabainguphap = mabai // Thêm vào nếu cần thiết
             };
+
+            // Đặt ViewData cho loại Navbar (nếu cần)
             ViewData["NavbarType"] = "_NavbarBack";
+
+            // Trả về view với ViewModel
             return View(viewModel);
         }
+
+
 
     }
 }

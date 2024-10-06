@@ -1,7 +1,11 @@
 ﻿var dataTable;
 
 $(document).ready(function () {
+    $('#BaigrammarModal').on('hide.bs.modal', function () {
+        HideModal();
+    });
     loadDataTable();
+
 });
 
 // Read data
@@ -133,8 +137,137 @@ function handleCreate() {
     });
 }
 
+function Edit(id) {
+    $.ajax({
+        url: '/Admin/Grammar/Edit?id=' + id,
+        type: 'GET',
+        contentType: 'application/json; charset=utf-8',
+        datatype: 'json',
+        success: function (response) {
+            if (response == null || response == undefined) {
+                alert('Không thể đọc dữ liệu');
+            } else if (response.success === false) {
+                alert(response.message);
+            } else {
+                // Lưu dữ liệu ban đầu
+                originalData = {
+                    ten_bai: response.data.ten_bai,
+                    noi_dung: response.data.noi_dung,
+                };
 
-function initTinyMCE() {
+                $('#BaigrammarModal').modal('show');
+                $('#modalTitle').text('Sửa bài từ vựng');
+                $('#Save').css('display', 'none');
+                $('#Update').css('display', 'block');
+
+                // Điền các giá trị vào modal
+                $('#Id').val(response.data.id);
+                $('#Ten_bai').val(response.data.ten_bai);
+
+                // Khởi tạo lại TinyMCE với nội dung
+                initTinyMCE(response.data.noi_dung);
+
+                // Hiển thị tên file ảnh
+                if (response.data.filePathImageVoca) {
+                    var fileNameVoca = response.data.filePathImageVoca.split('\\').pop().split('/').pop();
+                    $('#ImageFileGrammar').text(fileNameVoca); // Cập nhật tên file vào span
+                    $('#ImageFileGraInfo').show(); // Hiện thị thông tin file
+                } else {
+                    $('#ImageFileGraInfo').hide(); // Ẩn thông tin file nếu không có
+                }
+
+                // Reset phần input file mới
+                $('#NewImageFileGra').val('');
+            }
+        },
+        error: function () {
+            alert('Không thể đọc dữ liệu');
+        }
+    });
+}
+
+
+
+function Update() {
+    // Kiểm tra và khởi tạo TinyMCE nếu chưa khởi tạo
+    if (!tinymce.get('Noi_dung')) {
+        tinymce.init({
+            selector: '#Noi_dung',
+            setup: function (editor) {
+                editor.on('change', function () {
+                    editor.save();  // Cập nhật nội dung textarea
+                });
+            },
+            init_instance_callback: function (editor) {
+                // Khi TinyMCE đã sẵn sàng, gọi hàm xử lý
+                handleUpdate();
+            }
+        });
+    } else {
+        // Nếu TinyMCE đã được khởi tạo, gọi trực tiếp
+        handleUpdate();
+    }
+}
+
+// Hàm xử lý việc cập nhật dữ liệu
+function handleUpdate() {
+    var tenbai = $('#Ten_bai').val();
+    // Lấy nội dung từ TinyMCE
+    var noi_dung_value = tinymce.get('Noi_dung').getContent();
+    var newImageFileGra = $('#NewImageFileGra').get(0).files[0];
+
+  
+
+    // Kiểm tra có thay đổi nào không
+    var isChanged = false;
+
+    // Chỉ thiết lập isChanged là true nếu có sự thay đổi
+    if (tenbai !== originalData.ten_bai ||
+        (newImageFileGra || originalData.imageFileGrammar) || // Nếu có file mới hoặc file cũ tồn tại
+        noi_dung_value !== originalData.noi_dung) {
+        isChanged = true; // Có sự thay đổi
+    }
+
+    if (!isChanged) {
+        toastr.info("Không có thay đổi nào để cập nhật");
+        return; // Kết thúc hàm nếu không có thay đổi
+    }
+
+    var formData = new FormData();
+    if (newImageFileGra) {
+        formData.append('ImageFileGrammar', newImageFileGra);
+    }
+    formData.append('Noi_dung', noi_dung_value);
+    formData.append('Id', $('#Id').val());
+    formData.append('Ten_bai', tenbai);
+
+    // Gửi yêu cầu AJAX để cập nhật
+    $.ajax({
+        url: '/Admin/Grammar/Update',  // URL của action Update trong controller
+        data: formData,
+        type: 'POST',
+        contentType: false,
+        processData: false,
+        success: function (response) {
+            if (!response.success) {
+                toastr.error(response.message);
+            } else {
+                HideModal();
+                loadDataTable();
+                ClearData();
+                toastr.success(response.message);
+            }
+        },
+        error: function (xhr) {
+            console.error(xhr);
+            toastr.error(xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Đã xảy ra lỗi.');
+        }
+    });
+}
+
+
+
+function initTinyMCE(content) {
     if (tinymce.get('Noi_dung')) {
         tinymce.get('Noi_dung').remove();  // Hủy bỏ nếu đã tồn tại
     }
@@ -150,16 +283,24 @@ function initTinyMCE() {
                     editor.getContainer().style.border = "1px solid red";
                 }
             });
+
+            // Đặt nội dung cũ vào trình soạn thảo sau khi khởi tạo TinyMCE
+            editor.on('init', function () {
+                editor.setContent(content || "");  // Đặt nội dung từ biến content vào editor
+            });
         },
         plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',
         toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat',
     });
 }
 
+
+
 function Validate() {
     var isValid = true;
 
-    if ($('#Ten_bai').val().trim() == "") {
+    // Kiểm tra tên bài
+    if ($('#Ten_bai').val().trim() === "") {
         $('#Ten_bai').css('border-color', 'Red');
         $('#Ten_baiError').text('Vui lòng nhập tên bài.').show();
         isValid = false;
@@ -168,25 +309,24 @@ function Validate() {
         $('#Ten_baiError').text('').hide();
     }
 
-
-    // Kiểm tra nội dung từ TinyMCE sau khi khởi tạo
+    // Kiểm tra nội dung từ TinyMCE
     var editor = tinymce.get('Noi_dung');
     if (editor) {
         var noi_dung_value = editor.getContent();
-
-        if (noi_dung_value.trim() == "") {
-            editor.getContainer().style.border = "1px solid red";
+        if (noi_dung_value.trim() === "") {
+            // Sử dụng jQuery để tìm phần tử chứa
+            $(editor.getContainer()).css('border', '1px solid red');
             $('#Noi_dungError').text('Vui lòng nhập nội dung.').show();
             isValid = false;
         } else {
-            editor.getContainer().style.border = "1px solid lightgrey";
+            $(editor.getContainer()).css('border', '1px solid lightgrey');
             $('#Noi_dungError').text('').hide();
         }
     } else {
         console.error('Editor TinyMCE chưa được khởi tạo hoặc không tìm thấy.');
     }
 
-
+    // Kiểm tra tệp hình ảnh
     var newImageFileGraInput = $('#NewImageFileGra').get(0);
     if (newImageFileGraInput && newImageFileGraInput.files.length === 0) {
         $('#NewImageFileGra').css('border-color', 'Red');
@@ -203,19 +343,29 @@ function Validate() {
 
 
 
+
+
 $('#btnAdd').click(function () {
+    ClearData(); // Xóa dữ liệu trước khi mở modal
     $('#BaigrammarModal').modal('show');
     $('#modalTitle').text('Thêm bài ngữ pháp mới');
     $('#Save').css('display', 'block');
     $('#Update').css('display', 'none');
 });
 
+var isHidingModal = false; // Khai báo biến chỉ một lần
+
 function HideModal() {
+    if (isHidingModal) return; // Ngăn chặn vòng lặp
+    isHidingModal = true;
+
     ClearData();
     $('#BaigrammarModal').modal('hide');
+
+    $('#ImageFileGraInfo').hide();
+
+    isHidingModal = false; // Đặt lại biến cờ
 }
-
-
 function ClearData() {
     $('#Ten_bai').val('');
     tinymce.get('Noi_dung').setContent(''); // Xóa nội dung TinyMCE

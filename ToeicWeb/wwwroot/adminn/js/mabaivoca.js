@@ -1,7 +1,7 @@
 ﻿var dataTable;
 
+
 $(document).ready(function () {
-    // Khi modal bị ẩn, gọi hàm HideModal để xóa dữ liệu
     $('#BaivocaModal').on('hide.bs.modal', function () {
         HideModal();
     });
@@ -206,7 +206,8 @@ function Edit(id) {
 // Update data
 function Update() {
     var tenbai = $('#Ten_bai').val();
-    var excelFile = $('#NewExcelFile').get(0).files[0];  // Lấy file excel từ input
+    var excelFile = $('#NewExcelFile').get(0).files[0];  
+    var newImageMavocaFile = $('#NewImageFileMavoca').get(0).files[0];  
     var newImageFiles = $('#NewImageFile').get(0).files;
     var newAudioFiles = $('#NewAudioFile').get(0).files;
 
@@ -215,7 +216,7 @@ function Update() {
     // Kiểm tra có thay đổi nào không
     var isChanged = true;
     if (tenbai != originalData.ten_bai || (excelFile !== undefined && excelFile !== null) ||
-        newImageFiles.length > 0 || newAudioFiles.length > 0) {
+        newImageFiles.length > 0 || (newImageMavocaFile !== undefined && newImageMavocaFile !== null) || newAudioFiles.length > 0) {
         isChanged = false;
     }
     if (isChanged) {
@@ -241,6 +242,9 @@ function Update() {
         for (var i = 0; i < newAudioFiles.length; i++) {
             formData.append('AudioFile', newAudioFiles[i]);
         }
+    }
+    if (newImageMavocaFile) {
+        formData.append('ImageFileMavoca', newImageMavocaFile);
     }
 
 
@@ -329,7 +333,7 @@ $('#btnAdd').click(function () {
     $('#Update').css('display', 'none');
 });
 
-let isHidingModal = false; // Khai báo biến chỉ một lần
+var isHidingModal = false; // Khai báo biến chỉ một lần
 
 function HideModal() {
     if (isHidingModal) return; // Ngăn chặn vòng lặp

@@ -51,13 +51,19 @@
                     <span id="Ten_baiError" class="text-danger"></span>
                 </div>
 
+                <!-- Input cho file ảnh mã bài ngữ pháp -->
                 <div class="mb-2">
                     <label for="NewImageFileGra" class="d-flex align-items-center fs-5 fw-semibold mb-2">
-                        <span class="required">Ảnh bài ngữ pháp</span>
+                        <span class="required">Ảnh bài từ vựng</span>
                     </label>
+                    <div id="ImageFileGraInfo" class="mb-2" style="display:none;">
+                        <p>File hiện tại: <span id="ImageFileGrammar"></span></p> <!-- Đây là nơi tên file sẽ được hiển thị -->
+                    </div>
                     <input type="file" class="form-control" id="NewImageFileGra" name="ImageFileGrammar" accept="image/*" />
-                    <span id="ImageFileGraError" class="text-danger"></span>
+                    <span id="ImageFileGrammarError" class="text-danger"></span>
                 </div>
+
+
                 <div class="mb-2">
                     <label for="Noi_dung" class="d-flex align-items-center fs-5 fw-semibold mb-2">
                         <span class="required">Nội dung</span>

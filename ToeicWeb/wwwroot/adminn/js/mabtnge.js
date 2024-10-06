@@ -305,11 +305,11 @@ $('#btnAdd').click(function () {
     $('#Update').css('display', 'none');
 });
 
-let isHidingModalll = false;
+var isHidingModal = false; // Khai báo biến chỉ một lần
 
 function HideModal() {
-    if (isHidingModalll) return; // Ngăn chặn vòng lặp
-    isHidingModalll = true;
+    if (isHidingModal) return; // Ngăn chặn vòng lặp
+    isHidingModal = true;
 
     ClearData();
     $('#BaitapngeModal').modal('hide');
@@ -317,7 +317,7 @@ function HideModal() {
     $('#NumberOfImages').hide();
     $('#NumberOfAudios').hide();
 
-    isHidingModalll = false; // Đặt lại biến cờ
+    isHidingModal = false; // Đặt lại biến cờ
 }
 function ClearData() {
     $('#Tieu_de').val('');

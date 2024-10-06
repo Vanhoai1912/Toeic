@@ -237,9 +237,6 @@ namespace Toeic.DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Bai_doc")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Cau_hoi")
                         .HasColumnType("nvarchar(max)");
 
@@ -366,6 +363,10 @@ namespace Toeic.DataAccess.Migrations
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Noi_dung")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Ten_bai")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -462,31 +463,6 @@ namespace Toeic.DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Mabaituvungs");
-                });
-
-            modelBuilder.Entity("Toeic.Models.Noi_dung_bai_ngu_phap", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ImageUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Ma_bai_ngu_phapId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Noi_dung")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Ma_bai_ngu_phapId");
-
-                    b.ToTable("Noidungbainguphaps");
                 });
 
             modelBuilder.Entity("Toeic.Models.Noi_dung_bai_tu_vung", b =>
@@ -626,17 +602,6 @@ namespace Toeic.DataAccess.Migrations
                     b.Navigation("Ma_bai_tap_nge");
                 });
 
-            modelBuilder.Entity("Toeic.Models.Noi_dung_bai_ngu_phap", b =>
-                {
-                    b.HasOne("Toeic.Models.Ma_bai_ngu_phap", "Ma_bai_ngu_phap")
-                        .WithMany("Noidungbainguphaps")
-                        .HasForeignKey("Ma_bai_ngu_phapId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Ma_bai_ngu_phap");
-                });
-
             modelBuilder.Entity("Toeic.Models.Noi_dung_bai_tu_vung", b =>
                 {
                     b.HasOne("Toeic.Models.Ma_bai_tu_vung", "Ma_bai_tu_vung")
@@ -646,11 +611,6 @@ namespace Toeic.DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("Ma_bai_tu_vung");
-                });
-
-            modelBuilder.Entity("Toeic.Models.Ma_bai_ngu_phap", b =>
-                {
-                    b.Navigation("Noidungbainguphaps");
                 });
 
             modelBuilder.Entity("Toeic.Models.Ma_bai_tap_doc", b =>

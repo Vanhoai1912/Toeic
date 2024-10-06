@@ -223,7 +223,7 @@ namespace ToeicWeb.Areas.Admin.Controllers
             var baitapnge = await _db.Mabaitapnges.FindAsync(id);
             if (baitapnge == null)
             {
-                return Json(new { success = false, message = "Không tìm thấy bài tập đọc" });
+                return Json(new { success = false, message = "Không tìm thấy bài nge đọc" });
             }
 
             // Lấy số file ảnh trong folder

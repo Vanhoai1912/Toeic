@@ -22,7 +22,6 @@ namespace Toeic.Models
 
         public string Giai_thich { get; set; }
         public string? Image_bai_doc { get; set; }
-        public string? Bai_doc { get; set; }
         public string? Giai_thich_bai_doc { get; set; }
 
         public int Thu_tu_cau { get; set; }
