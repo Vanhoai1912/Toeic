@@ -140,14 +140,30 @@ namespace ToeicWeb.Areas.Admin.Controllers
 
                 // Kiểm tra thay đổi tiêu đề, hình ảnh và nội dung
                 bool tieuDeChanged = manguphap.Ten_bai != viewModel.Ten_bai;
-                bool imageChanged = viewModel.ImageFileGrammar != null && viewModel.ImageFileGrammar.Length > 0; // Kiểm tra nếu có tệp mới
                 bool noiDungChanged = manguphap.Noi_dung != viewModel.Noi_dung;
 
-                // Kiểm tra xem hình ảnh có thay đổi nếu có hình ảnh cũ
-                bool imageUrlChanged = manguphap.ImageUrl != viewModel.ImageUrl;
+                // Kiểm tra nếu có tệp hình ảnh mới và so sánh với hình ảnh cũ (nếu có)
+                bool imageChanged = viewModel.ImageFileGrammar != null && viewModel.ImageFileGrammar.Length > 0;
+                bool imageFileChanged = false;
+                if (imageChanged)
+                {
+                    // So sánh tên tệp mới với tên tệp hình ảnh cũ nếu cần
+                    if (!string.IsNullOrEmpty(manguphap.ImageUrl))
+                    {
+                        string oldFileName = Path.GetFileName(manguphap.ImageUrl); // Lấy tên tệp từ URL cũ
+                        string newFileName = viewModel.ImageFileGrammar.FileName; // Tên tệp mới từ file upload
+
+                        imageFileChanged = oldFileName != newFileName; // So sánh tên tệp
+                    }
+                    else
+                    {
+                        // Nếu không có hình ảnh cũ, thì chỉ cần kiểm tra có file mới là đủ
+                        imageFileChanged = true;
+                    }
+                }
 
                 // Nếu không có thay đổi
-                if (!tieuDeChanged && !imageChanged && !noiDungChanged && !imageUrlChanged)
+                if (!tieuDeChanged && !noiDungChanged && !imageFileChanged)
                 {
                     return Json(new { success = false, message = "Không có thay đổi nào được thực hiện." });
                 }

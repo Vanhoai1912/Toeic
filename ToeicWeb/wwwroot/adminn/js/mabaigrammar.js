@@ -212,34 +212,34 @@ function Update() {
 // Hàm xử lý việc cập nhật dữ liệu
 function handleUpdate() {
     var tenbai = $('#Ten_bai').val();
-    // Lấy nội dung từ TinyMCE
     var noi_dung_value = tinymce.get('Noi_dung').getContent();
     var newImageFileGra = $('#NewImageFileGra').get(0).files[0];
 
-  
+    // Kiểm tra sự thay đổi của tiêu đề, nội dung và file ảnh
+    var tieuDeChanged = tenbai !== originalData.ten_bai;
+    var noiDungChanged = noi_dung_value !== originalData.noi_dung;
+    var imageFileChanged = false;
 
-    // Kiểm tra có thay đổi nào không
-    var isChanged = false;
-
-    // Chỉ thiết lập isChanged là true nếu có sự thay đổi
-    if (tenbai !== originalData.ten_bai ||
-        (newImageFileGra || originalData.imageFileGrammar) || // Nếu có file mới hoặc file cũ tồn tại
-        noi_dung_value !== originalData.noi_dung) {
-        isChanged = true; // Có sự thay đổi
+    // Kiểm tra nếu có tệp mới và so sánh với file cũ (nếu có)
+    if (newImageFileGra) {
+        var newFileName = newImageFileGra.name; // Lấy tên file mới
+        if (originalData.imageFileGrammar) {
+            var oldFileName = originalData.imageFileGrammar; // Tên file cũ từ dữ liệu ban đầu
+            imageFileChanged = newFileName !== oldFileName; // So sánh tên file
+        } else {
+            imageFileChanged = true; // Nếu không có file cũ, nhưng có file mới
+        }
     }
 
-    if (!isChanged) {
-        toastr.info("Không có thay đổi nào để cập nhật");
-        return; // Kết thúc hàm nếu không có thay đổi
-    }
-
+    // Tạo đối tượng FormData để gửi dữ liệu
     var formData = new FormData();
+    formData.append('Id', $('#Id').val());
+    formData.append('Ten_bai', tenbai);
+    formData.append('Noi_dung', noi_dung_value);
+
     if (newImageFileGra) {
         formData.append('ImageFileGrammar', newImageFileGra);
     }
-    formData.append('Noi_dung', noi_dung_value);
-    formData.append('Id', $('#Id').val());
-    formData.append('Ten_bai', tenbai);
 
     // Gửi yêu cầu AJAX để cập nhật
     $.ajax({
@@ -250,12 +250,14 @@ function handleUpdate() {
         processData: false,
         success: function (response) {
             if (!response.success) {
-                toastr.error(response.message);
+                // Hiển thị thông báo lỗi nếu không có thay đổi hoặc có lỗi
+                toastr.info(response.message);  // Hiển thị thông báo từ phản hồi server
             } else {
+                // Nếu cập nhật thành công, hiển thị thông báo thành công và xử lý các bước tiếp theo
                 HideModal();
                 loadDataTable();
                 ClearData();
-                toastr.success(response.message);
+                toastr.success(response.message);  // Hiển thị thông báo thành công
             }
         },
         error: function (xhr) {
@@ -264,6 +266,8 @@ function handleUpdate() {
         }
     });
 }
+
+
 
 
 
