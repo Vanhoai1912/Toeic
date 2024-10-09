@@ -1,6 +1,119 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@model Toeic.Models.ViewModels.CauhoiBThiVM
+
+<div class="container">
+    <div class="row pt-4 pb-3 mx-2">
+        <div class="col-6">
+            <h1 class="text-primary">
+                Quản lý bài thi
+            </h1>
+        </div>
+        <hr class="mx-3" style="width:98%" />
+    </div>
+
+    <div class="row pt-2 ms-2">
+        <div class="col-6 col-md-3">
+            <button id="btnAdd" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Thêm bài thi mới
+            </button>
+        </div>
+    </div>
+
+    <div class="card-body p-4">
+        <table id="tblData" class="table table-bordered table-striped" style="width:100%">
+            <thead>
+                <tr>
+                    <th class="text-start">Id</th>
+                    <th>TIÊU ĐỀ</th>
+                    <th class="text-start">EXAM TYPE</th>
+                    <th></th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="BaithiModal" tabindex="-1" aria-labelledby="BaithiModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Thêm bài thi</h3>
+                <button type="button" onclick="HideModal();" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="Id" value="0" />
+
+                <!-- Input cho tiêu đề -->
+                <div class="mb-2">
+                    <label for="Tieu_de" class="d-flex align-items-center fs-5 fw-semibold mb-2">
+                        <span class="required">Tiêu đề</span>
+                    </label>
+                    <input type="text" id="Tieu_de" class="form-control" required />
+                    <span id="Tieu_deError" class="text-danger"></span>
+                </div>
+
+                <!-- Select cho Exam Type -->
+                <div class="mb-2">
+                    <label for="ExamType" class="d-flex align-items-center fs-5 fw-semibold mb-2">
+                        <span class="required">Exam Type</span>
+                    </label>
+                    <select id="ExamType" class="form-control" required>
+                        <option value="" disabled selected>--Chọn bài thi--</option>
+                        <option value="nghe">Bài thi nghe</option>
+                        <option value="đọc">Bài thi đọc</option>
+                        <option value="tổng hợp">Bài thi tổng hợp</option>
+                    </select>
+                    <span id="ExamTypeError" class="text-danger"></span>
+                </div>
+
+                <!-- Input cho file Excel -->
+                <div class="mb-2">
+                    <label for="NewExcelFile" class="d-flex align-items-center fs-5 fw-semibold mb-2">
+                        <span class="required">File Excel</span>
+                    </label>
+                    <div id="ExcelFileInfo" class="mb-2" style="display:none;">
+                        <p>File hiện tại: <span id="ExcelFile"></span></p>
+                    </div>
+                    <input type="file" class="form-control" id="NewExcelFile" accept=".xls,.xlsx" />
+                    <span id="ExcelFileError" class="text-danger"></span>
+                </div>
+
+                <!-- Input cho nhiều file ảnh -->
+                <div class="mb-2">
+                    <label for="NewImageFile" class="d-flex align-items-center fs-5 fw-semibold mb-2">
+                        <span class="required">File ảnh</span>
+                    </label>
+                    <div id="NumberOfImages" class="mb-2" style="display:none">
+                        <p>File ảnh đã thêm: <span id="ImageFiles"></span></p>
+                    </div>
+                    <input type="file" class="form-control" id="NewImageFile" name="ImageFile" accept="image/*" multiple />
+                    <span id="ImageFileError" class="text-danger"></span>
+                </div>
+
+                <!-- Input cho nhiều file âm thanh -->
+                <div id="audioFileSection" class="mb-2">
+                    <label for="NewAudioFile" class="d-flex align-items-center fs-5 fw-semibold mb-2">
+                        <span class="required">File nghe</span>
+                    </label>
+                    <div id="NumberOfAudios" class="mb-2" style="display:none">
+                        <p>File nghe đã thêm: <span id="AudioFiles"></span></p>
+                    </div>
+                    <input type="file" class="form-control" id="NewAudioFile" name="AudioFile" accept="audio/*" multiple />
+                    <span id="AudioFileError" class="text-danger"></span>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" onclick="HideModal();">Hủy</button>
+                <button class="btn btn-primary" type="button" id="Save" onclick="Create();">Thêm</button>
+                <button class="btn btn-success" type="button" id="Update" onclick="Update();" style="display:none">Cập nhật</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <script src="~/adminn/js/mabthi.js"></script>
 }
-<h3>baithi</h3>

@@ -268,7 +268,7 @@
                                     <span class="menu-title">Quản lý bài tập nge</span>
                                 </span>
                             </a>
-                            <a href="#" class="nav-link nav-linkH menu-item" id="">
+                            <a href="#" class="nav-link nav-linkH menu-item" id="dethiLink">
                                 <span class="menu-link">
                                     <span class="menu-icon">
                                         <i class="bi bi-layout-text-window-reverse" style="font-size: 18px">
@@ -556,7 +556,7 @@
                         });
                         break;
                     case '/Admin/BThi/Index':
-                        $.getScript('@Url.Content("~/adminn/js/bthi.js")', function () {
+                        $.getScript('@Url.Content("~/adminn/js/mabthi.js")', function () {
                             loadDataTable();
                         });
                         break;

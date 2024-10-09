@@ -12,8 +12,8 @@ using Toeic.DataAccess;
 namespace Toeic.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241006135143_Data")]
-    partial class Data
+    [Migration("20241008092948_Addmi")]
+    partial class Addmi
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -355,6 +355,70 @@ namespace Toeic.DataAccess.Migrations
                     b.ToTable("Cauhoibaitapnges");
                 });
 
+            modelBuilder.Entity("Toeic.Models.Cau_hoi_bai_thi", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Audio")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Cau_hoi")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Dap_an_1")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Dap_an_2")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Dap_an_3")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Dap_an_4")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Dap_an_dung")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Giai_thich")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Giai_thich_bai_doc")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Image")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Ma_bai_thiId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("QuestionType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Thu_tu_cau")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Transcript")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Ma_bai_thiId");
+
+                    b.ToTable("Cauhoibaithis");
+                });
+
             modelBuilder.Entity("Toeic.Models.Ma_bai_ngu_phap", b =>
                 {
                     b.Property<int>("Id")
@@ -435,6 +499,37 @@ namespace Toeic.DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Mabaitapnges");
+                });
+
+            modelBuilder.Entity("Toeic.Models.Ma_bai_thi", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AudioFolderPath")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ExamType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ExcelFilePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageFolderPath")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Tieu_de")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Mabaithis");
                 });
 
             modelBuilder.Entity("Toeic.Models.Ma_bai_tu_vung", b =>
@@ -603,6 +698,17 @@ namespace Toeic.DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("Ma_bai_tap_nge");
+                });
+
+            modelBuilder.Entity("Toeic.Models.Cau_hoi_bai_thi", b =>
+                {
+                    b.HasOne("Toeic.Models.Ma_bai_thi", "Ma_bai_thi")
+                        .WithMany()
+                        .HasForeignKey("Ma_bai_thiId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Ma_bai_thi");
                 });
 
             modelBuilder.Entity("Toeic.Models.Noi_dung_bai_tu_vung", b =>

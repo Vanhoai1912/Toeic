@@ -6,7 +6,7 @@ namespace ToeicWeb.Areas.Admin.Controllers
 {
 
     [Area("Admin")]
-    [Authorize(Roles = SD.Role_Admin + "," + SD.Role_Employee)]
+    //[Authorize(Roles = SD.Role_Admin + "," + SD.Role_Employee)]
 
     public class HomeAdminController : Controller
     {

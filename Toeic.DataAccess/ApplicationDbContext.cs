@@ -21,7 +21,8 @@ namespace Toeic.DataAccess
         public virtual DbSet<Ma_bai_tu_vung> Mabaituvungs { get; set; }
         public virtual DbSet<Noi_dung_bai_tu_vung> Noidungbaituvungs { get; set; }
         public virtual DbSet<Ma_bai_ngu_phap> Mabainguphaps { get; set; }
-
+        public virtual DbSet<Ma_bai_thi> Mabaithis { get; set; }
+        public virtual DbSet<Cau_hoi_bai_thi> Cauhoibaithis { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
