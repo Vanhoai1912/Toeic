@@ -10,5 +10,8 @@
 
         public Ma_bai_tap_nge BaiTapNge { get; set; }
         public List<Cau_hoi_bai_tap_nge> CauHoiNgeList { get; set; }
+
+        public Ma_bai_thi Baithi { get; set; }
+        public List<Cau_hoi_bai_thi> CauHoiBaiThiList { get; set; }
     }
 }

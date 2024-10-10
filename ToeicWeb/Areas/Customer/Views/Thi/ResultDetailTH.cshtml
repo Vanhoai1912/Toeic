@@ -1,0 +1,218 @@
+﻿@model Toeic.Models.ViewModels.TracNghiemViewModel
+
+<!-- Tiêu đề -->
+<div class="col-12 text-center">
+    <h2>@Model.Baithi.Tieu_de</h2>
+</div>
+
+
+<div class="container rounded-4" style="max-width: 1220px; box-shadow: 0 2px 4px rgba(0, 0, 0, .08), 0 4px 12px rgba(0, 0, 0, .08); margin-left: -6rem;">
+    <div class="row">
+        <!-- Phần tiêu đề Part -->
+        <p class="mt-xxl-3">
+            <span class="badge rounded-4 bg-primary">
+                @Model.Baithi.ExamType
+            </span>
+        </p>
+
+        <!-- Phần câu hỏi và đáp án bên trái -->
+        @{
+            // Khởi tạo một danh sách để lưu trữ các tên ảnh đã hiển thị
+            List<string> displayedImages = new List<string>();
+        }
+        <div class="col-md-8">
+            @for (int i = 0; i < Model.CauHoiBaiThiList.Count; i++)
+            {
+                var question = Model.CauHoiBaiThiList[i];
+
+                <div class="question-block" id="question_@question.Id" style="padding: 10px;">
+
+                    <!-- Hiển thị âm thanh nếu có -->
+                    @if (!string.IsNullOrEmpty(question.Audio))
+                    {
+                        <div class="box-audio mb-3">
+                            <audio controls class="w-100">
+                                <source src="~/@question.Audio" type="audio/mpeg" />
+                            </audio>
+                        </div>
+                    }
+
+                    <!-- Hiển thị hình ảnh nếu có -->
+                    @if (!string.IsNullOrEmpty(question.Image))
+                    {
+                        <div class="box-image w-75 h-50">
+                            <img src="~/@question.Image" alt="Question Image" class="img-fluid" />
+                        </div>
+                    }
+
+                    <!-- Hiện transcript nếu có -->
+                    @if (!string.IsNullOrEmpty(question.Transcript_bai_nghe))
+                    {
+
+                        <div class="mt-4">
+                            <div class="toggle-explanation" onclick="toggleExplanation('transcript_@question.Id')" style="cursor: pointer; color: #3b4f95; text-decoration: none;">
+                                Hiện transcript <i class="bi bi-chevron-down"></i>
+                            </div>
+                            <div class="explanation-content mt-2" id="transcript_@question.Id">
+                                <div>
+                                    @question.Transcript_bai_nghe
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(question.Image_bai_doc)) // Kiểm tra nếu có ảnh bài đọc
+                    {
+                        // Kiểm tra nếu ảnh đã được hiển thị chưa
+                        if (!displayedImages.Contains(question.Image_bai_doc))
+                        {
+                            <hr style="border: 1px solid #ccc; margin-bottom: 20px;" /> <!-- Đường cắt ngang trên bài đọc -->
+
+                            <div class="reading-passage" style="margin-top: 20px;">
+                                <h5>Bài đọc</h5>
+                                <div class="box-image w-75 h-50">
+                                    <img src="~/@question.Image_bai_doc" alt="Question Image" />
+                                </div>
+                                <!-- Giải thích đáp án bài đọc -->
+                                <div class="mt-2">
+                                    <div class="toggle-explanation" onclick="toggleExplanation('readingExplanation_@question.Id')" style="cursor: pointer; color: #3b4f95; text-decoration: none;">
+                                        Giải thích chi tiết bài đọc <i class="bi bi-chevron-down"></i>
+                                    </div>
+                                    <div class="explanation-content mt-2" id="readingExplanation_@question.Id">
+                                        <div class="">
+                                            @question.Giai_thich_bai_doc
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            // Thêm tên ảnh vào danh sách đã hiển thị
+                            displayedImages.Add(question.Image_bai_doc);
+                        }
+                    }
+
+                    <div class="my-3"><b>@Model.CauHoiBaiThiList[i].Thu_tu_cau</b></div>
+                    <!-- Hiển thị đáp án -->
+                    @{
+                        var options = new[] {
+                new { Letter = "A", Text = Model.CauHoiBaiThiList[i].Dap_an_1 },
+                new { Letter = "B", Text = Model.CauHoiBaiThiList[i].Dap_an_2 },
+                new { Letter = "C", Text = Model.CauHoiBaiThiList[i].Dap_an_3 },
+                new { Letter = "D", Text = Model.CauHoiBaiThiList[i].Dap_an_4 }
+
+                };
+
+                        var userAnswered = !string.IsNullOrEmpty(question.UserAnswer);
+                    }
+
+                    @for (int j = 0; j < options.Length; j++)
+                    {
+                        var option = options[j];
+                        var isCorrectAnswer = string.Equals(option.Text, question.Dap_an_dung, StringComparison.OrdinalIgnoreCase);
+                        var isUserAnswer = string.Equals(option.Text, question.UserAnswer, StringComparison.OrdinalIgnoreCase);
+
+                        <div>
+                            <!-- Apply color only if user answered, otherwise no color -->
+                            <span style="color: @(userAnswered && isUserAnswer ? (isCorrectAnswer ? "green" : "#e69a9c") : (userAnswered && isCorrectAnswer ? "green" : "black")); font-weight: @(userAnswered && (isUserAnswer || isCorrectAnswer) ? "bold" : "normal");">
+                                <input type="radio" name="cauHoi_@question.Id" value="@option.Text" disabled @(isUserAnswer ? "checked" : "") />
+                                @options[j].Letter. @option.Text.
+                            </span>
+                        </div>
+                    }
+
+                    <!-- Đáp án đúng -->
+                    <p><strong>Đáp án đúng:</strong> <span style="color:green; font-weight: bold">@question.Dap_an_dung</span></p>
+
+
+
+
+                    <!-- Giải thích chi tiết đáp án -->
+                    <div class="mt-2">
+                        <div class="toggle-explanation" onclick="toggleExplanation('explanation_@question.Id')" style="cursor: pointer; color: #3b4f95; text-decoration: none;">
+                            Giải thích chi tiết đáp án <i class="bi bi-chevron-down"></i>
+                        </div>
+                        <div class="explanation-content mt-2" id="explanation_@question.Id">
+                            <div>
+                                @question.Giai_thich_dap_an
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<div style="position: fixed; top: 130px; right: 10px; width: 250px; box-shadow: 0 2px 4px rgba(0, 0, 0, .08), 0 4px 12px rgba(0, 0, 0, .08); border-radius: 10px; padding: 18px;">
+    <h4>Kết quả làm bài:</h4>
+    <div class="">
+        <div class="row text-center">
+            <!-- Total Time Card -->
+            <div class="row mt-3">
+                <div class=" d-sm-flex">
+                            <i class="bi bi-clock-fill card-icon me-sm-3" style="color: dodgerblue;"></i>
+                    <h5 class="card-title text-dark me-sm-3">Thời gian làm bài:</h5>
+                    <p class="card-text">@Model.TotalTime</p>
+                </div>
+            </div>
+            <!-- Correct Answer Card -->
+            <div class="row mt-3">
+                <div class=" d-sm-flex">
+                    <i class="bi bi-check-circle-fill text-success card-icon me-sm-3 "></i>
+                    <h5 class="card-title text-success me-sm-3">Trả lời đúng:</h5>
+                    <p class="card-text">@ViewBag.CorrectAnswers</p>
+                </div>
+            </div>
+            <!-- Incorrect Answer Card -->
+            <div class="row mt-3 d-sm-flex">
+                <div class=" d-sm-flex">
+                    <i class="bi bi-x-circle-fill text-danger card-icon me-sm-3"></i>
+                    <h5 class="card-title text-danger me-sm-3">Trả lời sai:</h5>
+                    <p class="card-text ">@ViewBag.IncorrectAnswers</p>
+                </div>
+            </div>
+            <!-- Skipped Question Card -->
+            <div class="row mt-3 d-sm-flex">
+                <div class=" d-sm-flex">
+                    <i class="bi bi-dash-circle-fill card-icon me-sm-3"></i>
+                    <h5 class="card-title me-sm-3">Bỏ qua:</h5>
+                    <p class="card-text ">@ViewBag.SkippedQuestions</p>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function toggleExplanation(id) {
+        var explanationElement = document.getElementById(id);
+
+        if (explanationElement.classList.contains('show')) {
+            explanationElement.style.height = '0';
+            explanationElement.classList.remove('show'); // Xóa lớp show
+        } else {
+            explanationElement.style.height = explanationElement.scrollHeight + 'px';
+            explanationElement.classList.add('show'); // Thêm lớp show
+        }
+    }
+
+</script>
+
+
+<style>
+    /* Phần tử giải thích ban đầu ẩn */
+    .explanation-content {
+        height: 0;
+        overflow: hidden;
+        transition: height 0.5s ease; /* Sử dụng thuộc tính height để tạo hiệu ứng */
+    }
+
+        /* Phần tử giải thích khi hiển thị */
+        .explanation-content.show {
+            height: auto;
+        }
+</style>

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Toeic.DataAccess;
 
@@ -11,9 +12,11 @@ using Toeic.DataAccess;
 namespace Toeic.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241010050209_Data")]
+    partial class Data
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -386,21 +389,15 @@ namespace Toeic.DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Giai_thich_bai_doc")
+                    b.Property<string>("Giai_thich")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Giai_thich_dap_an")
-                        .IsRequired()
+                    b.Property<string>("Giai_thich_bai_doc")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Image_bai_doc")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsCorrect")
-                        .HasColumnType("bit");
 
                     b.Property<int>("Ma_bai_thiId")
                         .HasColumnType("int");
@@ -412,10 +409,7 @@ namespace Toeic.DataAccess.Migrations
                     b.Property<int>("Thu_tu_cau")
                         .HasColumnType("int");
 
-                    b.Property<string>("Transcript_bai_nghe")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserAnswer")
+                    b.Property<string>("Transcript")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");

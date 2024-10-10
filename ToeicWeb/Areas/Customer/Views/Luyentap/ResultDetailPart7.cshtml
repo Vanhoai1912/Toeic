@@ -19,7 +19,6 @@
         @foreach (var question in Model.CauHoiList)
         {
             <div class="question-row" style="margin-bottom: 30px;">
-                <!-- Đường cắt ngang phía trên bài đọc nếu có -->
                 @if (!string.IsNullOrEmpty(question.Image_bai_doc)) // Kiểm tra nếu có ảnh bài đọc
                 {
                     // Kiểm tra nếu ảnh đã được hiển thị chưa

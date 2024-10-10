@@ -62,7 +62,6 @@ function Delete(url) {
                             icon: "success"
                         });
                         dataTable.ajax.reload();
-                        //clearFormData();
                     }
                     else {
                         toastr.error(data.message);

@@ -253,7 +253,6 @@ function Delete(url) {
                             icon: "success"
                         });
                         dataTable.ajax.reload();
-                        clearFormData();
                     }
                     else {
                         toastr.error(data.message);
@@ -327,19 +326,7 @@ function Validate() {
         $('#ExcelFileError').text('').hide();
     }
 
-    // Chỉ kiểm tra file âm thanh nếu loại bài thi không phải là "đọc"
-    var examType = $('#ExamType').val();
-    if (examType != 'đọc') {
-        var newAudioFileInput = $('#NewAudioFile').get(0);
-        if (newAudioFileInput && newAudioFileInput.files.length == 0) {
-            $('#NewAudioFile').css('border-color', 'Red');
-            $('#AudioFileError').text('Vui lòng chọn file nghe.').show();
-            isValid = false;
-        } else {
-            $('#NewAudioFile').css('border-color', 'lightgrey');
-            $('#AudioFileError').text('').hide();
-        }
-    }
+   
 
     return isValid;
 }
@@ -352,11 +339,11 @@ $('#btnAdd').click(function () {
     //handleExamTypeChange(); // Đảm bảo xử lý lại khi mở modal
 });
 
-let isHidingModalll = false;
+var isHidingModal = false;
 
 function HideModal() {
-    if (isHidingModalll) return; // Ngăn chặn vòng lặp
-    isHidingModalll = true;
+    if (isHidingModal) return; // Ngăn chặn vòng lặp
+    isHidingModal = true;
 
     ClearData();
     $('#BaithiModal').modal('hide');
@@ -364,7 +351,7 @@ function HideModal() {
     $('#NumberOfImages').hide();
     $('#NumberOfAudios').hide();
 
-    isHidingModalll = false; // Đặt lại biến cờ
+    isHidingModal = false; // Đặt lại biến cờ
 }
 function ClearData() {
     $('#Tieu_de').val('');

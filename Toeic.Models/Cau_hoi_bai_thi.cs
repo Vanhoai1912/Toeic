@@ -12,6 +12,7 @@ namespace Toeic.Models
     {
         [Key]
         public int Id { get; set; }
+
         public string QuestionType { get; set; }
 
         public int Thu_tu_cau { get; set; }
@@ -32,13 +33,19 @@ namespace Toeic.Models
 
         public string Dap_an_dung { get; set; }
 
-        public string? Transcript { get; set; }
+        public string? Transcript_bai_nghe { get; set; } // bài nge
 
-        public string Giai_thich { get; set; }
-        public string? Giai_thich_bai_doc { get; set; }
+        public string? Image_bai_doc { get; set; }
+
+        public string Giai_thich_dap_an { get; set; }
+
+        public string? Giai_thich_bai_doc { get; set; } // baidoc
 
         public int Ma_bai_thiId { get; set; }
         [ForeignKey("Ma_bai_thiId")]
         public Ma_bai_thi Ma_bai_thi { get; set; }
+
+        public string? UserAnswer { get; set; }
+        public bool IsCorrect { get; set; }
     }
 }
