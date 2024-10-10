@@ -41,7 +41,5 @@ namespace Toeic.Models
         [ForeignKey("Ma_bai_thiId")]
         public Ma_bai_thi Ma_bai_thi { get; set; }
 
-        public string? UserAnswer { get; set; }
-        public bool IsCorrect { get; set; }
     }
 }

@@ -23,6 +23,10 @@ namespace Toeic.DataAccess
         public virtual DbSet<Ma_bai_ngu_phap> Mabainguphaps { get; set; }
         public virtual DbSet<Ma_bai_thi> Mabaithis { get; set; }
         public virtual DbSet<Cau_hoi_bai_thi> Cauhoibaithis { get; set; }
+        public virtual DbSet<TestResult> TestResults { get; set; }
+        public virtual DbSet<UserAnswer> UserAnswers { get; set; }
+
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

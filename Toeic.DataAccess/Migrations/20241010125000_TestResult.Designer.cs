@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Toeic.DataAccess;
 
@@ -11,9 +12,11 @@ using Toeic.DataAccess;
 namespace Toeic.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241010125000_TestResult")]
+    partial class TestResult
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -393,6 +396,9 @@ namespace Toeic.DataAccess.Migrations
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsCorrect")
+                        .HasColumnType("bit");
+
                     b.Property<int>("Ma_bai_thiId")
                         .HasColumnType("int");
 
@@ -404,6 +410,9 @@ namespace Toeic.DataAccess.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Transcript")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserAnswer")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -644,34 +653,6 @@ namespace Toeic.DataAccess.Migrations
                     b.ToTable("TestResults");
                 });
 
-            modelBuilder.Entity("Toeic.Models.UserAnswer", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Answer")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("CauHoiId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsCorrect")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("TestResultId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CauHoiId");
-
-                    b.ToTable("UserAnswers");
-                });
-
             modelBuilder.Entity("Toeic.Models.ApplicationUser", b =>
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
@@ -787,17 +768,6 @@ namespace Toeic.DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
-                });
-
-            modelBuilder.Entity("Toeic.Models.UserAnswer", b =>
-                {
-                    b.HasOne("Toeic.Models.Cau_hoi_bai_thi", "CauHoi")
-                        .WithMany()
-                        .HasForeignKey("CauHoiId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CauHoi");
                 });
 
             modelBuilder.Entity("Toeic.Models.Ma_bai_tap_doc", b =>

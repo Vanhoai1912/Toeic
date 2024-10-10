@@ -13,5 +13,8 @@
 
         public Ma_bai_thi Baithi { get; set; }
         public List<Cau_hoi_bai_thi> CauHoiBaiThiList { get; set; }
+
+        public List<UserAnswer> UserAnswers { get; set; } // Thêm dòng này vào ViewModel
+        public TestResult TestResult { get; set; }
     }
 }
