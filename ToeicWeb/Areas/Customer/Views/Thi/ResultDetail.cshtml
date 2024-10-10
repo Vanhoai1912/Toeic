@@ -37,61 +37,38 @@
                         </div>
                     }
 
-                    <!-- Hiển thị hình ảnh nếu có -->
-                    @if (!string.IsNullOrEmpty(question.Image))
-                    {
-                        <div class="box-image w-75 h-50">
-                            <img src="~/@question.Image" alt="Question Image" class="img-fluid" />
-                        </div>
-                    }
 
-                    <!-- Hiện transcript nếu có -->
-                    @if (!string.IsNullOrEmpty(question.Transcript_bai_nghe))
-                    {
-
-                        <div class="mt-4">
-                            <div class="toggle-explanation" onclick="toggleExplanation('transcript_@question.Id')" style="cursor: pointer; color: #3b4f95; text-decoration: none;">
-                                Hiện transcript <i class="bi bi-chevron-down"></i>
-                            </div>
-                            <div class="explanation-content mt-2" id="transcript_@question.Id">
-                                <div>
-                                    @question.Transcript_bai_nghe
-                                </div>
-                            </div>
-                        </div>
-                    }
-
-                    @if (!string.IsNullOrEmpty(question.Image_bai_doc)) // Kiểm tra nếu có ảnh bài đọc
+                    @if (!string.IsNullOrEmpty(question.Image)) // Kiểm tra nếu có ảnh bài đọc
                     {
                         // Kiểm tra nếu ảnh đã được hiển thị chưa
-                        if (!displayedImages.Contains(question.Image_bai_doc))
+                        if (!displayedImages.Contains(question.Image))
                         {
                             <hr style="border: 1px solid #ccc; margin-bottom: 20px;" /> <!-- Đường cắt ngang trên bài đọc -->
 
                             <div class="reading-passage" style="margin-top: 20px;">
-                                <h5>Bài đọc</h5>
                                 <div class="box-image w-75 h-50">
-                                    <img src="~/@question.Image_bai_doc" alt="Question Image" />
+                                    <img src="~/@question.Image" alt="Question Image" />
                                 </div>
                                 <!-- Giải thích đáp án bài đọc -->
                                 <div class="mt-2">
                                     <div class="toggle-explanation" onclick="toggleExplanation('readingExplanation_@question.Id')" style="cursor: pointer; color: #3b4f95; text-decoration: none;">
-                                        Giải thích chi tiết bài đọc <i class="bi bi-chevron-down"></i>
+                                        Hiện transcript <i class="bi bi-chevron-down"></i>
                                     </div>
                                     <div class="explanation-content mt-2" id="readingExplanation_@question.Id">
                                         <div class="">
-                                            @question.Giai_thich_bai_doc
+                                            @question.Transcript
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
                             // Thêm tên ảnh vào danh sách đã hiển thị
-                            displayedImages.Add(question.Image_bai_doc);
+                            displayedImages.Add(question.Image);
                         }
                     }
 
-                    <div class="my-3"><b>@Model.CauHoiBaiThiList[i].Thu_tu_cau</b></div>
+                    <p><b>@Model.CauHoiBaiThiList[i].Thu_tu_cau. @Model.CauHoiBaiThiList[i].Cau_hoi</b></p>
+
                     <!-- Hiển thị đáp án -->
                     @{
                         var options = new[] {

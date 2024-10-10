@@ -69,30 +69,6 @@ namespace ToeicWeb.Areas.Admin.Controllers
                 }
             }
 
-            var fileImageBDPaths = new Dictionary<string, string>();
-            foreach (var formFile in viewModel.ImageFile)
-            {
-                var fileExtension = Path.GetExtension(formFile.FileName).ToLowerInvariant();
-                if (string.IsNullOrEmpty(fileExtension) || !allowedImageExtensions.Contains(fileExtension))
-                {
-                    return Json(new { success = false, message = "Invalid file extension for images. Allowed extensions are: " + string.Join(", ", allowedImageExtensions) });
-                }
-
-                if (formFile.Length > 0)
-                {
-                    var fileName = Path.GetFileNameWithoutExtension(formFile.FileName);
-                    var fileNameFul = fileName + fileExtension;
-                    var filePath = Path.Combine(uploadImageFolderPath, fileNameFul);
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await formFile.CopyToAsync(stream);
-                    }
-
-                    var relativeFilePath = Path.Combine("adminn", "upload", "bài thi " + viewModel.ExamType.ToString(), viewModel.Tieu_de.ToString(), "image", fileNameFul).Replace("\\", "/");
-                    fileImageBDPaths.Add(relativeFilePath, fileName);
-                }
-            }
-
 
             var uploadAudioFolderPath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "bài thi " + viewModel.ExamType.ToString(), viewModel.Tieu_de.ToString(), "audio");
             Directory.CreateDirectory(uploadAudioFolderPath);
@@ -118,7 +94,6 @@ namespace ToeicWeb.Areas.Admin.Controllers
                         Console.WriteLine($"Invalid extension detected: {fileExtension}. Expected: {string.Join(", ", allowedAudioExtensions)}");
                         return Json(new { success = false, message = "Invalid file extension for audio. Allowed extensions are: " + string.Join(", ", allowedAudioExtensions) });
                     }
-
                     if (!allowedAudioMimeTypes.Contains(mimeType))
                     {
                         Console.WriteLine($"Invalid MIME type detected: {mimeType}. Expected: {string.Join(", ", allowedAudioMimeTypes)}");
@@ -165,210 +140,78 @@ namespace ToeicWeb.Areas.Admin.Controllers
                 {
                     await viewModel.ExcelFile.CopyToAsync(fileStream);
                 }
-
-                if (viewModel.ExamType == "NGHE")
+                // Xử lý file Excel
+                using (var stream = new MemoryStream())
                 {
-                    // Xử lý file Excel
-                    using (var stream = new MemoryStream())
+                    await viewModel.ExcelFile.CopyToAsync(stream);
+                    using (var package = new ExcelPackage(stream))
                     {
-                        await viewModel.ExcelFile.CopyToAsync(stream);
-                        using (var package = new ExcelPackage(stream))
+                        var worksheet = package.Workbook.Worksheets.First();
+                        // Kiểm tra xem mabainge đã tồn tại chưa
+                        var mabaithi = _db.Mabaithis.FirstOrDefault(c => c.Tieu_de == viewModel.Tieu_de);
+                        if (mabaithi == null)
                         {
-                            var worksheet = package.Workbook.Worksheets.First();
-                            // Kiểm tra xem mabainge đã tồn tại chưa
-                            var mabaithi = _db.Mabaithis.FirstOrDefault(c => c.Tieu_de == viewModel.Tieu_de);
-                            if (mabaithi == null)
+                            mabaithi = new Ma_bai_thi
                             {
-                                mabaithi = new Ma_bai_thi
-                                {
-                                    Tieu_de = viewModel.Tieu_de,
-                                    ExamType = viewModel.ExamType,
-                                    ExcelFilePath = excelFilePath,
-                                    ImageFolderPath = uploadImageFolderPath,
-                                    AudioFolderPath = uploadAudioFolderPath
-                                };
-                                _db.Mabaithis.Add(mabaithi);
-                                await _db.SaveChangesAsync();
-                            }
-                            for (int row = 2; row <= worksheet.Dimension.Rows; row++)
-                            {
-                                var cauhoi = new Cau_hoi_bai_thi
-                                {
-
-                                    Thu_tu_cau = worksheet.Cells[row, 1].Value != null ? Convert.ToInt32(worksheet.Cells[row, 1].Value) : 0,
-                                    Cau_hoi = worksheet.Cells[row, 2].Value?.ToString() ?? string.Empty,
-                                    Dap_an_1 = worksheet.Cells[row, 5].Value?.ToString() ?? string.Empty,
-                                    Dap_an_2 = worksheet.Cells[row, 6].Value?.ToString() ?? string.Empty,
-                                    Dap_an_3 = worksheet.Cells[row, 7].Value?.ToString() ?? string.Empty,
-                                    Dap_an_4 = worksheet.Cells[row, 8].Value?.ToString() ?? string.Empty,
-                                    Dap_an_dung = worksheet.Cells[row, 9].Value?.ToString() ?? string.Empty,
-                                    Giai_thich_dap_an = worksheet.Cells[row, 10].Value?.ToString() ?? string.Empty,
-                                    QuestionType = viewModel.ExamType,
-                                    Ma_bai_thiId = mabaithi.Id
-                                };
-                                if (!string.IsNullOrEmpty(worksheet.Cells[row, 11].Value?.ToString()))
-                                {
-                                    cauhoi.Transcript_bai_nghe = worksheet.Cells[row, 11].Value.ToString();
-                                }
-                                else
-                                {
-                                    cauhoi.Transcript_bai_nghe = string.Empty;
-                                }
-
-                                for (int i = 0; i < fileAudioPaths.Count; i++)
-                                {
-                                    if (worksheet.Cells[row, 3].Value?.ToString() == fileAudioPaths.ElementAt(i).Value)
-                                    {
-                                        cauhoi.Audio = fileAudioPaths.ElementAt(i).Key;
-                                    }
-                                }
-
-                                for (int i = 0; i < fileImagePaths.Count; i++)
-                                {
-                                    if (worksheet.Cells[row, 4].Value?.ToString() == fileImagePaths.ElementAt(i).Value)
-                                    {
-                                        cauhoi.Image = fileImagePaths.ElementAt(i).Key;
-                                    }
-                                }
-
-                                _db.Cauhoibaithis.Add(cauhoi);
-                            }
+                                Tieu_de = viewModel.Tieu_de,
+                                ExamType = viewModel.ExamType,
+                                ExcelFilePath = excelFilePath,
+                                ImageFolderPath = uploadImageFolderPath,
+                                AudioFolderPath = uploadAudioFolderPath
+                            };
+                            _db.Mabaithis.Add(mabaithi);
                             await _db.SaveChangesAsync();
                         }
-                    }
-                }
-                else if (viewModel.ExamType == "DOC")
-                {
-                    // Xử lý file Excel
-                    using (var stream = new MemoryStream())
-                    {
-                        await viewModel.ExcelFile.CopyToAsync(stream);
-                        using (var package = new ExcelPackage(stream))
+                        for (int row = 2; row <= worksheet.Dimension.Rows; row++)
                         {
-                            var worksheet = package.Workbook.Worksheets.First();
-                            var mabaithi = _db.Mabaithis.FirstOrDefault(c => c.Tieu_de == viewModel.Tieu_de);
-                            if (mabaithi == null)
+                            var cauhoi = new Cau_hoi_bai_thi
                             {
-                                mabaithi = new Ma_bai_thi
-                                {
-                                    Tieu_de = viewModel.Tieu_de,
-                                    ExamType = viewModel.ExamType,
-                                    ExcelFilePath = excelFilePath,
-                                    ImageFolderPath = uploadImageFolderPath
-                                };
-                                _db.Mabaithis.Add(mabaithi);
-                                await _db.SaveChangesAsync();
+                                Thu_tu_cau = worksheet.Cells[row, 1].Value != null ? Convert.ToInt32(worksheet.Cells[row, 1].Value) : 0,
+                                Cau_hoi = worksheet.Cells[row, 2].Value?.ToString() ?? string.Empty,
+                                Dap_an_1 = worksheet.Cells[row, 5].Value?.ToString() ?? string.Empty,
+                                Dap_an_2 = worksheet.Cells[row, 6].Value?.ToString() ?? string.Empty,
+                                Dap_an_3 = worksheet.Cells[row, 7].Value?.ToString() ?? string.Empty,
+                                Dap_an_4 = worksheet.Cells[row, 8].Value?.ToString() ?? string.Empty,
+                                Dap_an_dung = worksheet.Cells[row, 9].Value?.ToString() ?? string.Empty,
+                                Giai_thich_dap_an = worksheet.Cells[row, 10].Value?.ToString() ?? string.Empty,
+                                QuestionType = viewModel.ExamType,
+                                Ma_bai_thiId = mabaithi.Id
+                            };
+
+                            if (!string.IsNullOrEmpty(worksheet.Cells[row, 11].Value?.ToString()))
+                            {
+                                cauhoi.Transcript = worksheet.Cells[row, 11].Value.ToString();
+                            }
+                            else
+                            {
+                                cauhoi.Transcript = string.Empty;
                             }
 
-                            for (int row = 2; row <= worksheet.Dimension.Rows; row++)
+
+
+                            for (int i = 0; i < fileAudioPaths.Count; i++)
                             {
-                                var cauhoi = new Cau_hoi_bai_thi
+                                if (worksheet.Cells[row, 3].Value?.ToString() == fileAudioPaths.ElementAt(i).Value)
                                 {
-                                    Thu_tu_cau = worksheet.Cells[row, 1].Value != null ? Convert.ToInt32(worksheet.Cells[row, 1].Value) : 0,
-                                    Cau_hoi = worksheet.Cells[row, 2].Value?.ToString() ?? string.Empty,
-                                    Dap_an_1 = worksheet.Cells[row, 3].Value?.ToString() ?? string.Empty,
-                                    Dap_an_2 = worksheet.Cells[row, 4].Value?.ToString() ?? string.Empty,
-                                    Dap_an_3 = worksheet.Cells[row, 5].Value?.ToString() ?? string.Empty,
-                                    Dap_an_4 = worksheet.Cells[row, 6].Value?.ToString() ?? string.Empty,
-                                    Dap_an_dung = worksheet.Cells[row, 7].Value?.ToString() ?? string.Empty,
-                                    Giai_thich_dap_an = worksheet.Cells[row, 8].Value?.ToString() ?? string.Empty,
-                                    Giai_thich_bai_doc = worksheet.Cells[row, 10].Value?.ToString() ?? string.Empty,
-                                    QuestionType = viewModel.ExamType,
-                                    Ma_bai_thiId = mabaithi.Id
-                                };
-                                for (int i = 0; i < fileImagePaths.Count; i++)
-                                {
-                                    if (worksheet.Cells[row, 9].Value?.ToString() == fileImagePaths.ElementAt(i).Value)
-                                    {
-                                        cauhoi.Image_bai_doc = fileImagePaths.ElementAt(i).Key;
-                                    }
+                                    cauhoi.Audio = fileAudioPaths.ElementAt(i).Key;
                                 }
-
-                                _db.Cauhoibaithis.Add(cauhoi);
                             }
 
-                            await _db.SaveChangesAsync();
+                            for (int i = 0; i < fileImagePaths.Count; i++)
+                            {
+                                if (worksheet.Cells[row, 4].Value?.ToString() == fileImagePaths.ElementAt(i).Value)
+                                {
+                                    cauhoi.Image = fileImagePaths.ElementAt(i).Key;
+                                }
+                            }
+
+
+
+                            _db.Cauhoibaithis.Add(cauhoi);
                         }
+                        await _db.SaveChangesAsync();
                     }
                 }
-                else
-                {
-                    // Xử lý file Excel
-                    using (var stream = new MemoryStream())
-                    {
-                        await viewModel.ExcelFile.CopyToAsync(stream);
-                        using (var package = new ExcelPackage(stream))
-                        {
-                            var worksheet = package.Workbook.Worksheets.First();
-                            // Kiểm tra xem mabainge đã tồn tại chưa
-                            var mabaithi = _db.Mabaithis.FirstOrDefault(c => c.Tieu_de == viewModel.Tieu_de);
-                            if (mabaithi == null)
-                            {
-                                mabaithi = new Ma_bai_thi
-                                {
-                                    Tieu_de = viewModel.Tieu_de,
-                                    ExamType = viewModel.ExamType,
-                                    ExcelFilePath = excelFilePath,
-                                    ImageFolderPath = uploadImageFolderPath,
-                                    AudioFolderPath = uploadAudioFolderPath
-                                };
-                                _db.Mabaithis.Add(mabaithi);
-                                await _db.SaveChangesAsync();
-                            }
-                            for (int row = 2; row <= worksheet.Dimension.Rows; row++)
-                            {
-                                var cauhoi = new Cau_hoi_bai_thi
-                                {
-                                    Thu_tu_cau = worksheet.Cells[row, 1].Value != null ? Convert.ToInt32(worksheet.Cells[row, 1].Value) : 0,
-                                    Cau_hoi = worksheet.Cells[row, 2].Value?.ToString() ?? string.Empty,
-                                    Dap_an_1 = worksheet.Cells[row, 6].Value?.ToString() ?? string.Empty,
-                                    Dap_an_2 = worksheet.Cells[row, 7].Value?.ToString() ?? string.Empty,
-                                    Dap_an_3 = worksheet.Cells[row, 8].Value?.ToString() ?? string.Empty,
-                                    Dap_an_4 = worksheet.Cells[row, 9].Value?.ToString() ?? string.Empty,
-                                    Dap_an_dung = worksheet.Cells[row, 10].Value?.ToString() ?? string.Empty,
-                                    Giai_thich_dap_an = worksheet.Cells[row, 11].Value?.ToString() ?? string.Empty,
-                                    Giai_thich_bai_doc = worksheet.Cells[row, 12].Value?.ToString() ?? string.Empty,
-                                    QuestionType = viewModel.ExamType,
-                                    Ma_bai_thiId = mabaithi.Id
-                                };
-                                if (!string.IsNullOrEmpty(worksheet.Cells[row, 13].Value?.ToString()))
-                                {
-                                    cauhoi.Transcript_bai_nghe = worksheet.Cells[row, 13].Value.ToString();
-                                }
-                                else
-                                {
-                                    cauhoi.Transcript_bai_nghe = string.Empty;
-                                }
-
-                                for (int i = 0; i < fileAudioPaths.Count; i++)
-                                {
-                                    if (worksheet.Cells[row, 3].Value?.ToString() == fileAudioPaths.ElementAt(i).Value)
-                                    {
-                                        cauhoi.Audio = fileAudioPaths.ElementAt(i).Key;
-                                    }
-                                }
-
-                                for (int i = 0; i < fileImagePaths.Count; i++)
-                                {
-                                    if (worksheet.Cells[row, 4].Value?.ToString() == fileImagePaths.ElementAt(i).Value)
-                                    {
-                                        cauhoi.Image = fileImagePaths.ElementAt(i).Key;
-                                    }
-                                }
-                                for (int i = 0; i < fileImageBDPaths.Count; i++)
-                                {
-                                    if (worksheet.Cells[row, 5].Value?.ToString() == fileImageBDPaths.ElementAt(i).Value)
-                                    {
-                                        cauhoi.Image_bai_doc = fileImageBDPaths.ElementAt(i).Key;
-                                    }
-                                }
-                                _db.Cauhoibaithis.Add(cauhoi);
-                            }
-                            await _db.SaveChangesAsync();
-                        }
-                    }
-                }
-
                 return Json(new { success = true, message = "Thêm bài thi mới thành công" });
             }
             catch (Exception ex)

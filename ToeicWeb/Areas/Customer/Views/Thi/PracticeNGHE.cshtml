@@ -47,14 +47,14 @@
                             </div>
                         }
                         @* Hiển thị hình ảnh nếu có và nếu chưa được hiển thị *@
-                        @if (!string.IsNullOrEmpty(Model.CauHoiBaiThiList[i].Image_bai_doc) && !displayedImages.Contains(Model.CauHoiBaiThiList[i].Image_bai_doc))
+                        @if (!string.IsNullOrEmpty(Model.CauHoiBaiThiList[i].Image) && !displayedImages.Contains(Model.CauHoiBaiThiList[i].Image))
                         {
-                            displayedImages.Add(Model.CauHoiBaiThiList[i].Image_bai_doc);
+                            displayedImages.Add(Model.CauHoiBaiThiList[i].Image);
 
                             <hr />
 
                             <div class="box-image w-75 h-50">
-                                <img src="~/@Model.CauHoiBaiThiList[i].Image_bai_doc" alt="Question Image" />
+                                <img src="~/@Model.CauHoiBaiThiList[i].Image" alt="Question Image" />
                             </div>
                         }
                         <p><b>@Model.CauHoiBaiThiList[i].Thu_tu_cau. @Model.CauHoiBaiThiList[i].Cau_hoi</b></p>

@@ -19,7 +19,7 @@ namespace Toeic.Models
 
         public string? Audio { get; set; }
 
-        public string? Image { get; set; }
+        public string? Image { get; set; } // bai nghe va bai doc
 
         public string? Cau_hoi { get; set; }
 
@@ -33,13 +33,9 @@ namespace Toeic.Models
 
         public string Dap_an_dung { get; set; }
 
-        public string? Transcript_bai_nghe { get; set; } // bài nge
-
-        public string? Image_bai_doc { get; set; }
+        public string? Transcript { get; set; } // bài nge va giai thich bai doc
 
         public string Giai_thich_dap_an { get; set; }
-
-        public string? Giai_thich_bai_doc { get; set; } // baidoc
 
         public int Ma_bai_thiId { get; set; }
         [ForeignKey("Ma_bai_thiId")]
