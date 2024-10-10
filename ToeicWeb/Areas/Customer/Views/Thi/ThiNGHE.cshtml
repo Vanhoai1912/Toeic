@@ -1,0 +1,29 @@
+﻿@model List<Ma_bai_thi>
+
+@for (int i = 0; i < Model.Count; i++)
+{
+    @if (@Model[i].ExamType == "NGHE")
+    {
+        <a class="col-lg-3 col-sm-6 text-decoration-none" asp-area="Customer" asp-controller="Thi" asp-action="PracticeNGHE" asp-route-baiTapId="@Model[i].Id">
+            <div class="col d-sm-flex justify-content-sm-center">
+                <div class="col-8 p-1 border-primary mb-3 hV">
+                    <div class="shadow border rounded bgC">
+                        <div class="pb-0">
+                            <div class="pl-1 m-2 mx-3 ">
+
+                                <p class="text-dark mb-2"> <b>@Model[i].Tieu_de</b></p>
+
+                                <p class="">
+                                    <span class="badge rounded-pill bg-primary">
+                                        2024 Format
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+
+    }
+}

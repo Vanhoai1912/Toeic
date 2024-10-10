@@ -21,8 +21,23 @@ namespace ToeicWeb.Areas.Customer.Controllers
         }
 
 
-        // PART1
+        // TỔNG HỢP
         public IActionResult ThiTH()
+        {
+            List<Ma_bai_thi> mabaitaps = _db.Mabaithis.ToList();
+            ViewData["NavbarType"] = "_NavbarBack";
+            return View(mabaitaps);
+        }
+
+        // NGHE
+        public IActionResult ThiNGHE()
+        {
+            List<Ma_bai_thi> mabaitaps = _db.Mabaithis.ToList();
+            ViewData["NavbarType"] = "_NavbarBack";
+            return View(mabaitaps);
+        }
+        // DOC
+        public IActionResult ThiDOC()
         {
             List<Ma_bai_thi> mabaitaps = _db.Mabaithis.ToList();
             ViewData["NavbarType"] = "_NavbarBack";
@@ -53,8 +68,56 @@ namespace ToeicWeb.Areas.Customer.Controllers
             return View(viewModel);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> PracticeNGHE(int baiTapId)
+        {
+            var baiTap = await _db.Mabaithis.FindAsync(baiTapId);
+            if (baiTap == null)
+            {
+                return NotFound();
+            }
+
+            var cauHoiList = await _db.Cauhoibaithis
+                                           .Where(c => c.Ma_bai_thiId == baiTapId)
+                                           .OrderBy(c => c.Thu_tu_cau)
+                                           .ToListAsync();
+
+            var viewModel = new TracNghiemViewModel
+            {
+                Baithi = baiTap,
+                CauHoiBaiThiList = cauHoiList
+            };
+            ViewData["NavbarType"] = "_NavbarBack";
+
+            return View(viewModel);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> PracticeDOC(int baiTapId)
+        {
+            var baiTap = await _db.Mabaithis.FindAsync(baiTapId);
+            if (baiTap == null)
+            {
+                return NotFound();
+            }
+
+            var cauHoiList = await _db.Cauhoibaithis
+                                           .Where(c => c.Ma_bai_thiId == baiTapId)
+                                           .OrderBy(c => c.Thu_tu_cau)
+                                           .ToListAsync();
+
+            var viewModel = new TracNghiemViewModel
+            {
+                Baithi = baiTap,
+                CauHoiBaiThiList = cauHoiList
+            };
+            ViewData["NavbarType"] = "_NavbarBack";
+
+            return View(viewModel);
+        }
+
         [HttpPost]
-        public async Task<IActionResult> ResultDetailTH(IFormCollection form, int baiTapId)
+        public async Task<IActionResult> ResultDetail(IFormCollection form, int baiTapId)
         {
             int correctAnswers = 0;
             int incorrectAnswers = 0;
