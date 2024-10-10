@@ -237,6 +237,7 @@ $('#btnAdd').click(function () {
     $('#modalTitle').text('Thêm bài tập đọc mới');
     $('#Save').css('display', 'block');
     $('#Update').css('display', 'none');
+    ClearData();
 });
 
 var isHidingModal = false; // Khai báo biến chỉ một lần
@@ -261,12 +262,24 @@ function ClearData() {
     $('#Tieu_de').val('');
     $('#Tieu_de').css('border-color', 'lightgrey');
 
-    // Xóa thông tin file cũ và reset input file mới
+    // Reset input file Excel
     $('#ExcelFile').text('');
     $('#ExcelFileInfo').hide();
     $('#NewExcelFile').val('');
     $('#NewExcelFile').css('border-color', 'lightgrey');
+
+    // Reset input file ảnh
+    $('#ImageFiles').text(''); // Clear image file names
+    $('#NumberOfImages').hide(); // Hide number of images
+    $('#NewImageFile').val('');
+    $('#NewImageFile').css('border-color', 'lightgrey');
+
+    // Ẩn các lỗi
+    $('#Tieu_deError').text('').hide();
+    $('#PartError').text('').hide();
+    $('#ExcelFileError').text('').hide();
 }
+
 
 function Validate() {
     var isValid = true;
@@ -302,26 +315,6 @@ function Validate() {
     return isValid;
 }
 
-function ClearData() {
-    $('#Tieu_de').val('');
-    $('#Part').val('');
-    $('#NewExcelFile').val('');
-
-    // Ẩn các lỗi và khôi phục lại màu 
-    $('#Tieu_deError').text('').hide();
-    $('#PartError').text('').hide();
-    $('#ExcelFileError').text('').hide();
-
-    $('#Tieu_de').css('border-color', 'lightgrey');
-    $('#Part').css('border-color', 'lightgrey');
-    $('#NewExcelFile').css('border-color', 'lightgrey');
-
-    // Xóa thông tin file cũ và reset input file mới
-    $('#ExcelFile').text('');
-    $('#ExcelFileInfo').hide();
-    $('#NewExcelFile').val('');
-    $('#NewExcelFile').css('border-color', 'lightgrey');
-}
 
 $('#Tieu_de').on('input', function () {
     if ($(this).val().trim() !== "") {
@@ -341,5 +334,15 @@ $('#NewExcelFile').on('change', function () {
     if (this.files.length > 0) {
         $('#NewExcelFile').css('border-color', 'lightgrey');
         $('#ExcelFileError').text('').hide();
+    }
+});
+$('#NewImageFile').on('change', function () {
+    var numberOfFiles = this.files.length;
+    $('#ImageFiles').text(numberOfFiles + ' file' + (numberOfFiles > 1 ? 's' : '')); // Cập nhật số lượng file
+    if (numberOfFiles > 0) {
+        $('#NewImageFile').css('border-color', 'lightgrey');
+        $('#ImageFileError').text('').hide();
+    } else {
+        $('#ImageFiles').text(''); // Xóa số lượng nếu không có file nào
     }
 });

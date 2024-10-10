@@ -15,7 +15,7 @@
                 <input type="hidden" name="baiTapId" value="@Model.BaiTapNge.Id" />
                 @for (int i = 0; i < Model.CauHoiNgeList.Count; i++)
                 {
-                    <div class="question-block" id="question_@Model.CauHoiNgeList[i].Id" style="padding: 10px; margin-bottom: 30px;">
+                    <div class="question-block" id="question_@Model.CauHoiNgeList[i].Id" style="padding: 10px;">
 
 
                         @if (!string.IsNullOrEmpty(Model.CauHoiNgeList[i].Audio))
