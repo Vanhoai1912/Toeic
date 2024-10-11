@@ -21,7 +21,7 @@ namespace Toeic.Models
 
         // Điều hướng đến đối tượng ApplicationUser
         public ApplicationUser ApplicationUser { get; set; }
+
+        public TimeSpan Duration { get; set; } // Thêm trường này để lưu thời gian làm bài
     }
-
-
 }

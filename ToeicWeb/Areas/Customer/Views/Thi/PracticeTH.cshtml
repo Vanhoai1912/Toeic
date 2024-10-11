@@ -128,7 +128,7 @@
     var totalTime = 0;
 
     function startTimer() {
-        var countdown = setInterval(function () {
+        var countdown = setInterval(function() {
             var minutes = Math.floor(remainingTime / 60);
             var seconds = remainingTime % 60;
             seconds = seconds < 10 ? "0" + seconds : seconds;
@@ -149,40 +149,23 @@
         }, 1000);
     }
 
-    window.onload = function () {
+    window.onload = function() {
         startTimer();
     };
 
     // Khi nộp bài tự động
-function autoSubmit() {
-    Swal.fire({
-        title: "Hết thời gian!",
-        text: "Bài làm của bạn sẽ được tự động nộp.",
-        icon: "info",
-        timer: 3000,
-        timerProgressBar: true,
-        didClose: () => {
-            showTotalTime(); // Hiển thị tổng thời gian đã làm
-
-            // Lấy thời gian làm bài
-            var minutes = Math.floor(totalTime / 60);
-            var seconds = totalTime % 60;
-            var formattedTime = minutes + ":" + (seconds < 10 ? "0" + seconds : seconds);
-
-            // Tạo input ẩn để lưu tổng thời gian vào form trước khi nộp
-            var totalTimeInput = document.createElement('input');
-            totalTimeInput.type = 'hidden';
-            totalTimeInput.name = 'TotalTime';  // Tên này phải trùng với key trong controller
-            totalTimeInput.value = formattedTime;
-
-            var form = document.getElementById('tracNghiemForm');
-            form.appendChild(totalTimeInput); // Thêm input vào form
-            form.submit();
-        }
-    });
-}
-
-
+    function autoSubmit() {
+        Swal.fire({
+            title: "Hết thời gian!",
+            text: "Bài làm của bạn sẽ được tự động nộp.",
+            icon: "info",
+            timer: 3000,
+            timerProgressBar: true,
+            didClose: () => {
+                submitFormWithTime(); // Gửi bài với thời gian làm
+            }
+        });
+    }
 
     // Hiển thị tổng thời gian đã làm bài
     function showTotalTime() {
@@ -196,56 +179,63 @@ function autoSubmit() {
         }
     }
 
-  function confirmSubmission() {
-    Swal.fire({
-        title: "Bạn có chắc muốn nộp bài?",
-        text: "Bài làm sẽ không thể thay đổi!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Nộp bài",
-        cancelButtonText: "Hủy"
-    }).then((result) => {
-        if (result.isConfirmed) {
-            Swal.fire({
-                title: "Đã nộp bài!",
-                text: "Bài làm của bạn đã được nộp.",
-                icon: "success",
-                timer: 3000,
-                timerProgressBar: true,
-                didClose: () => {
-                    showTotalTime(); // Hiển thị tổng thời gian đã làm
+    // Thêm thời gian làm bài vào form và submit
+    function submitFormWithTime() {
+        // Lấy thời gian làm bài
+        var minutes = Math.floor(totalTime / 60);
+        var seconds = totalTime % 60;
+        var formattedTime = minutes + ":" + (seconds < 10 ? "0" + seconds : seconds);
 
-                    // Lấy thời gian làm bài
-                    var minutes = Math.floor(totalTime / 60);
-                    var seconds = totalTime % 60;
-                    var formattedTime = minutes + ":" + (seconds < 10 ? "0" + seconds : seconds);
+        // Tạo input ẩn để lưu tổng thời gian vào form trước khi nộp
+        var totalTimeInput = document.createElement('input');
+        totalTimeInput.type = 'hidden';
+        totalTimeInput.name = 'TotalTime';  // Tên này phải trùng với key trong controller
+        totalTimeInput.value = formattedTime;
 
-                    // Tạo input ẩn để lưu tổng thời gian vào form trước khi nộp
-                    var totalTimeInput = document.createElement('input');
-                    totalTimeInput.type = 'hidden';
-                    totalTimeInput.name = 'TotalTime';  // Tên này phải trùng với key trong controller
-                    totalTimeInput.value = formattedTime;
+        var form = document.getElementById('tracNghiemForm');
+        form.appendChild(totalTimeInput); // Thêm input vào form
+        form.submit();
+    }
 
-                    var form = document.getElementById('tracNghiemForm');
-                    form.appendChild(totalTimeInput); // Thêm input vào form
-                    form.submit();
-                }
-            });
-        }
-    });
-}
+    // Xác nhận nộp bài thủ công
+    function confirmSubmission() {
+        Swal.fire({
+            title: "Bạn có chắc muốn nộp bài?",
+            text: "Bài làm sẽ không thể thay đổi!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Nộp bài",
+            cancelButtonText: "Hủy"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: "Đã nộp bài!",
+                    text: "Bài làm của bạn đã được nộp.",
+                    icon: "success",
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didClose: () => {
+                        submitFormWithTime(); // Gửi bài với thời gian làm
+                    }
+                });
+            }
+        });
+    }
 
+    // Đánh dấu câu hỏi đã chọn
     function markAsSelected(questionId) {
         var button = document.getElementById('btn_' + questionId);
         if (button.style.backgroundColor === '#3b4f95') {
             button.style.backgroundColor = '#fff';
+            button.style.color = '#000'; // Đổi lại màu chữ mặc định
         } else {
             button.style.backgroundColor = '#3b4f95';
             button.style.color = '#fff';
         }
     }
+
     // Scroll tới câu hỏi khi nhấn vào nút
     function scrollToQuestion(questionId) {
         document.getElementById('question_' + questionId).scrollIntoView({ behavior: 'smooth' });

@@ -7,9 +7,14 @@
 
 @for (int i = 0; i < mabaitaps.Count; i++)
 {
-    @if (mabaitaps[i].ExamType == "TH")
+    if (mabaitaps[i].ExamType == "TH")
     {
-        <a class="col-lg-3 col-sm-6 text-decoration-none" asp-area="Customer" asp-controller="Thi" asp-action="PracticeTH" asp-route-baiTapId="@mabaitaps[i].Id">
+        <a class="col-lg-3 col-sm-6 text-decoration-none"
+           asp-area="Customer"
+           asp-controller="Thi"
+           asp-action="PracticeTH"
+           asp-route-baiTapId="@mabaitaps[i].Id"
+           onclick="return handleExamClick(event, @Html.Raw(User.Identity.IsAuthenticated.ToString().ToLower()), '@Url.Action("Login", "Account", new { Area = "Identity" })', '@mabaitaps[i].Id');">
             <div class="col d-sm-flex justify-content-sm-center">
                 <div class="col-8 p-1 border-primary mb-3 hV">
                     <div class="shadow border rounded bgC">
@@ -25,10 +30,8 @@
                                     @if (completedTests.Contains(mabaitaps[i].Id)) // Kiểm tra bài thi đã làm
                                     {
                                         <p class="text-success mt-2"><i>Bài thi đã làm</i></p>
-                                        // Hiển thị thông báo
                                     }
                                 </div>
-                               
                             </div>
                         </div>
                     </div>
@@ -37,3 +40,47 @@
         </a>
     }
 }
+<script>
+    function handleExamClick(event, isLoggedIn, loginUrl, baiTapId) {
+        console.log("BaiTapId: ", baiTapId);  // Kiểm tra giá trị ID
+
+        // Nếu ID của bài tập là undefined hoặc null
+        if (!baiTapId || baiTapId === "undefined" || baiTapId === "") {
+            event.preventDefault();  // Ngăn chặn điều hướng
+            Swal.fire({
+                title: "Lỗi",
+                text: "Không tìm thấy ID bài tập!",
+                icon: "error",
+                confirmButtonText: "OK"
+            });
+            return false;
+        }
+
+        // Nếu người dùng chưa đăng nhập
+        if (!isLoggedIn) {
+            event.preventDefault();  // Ngăn chặn điều hướng
+            Swal.fire({
+                title: "Thông báo",
+                text: "Bạn chưa đăng nhập, kết quả sẽ không được lưu.",
+                icon: "info",
+                showCancelButton: true,
+                confirmButtonText: "Làm bài",
+                cancelButtonText: "Đăng nhập",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Nếu nhấn "Làm bài", điều hướng đến bài thi với `baiTapId` đúng
+                    window.location.href = `/Customer/Thi/PracticeTH?baiTapId=${baiTapId}`;  // Sử dụng template string
+                } else if (result.isDismissed) {
+                    // Nếu nhấn "Đăng nhập", chuyển đến trang đăng nhập
+                    window.location.href = loginUrl;  // Điều hướng đến trang đăng nhập
+                }
+            });
+            return false;  // Không thực hiện hành động mặc định
+        }
+
+        // Nếu đã đăng nhập và ID hợp lệ, cho phép điều hướng
+        return true;
+    }
+
+
+</script>
