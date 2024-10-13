@@ -33,7 +33,31 @@ namespace Toeic.DataAccess
 
             base.OnModelCreating(modelBuilder);
 
-           
+
+            modelBuilder.Entity<UserAnswer>()
+                .HasOne(u => u.TestResult)
+                .WithMany(t => t.UserAnswers)
+                .HasForeignKey(u => u.TestResultId)
+                .OnDelete(DeleteBehavior.Restrict); // Không cho phép xóa cascade
+
+            modelBuilder.Entity<UserAnswer>()
+                .HasOne(u => u.CauHoi)
+                .WithMany()
+                .HasForeignKey(u => u.CauHoiId)
+                .OnDelete(DeleteBehavior.Restrict); // Không cho phép xóa cascade
+
+            modelBuilder.Entity<TestResult>()
+       .HasOne(tr => tr.Mabaithi) // Mối quan hệ với MaBaiThi
+       .WithMany() // Nếu bạn không cần truy cập từ MaBaiThi đến TestResults
+       .HasForeignKey(tr => tr.MabaithiId)
+       .OnDelete(DeleteBehavior.Cascade); // Cho phép xóa cascade
+
+            modelBuilder.Entity<UserAnswer>()
+                .HasOne(u => u.TestResult)
+                .WithMany(t => t.UserAnswers)
+                .HasForeignKey(u => u.TestResultId)
+                .OnDelete(DeleteBehavior.Cascade); // Cho phép xóa cascade
         }
+
     }
 }

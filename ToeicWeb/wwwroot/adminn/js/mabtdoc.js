@@ -104,7 +104,7 @@ function Edit(id) {
                 };
 
                 $('#BaitapdocModal').modal('show');
-                $('#modalTitle').text('Sửa bài tập đọcccc');
+                $('#modalTitle').text('Sửa bài tập đọc');
                 $('#Save').css('display', 'none');
                 $('#Update').css('display', 'block');
 
@@ -125,7 +125,8 @@ function Edit(id) {
 
                 // Hiển thị số file ảnh đã thêm
                 if (response.numberOfImages) {
-                    $('#ImageFiles').text(response.numberOfImages);
+                    var tmp = response.numberOfImages;
+                    $('#ImageFiles').text(tmp);
                     $('#NumberOfImages').show();
                 } else {
                     $('#NumberOfImages').hide();

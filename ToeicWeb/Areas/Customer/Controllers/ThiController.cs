@@ -32,7 +32,7 @@ namespace ToeicWeb.Areas.Customer.Controllers
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // Lấy ID người dùng từ Claims
             var completedTests = _db.TestResults
                                     .Where(tr => tr.ApplicationUserId == userId)
-                                    .Select(tr => tr.TestId)
+                                    .Select(tr => tr.MabaithiId)
                                     .ToList();
 
             // Tạo tuple chứa cả hai danh sách
@@ -54,7 +54,7 @@ namespace ToeicWeb.Areas.Customer.Controllers
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // Lấy ID người dùng từ Claims
             var completedTests = _db.TestResults
                                     .Where(tr => tr.ApplicationUserId == userId)
-                                    .Select(tr => tr.TestId)
+                                    .Select(tr => tr.MabaithiId)
                                     .ToList();
 
             // Tạo tuple chứa cả hai danh sách
@@ -76,7 +76,7 @@ namespace ToeicWeb.Areas.Customer.Controllers
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // Lấy ID người dùng từ Claims
             var completedTests = _db.TestResults
                                     .Where(tr => tr.ApplicationUserId == userId)
-                                    .Select(tr => tr.TestId)
+                                    .Select(tr => tr.MabaithiId)
                                     .ToList();
 
             // Tạo tuple chứa cả hai danh sách
@@ -144,7 +144,7 @@ namespace ToeicWeb.Areas.Customer.Controllers
 
             // Kiểm tra xem người dùng đã có kết quả của bài thi này chưa
             var testResult = await _db.TestResults
-                                      .FirstOrDefaultAsync(r => r.TestId == baiTapId && r.ApplicationUserId == userId);
+                                      .FirstOrDefaultAsync(r => r.MabaithiId == baiTapId && r.ApplicationUserId == userId);
 
             if (testResult != null)
             {
@@ -259,7 +259,7 @@ namespace ToeicWeb.Areas.Customer.Controllers
             // Nếu user đã đăng nhập, lưu kết quả như bình thường
             var testResult = new TestResult
             {
-                TestId = baiTapId,
+                MabaithiId = baiTapId,
                 ApplicationUserId = userId,
                 CorrectAnswers = correctAnswers,
                 IncorrectAnswers = incorrectAnswers,
@@ -344,7 +344,7 @@ namespace ToeicWeb.Areas.Customer.Controllers
 
             // Lấy kết quả từ bảng TestResult
             var testResult = await _db.TestResults
-                                      .FirstOrDefaultAsync(r => r.TestId == baiTapId && r.ApplicationUserId == userId);
+                                      .FirstOrDefaultAsync(r => r.MabaithiId == baiTapId && r.ApplicationUserId == userId);
 
             if (testResult == null)
             {

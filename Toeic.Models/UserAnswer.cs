@@ -14,6 +14,8 @@ namespace Toeic.Models
         public int Id { get; set; }
 
         public int TestResultId { get; set; }  // Liên kết với kết quả bài thi (TestResult)
+        [ForeignKey("TestResultId")]
+        public TestResult TestResult { get; set; } // Điều hướng đến đối tượng TestResult
 
         public int CauHoiId { get; set; }  // Liên kết với câu hỏi trong bảng Cau_hoi_bai_thi
         [ForeignKey("CauHoiId")]

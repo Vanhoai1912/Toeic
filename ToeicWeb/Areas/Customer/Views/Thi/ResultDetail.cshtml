@@ -17,6 +17,10 @@
         <!-- Phần câu hỏi và đáp án bên trái -->
         <div class="col-md-8">
             <!-- Hiển thị câu hỏi bài thi -->
+            @{
+                // Khởi tạo một danh sách để lưu trữ các tên ảnh đã hiển thị
+                List<string> displayedImages = new List<string>();
+            }
             @for (int i = 0; i < Model.CauHoiBaiThiList.Count; i++)
             {
                 var question = Model.CauHoiBaiThiList[i];
@@ -38,23 +42,31 @@
 
                     @if (!string.IsNullOrEmpty(question.Image)) // Kiểm tra nếu có ảnh bài đọc
                     {
-                        <hr style="border: 1px solid #ccc; margin-bottom: 20px;" /> <!-- Đường cắt ngang trên bài đọc -->
-                        <div class="reading-passage" style="margin-top: 20px;">
-                            <div class="box-image w-75 h-50">
-                                <img src="~/@question.Image" alt="Question Image" />
-                            </div>
-                            <!-- Giải thích đáp án bài đọc -->
-                            <div class="mt-2">
-                                <div class="toggle-explanation" onclick="toggleExplanation('readingExplanation_@question.Id')" style="cursor: pointer; color: #3b4f95; text-decoration: none;">
-                                    Hiện transcript <i class="bi bi-chevron-down"></i>
+                        // Kiểm tra nếu ảnh đã được hiển thị chưa
+                        if (!displayedImages.Contains(question.Image))
+                        {
+                            <hr style="border: 1px solid #ccc; margin-bottom: 20px;" /> <!-- Đường cắt ngang trên bài đọc -->
+
+                            <div class="reading-passage" style="margin-top: 20px;">
+                                <div class="box-image w-75 h-50">
+                                    <img src="~/@question.Image" alt="Question Image" />
                                 </div>
-                                <div class="explanation-content mt-2" id="readingExplanation_@question.Id" style="display:none;">
-                                    <div>
-                                        @question.Transcript
+                                <!-- Giải thích đáp án bài đọc -->
+                                <div class="mt-2">
+                                    <div class="toggle-explanation" onclick="toggleExplanation('readingExplanation_@question.Id')" style="cursor: pointer; color: #3b4f95; text-decoration: none;">
+                                       Hiện transcript <i class="bi bi-chevron-down"></i>
+                                    </div>
+                                    <div class="explanation-content mt-2" id="readingExplanation_@question.Id">
+                                        <div class="">
+                                            @question.Transcript
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+
+                            // Thêm tên ảnh vào danh sách đã hiển thị
+                            displayedImages.Add(question.Image);
+                        }
                     }
 
                     <p><b>@Model.CauHoiBaiThiList[i].Thu_tu_cau. @Model.CauHoiBaiThiList[i].Cau_hoi</b></p>
@@ -94,9 +106,9 @@
                         <div class="toggle-explanation" onclick="toggleExplanation('explanation_@question.Id')" style="cursor: pointer; color: #3b4f95; text-decoration: none;">
                             Giải thích chi tiết đáp án <i class="bi bi-chevron-down"></i>
                         </div>
-                        <div class="explanation-content mt-2" id="explanation_@question.Id" style="display:none;">
-                            <div>
-                                @question.Giai_thich_dap_an
+                        <div class="explanation-content mt-2" id="explanation_@question.Id">
+                            <div class="">
+                                @question.Giai_thich_dap_an <!-- Assuming you have an explanation field -->
                             </div>
                         </div>
                     </div>
@@ -149,32 +161,45 @@
 </div>
 
 
+<!-- JavaScript -->
 <script>
     function toggleExplanation(id) {
         var explanationElement = document.getElementById(id);
 
+        if (!explanationElement) {
+            console.error('Element with id ' + id + ' not found.');
+            return;
+        }
+
         if (explanationElement.classList.contains('show')) {
+            // Nếu đang hiển thị, thu nhỏ và ẩn
             explanationElement.style.height = '0';
-            explanationElement.classList.remove('show'); // Xóa lớp show
+            explanationElement.classList.remove('show');
+            explanationElement.style.visibility = 'hidden';
         } else {
+            // Nếu đang ẩn, mở rộng và hiển thị
             explanationElement.style.height = explanationElement.scrollHeight + 'px';
-            explanationElement.classList.add('show'); // Thêm lớp show
+            explanationElement.classList.add('show');
+            explanationElement.style.visibility = 'visible';
         }
     }
-
 </script>
-
-
 <style>
     /* Phần tử giải thích ban đầu ẩn */
     .explanation-content {
         height: 0;
         overflow: hidden;
-        transition: height 0.5s ease; /* Sử dụng thuộc tính height để tạo hiệu ứng */
+        transition: height 0.5s ease, visibility 0.5s ease; /* Tạo hiệu ứng chuyển tiếp cho chiều cao và khả năng hiển thị */
+        visibility: hidden; /* Ẩn nội dung */
     }
 
-        /* Phần tử giải thích khi hiển thị */
         .explanation-content.show {
-            height: auto;
+            visibility: visible; /* Hiển thị nội dung */
+            height: auto; /* Đặt chiều cao tự động khi hiển thị */
         }
+
+    /* Đảm bảo rằng phần giải thích không làm ảnh hưởng đến các cột khác */
+    .reading-column {
+        position: relative; /* Đảm bảo rằng các phần tử con không làm thay đổi chiều cao của cột bên phải */
+    }
 </style>

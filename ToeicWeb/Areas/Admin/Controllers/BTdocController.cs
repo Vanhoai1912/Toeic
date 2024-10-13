@@ -13,7 +13,7 @@ using Toeic.Utility;
 namespace Toeic.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    //[Authorize(Roles = SD.Role_Admin)]
+    [Authorize(Roles = SD.Role_Admin)]
 
     public class BTdocController : Controller
     {
@@ -124,18 +124,18 @@ namespace Toeic.Areas.Admin.Controllers
                             {
                                 Thu_tu_cau = worksheet.Cells[row, 1].Value != null ? Convert.ToInt32(worksheet.Cells[row, 1].Value) : 0,
                                 Cau_hoi = worksheet.Cells[row, 2].Value?.ToString() ?? string.Empty,
-                                Dap_an_1 = worksheet.Cells[row, 3].Value?.ToString() ?? string.Empty,
-                                Dap_an_2 = worksheet.Cells[row, 4].Value?.ToString() ?? string.Empty,
-                                Dap_an_3 = worksheet.Cells[row, 5].Value?.ToString() ?? string.Empty,
-                                Dap_an_4 = worksheet.Cells[row, 6].Value?.ToString() ?? string.Empty,
-                                Dap_an_dung = worksheet.Cells[row, 7].Value?.ToString() ?? string.Empty,
-                                Giai_thich = worksheet.Cells[row, 8].Value?.ToString() ?? string.Empty,
+                                Dap_an_1 = worksheet.Cells[row, 4].Value?.ToString() ?? string.Empty,
+                                Dap_an_2 = worksheet.Cells[row, 5].Value?.ToString() ?? string.Empty,
+                                Dap_an_3 = worksheet.Cells[row, 6].Value?.ToString() ?? string.Empty,
+                                Dap_an_4 = worksheet.Cells[row, 7].Value?.ToString() ?? string.Empty,
+                                Dap_an_dung = worksheet.Cells[row, 8].Value?.ToString() ?? string.Empty,
+                                Giai_thich = worksheet.Cells[row, 9].Value?.ToString() ?? string.Empty,
                                 Giai_thich_bai_doc = worksheet.Cells[row, 10].Value?.ToString() ?? string.Empty,
                                 Ma_bai_tap_docId = mabaidoc.Id
                             };
                             for (int i = 0; i < fileImageBDPaths.Count; i++)
                             {
-                                if (worksheet.Cells[row, 9].Value?.ToString() == fileImageBDPaths.ElementAt(i).Value)
+                                if (worksheet.Cells[row, 3].Value?.ToString() == fileImageBDPaths.ElementAt(i).Value)
                                 {
                                     cauhoi.Image_bai_doc = fileImageBDPaths.ElementAt(i).Key;
                                 }
@@ -261,6 +261,9 @@ namespace Toeic.Areas.Admin.Controllers
 
                 // Cập nhật đường dẫn trong database
                 baitapdoc.ImageBDFolderPath = newImageBDFolderPath;
+
+                _db.Mabaitapdocs.Update(baitapdoc);
+                await _db.SaveChangesAsync();
             }
 
             // Xử lý Image (nếu có file mới)
@@ -352,12 +355,12 @@ namespace Toeic.Areas.Admin.Controllers
                             {
                                 Thu_tu_cau = worksheet.Cells[row, 1].Value != null ? Convert.ToInt32(worksheet.Cells[row, 1].Value) : 0,
                                 Cau_hoi = worksheet.Cells[row, 2].Value?.ToString() ?? string.Empty,
-                                Dap_an_1 = worksheet.Cells[row, 3].Value?.ToString() ?? string.Empty,
-                                Dap_an_2 = worksheet.Cells[row, 4].Value?.ToString() ?? string.Empty,
-                                Dap_an_3 = worksheet.Cells[row, 5].Value?.ToString() ?? string.Empty,
-                                Dap_an_4 = worksheet.Cells[row, 6].Value?.ToString() ?? string.Empty,
-                                Dap_an_dung = worksheet.Cells[row, 7].Value?.ToString() ?? string.Empty,
-                                Giai_thich = worksheet.Cells[row, 8].Value?.ToString() ?? string.Empty,
+                                Dap_an_1 = worksheet.Cells[row, 4].Value?.ToString() ?? string.Empty,
+                                Dap_an_2 = worksheet.Cells[row, 5].Value?.ToString() ?? string.Empty,
+                                Dap_an_3 = worksheet.Cells[row, 6].Value?.ToString() ?? string.Empty,
+                                Dap_an_4 = worksheet.Cells[row, 7].Value?.ToString() ?? string.Empty,
+                                Dap_an_dung = worksheet.Cells[row, 8].Value?.ToString() ?? string.Empty,
+                                Giai_thich = worksheet.Cells[row, 9].Value?.ToString() ?? string.Empty,
                                 Giai_thich_bai_doc = worksheet.Cells[row, 10].Value?.ToString() ?? string.Empty,
                                 Ma_bai_tap_docId = baitapdoc.Id
                             };
@@ -366,7 +369,7 @@ namespace Toeic.Areas.Admin.Controllers
                             {
                                 for (int i = 0; i < fileImageBDPaths.Count; i++)
                                 {
-                                    if (worksheet.Cells[row, 9].Value?.ToString() == fileImageBDPaths.ElementAt(i).Value)
+                                    if (worksheet.Cells[row, 3].Value?.ToString() == fileImageBDPaths.ElementAt(i).Value)
                                     {
                                         cauhoi.Image_bai_doc = fileImageBDPaths.ElementAt(i).Key;
                                     }
@@ -381,8 +384,8 @@ namespace Toeic.Areas.Admin.Controllers
                                     {
                                         var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
                                         var fileName = Path.GetFileName(filePath);
-                                        var newFilePath = Path.Combine("adminn", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString(), "image", fileName);
-                                        if (worksheet.Cells[row, 9].Value?.ToString() == fileNameWithoutExtension)
+                                        var newFilePath = Path.Combine("adminn", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString(), "image", fileName).Replace("\\", "/");
+                                        if (worksheet.Cells[row, 3].Value?.ToString() == fileNameWithoutExtension)
                                         {
                                             cauhoi.Image_bai_doc = newFilePath;
                                         }
@@ -412,53 +415,50 @@ namespace Toeic.Areas.Admin.Controllers
                         var cauhoiList = _db.Cauhoibaitapdocs.Where(c => c.Ma_bai_tap_docId == baitapdoc.Id).ToList();
 
 
-                        if (!fileImageBDPaths.IsNullOrEmpty())
-                        {
-                            int row = 2;
-                            foreach (var cauhoi in cauhoiList)
-                            {
-                                if (row <= worksheet.Dimension.Rows)
-                                {
 
-                                    //
-                                    if (fileImageBDPaths.Count > 0)
+                        int row = 2;
+                        foreach (var cauhoi in cauhoiList)
+                        {
+                            if (row <= worksheet.Dimension.Rows)
+                            {
+
+                                //
+                                if (fileImageBDPaths.Count > 0)
+                                {
+                                    for (int i = 0; i < fileImageBDPaths.Count; i++)
                                     {
-                                        for (int i = 0; i < fileImageBDPaths.Count; i++)
+                                        if (worksheet.Cells[row, 3].Value?.ToString() == fileImageBDPaths.ElementAt(i).Value)
                                         {
-                                            if (worksheet.Cells[row, 9].Value?.ToString() == fileImageBDPaths.ElementAt(i).Value)
-                                            {
-                                                cauhoi.Image_bai_doc = fileImageBDPaths.ElementAt(i).Key;
-                                            }
+                                            cauhoi.Image_bai_doc = fileImageBDPaths.ElementAt(i).Key;
                                         }
                                     }
-                                    else
-                                    {
-                                        var imageFolderPath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString(), "image");
-                                        if (Directory.Exists(imageFolderPath))
-                                        {
-                                            foreach (var filePath in Directory.GetFiles(imageFolderPath))
-                                            {
-                                                var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
-                                                var fileName = Path.GetFileName(filePath);
-                                                var newFilePath = Path.Combine("adminn", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString(), "image", fileName);
-                                                if (worksheet.Cells[row, 9].Value?.ToString() == fileNameWithoutExtension)
-                                                {
-                                                    cauhoi.Image_bai_doc = newFilePath;
-                                                }
-                                            }
-                                        }
-                                    }
-                                    row++;
-                                    _db.Cauhoibaitapdocs.Update(cauhoi);
                                 }
+                                else
+                                {
+                                    var imageFolderPath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString(), "image");
+                                    if (Directory.Exists(imageFolderPath))
+                                    {
+                                        foreach (var filePath in Directory.GetFiles(imageFolderPath))
+                                        {
+                                            var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
+                                            var fileName = Path.GetFileName(filePath);
+                                            var newFilePath = Path.Combine("adminn", "upload", "part " + viewModel.Part.ToString(), viewModel.Tieu_de.ToString(), "image", fileName).Replace("\\", "/");
+                                            if (worksheet.Cells[row, 3].Value?.ToString() == fileNameWithoutExtension)
+                                            {
+                                                cauhoi.Image_bai_doc = newFilePath;
+                                            }
+                                        }
+                                    }
+                                }
+                                row++;
+                                _db.Cauhoibaitapdocs.Update(cauhoi);
                             }
                         }
+
                         await _db.SaveChangesAsync();
                     }
                 }
             }
-            _db.Mabaitapdocs.Update(baitapdoc);
-            await _db.SaveChangesAsync();
 
             return Json(new { success = true, message = "Cập nhật bài nghe thành công!" });
         }
@@ -476,7 +476,7 @@ namespace Toeic.Areas.Admin.Controllers
         public JsonResult Delete(int? id)
         {
             var baitapdoc = _db.Mabaitapdocs.Find(id);
-            if(baitapdoc != null)
+            if (baitapdoc != null)
             {
                 var oldFolderBasePath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "part " + baitapdoc.Part.ToString(), baitapdoc.Tieu_de.ToString());
                 if (Directory.Exists(oldFolderBasePath))

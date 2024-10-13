@@ -634,15 +634,17 @@ namespace Toeic.DataAccess.Migrations
                     b.Property<int>("IncorrectAnswers")
                         .HasColumnType("int");
 
-                    b.Property<int>("SkippedQuestions")
+                    b.Property<int>("MabaithiId")
                         .HasColumnType("int");
 
-                    b.Property<int>("TestId")
+                    b.Property<int>("SkippedQuestions")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationUserId");
+
+                    b.HasIndex("MabaithiId");
 
                     b.ToTable("TestResults");
                 });
@@ -671,6 +673,8 @@ namespace Toeic.DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CauHoiId");
+
+                    b.HasIndex("TestResultId");
 
                     b.ToTable("UserAnswers");
                 });
@@ -789,7 +793,15 @@ namespace Toeic.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Toeic.Models.Ma_bai_thi", "Mabaithi")
+                        .WithMany()
+                        .HasForeignKey("MabaithiId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("ApplicationUser");
+
+                    b.Navigation("Mabaithi");
                 });
 
             modelBuilder.Entity("Toeic.Models.UserAnswer", b =>
@@ -797,10 +809,18 @@ namespace Toeic.DataAccess.Migrations
                     b.HasOne("Toeic.Models.Cau_hoi_bai_thi", "CauHoi")
                         .WithMany()
                         .HasForeignKey("CauHoiId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Toeic.Models.TestResult", "TestResult")
+                        .WithMany("UserAnswers")
+                        .HasForeignKey("TestResultId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("CauHoi");
+
+                    b.Navigation("TestResult");
                 });
 
             modelBuilder.Entity("Toeic.Models.Ma_bai_tap_doc", b =>
@@ -816,6 +836,11 @@ namespace Toeic.DataAccess.Migrations
             modelBuilder.Entity("Toeic.Models.Ma_bai_tu_vung", b =>
                 {
                     b.Navigation("Noidungbaituvungs");
+                });
+
+            modelBuilder.Entity("Toeic.Models.TestResult", b =>
+                {
+                    b.Navigation("UserAnswers");
                 });
 #pragma warning restore 612, 618
         }

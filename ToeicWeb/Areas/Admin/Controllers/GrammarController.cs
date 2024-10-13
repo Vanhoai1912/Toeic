@@ -13,7 +13,7 @@ using Toeic.Utility;
 namespace ToeicWeb.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    //[Authorize(Roles = SD.Role_Admin)]
+    [Authorize(Roles = SD.Role_Admin)]
     public class GrammarController : Controller
     {
         private readonly ApplicationDbContext _db;
@@ -172,24 +172,26 @@ namespace ToeicWeb.Areas.Admin.Controllers
                 // Cập nhật tiêu đề nếu thay đổi
                 if (tieuDeChanged)
                 {
-                    var newFolderBasePath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "grammar", "bai " + viewModel.Ten_bai);
-                    Directory.CreateDirectory(newFolderBasePath);
+                    var newImageFolderPath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "grammar", "bai " + viewModel.Ten_bai, "imageGra");
+                    Directory.CreateDirectory(newImageFolderPath);
 
                     // Di chuyển file ảnh nếu có thay đổi
-                    var oldImageFolderPath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "grammar", "bai " + manguphap.Ten_bai);
-                    if (Directory.Exists(oldImageFolderPath))
+                    var oldImageFilePath = Path.Combine(_environment.WebRootPath, manguphap.ImageUrl);
+                    if (System.IO.File.Exists(oldImageFilePath))
                     {
-                        var newImageFolderPath = Path.Combine(newFolderBasePath, "imageGra");
-                        Directory.CreateDirectory(newImageFolderPath);
-                        foreach (var filePath in Directory.GetFiles(oldImageFolderPath))
-                        {
-                            var fileName = Path.GetFileName(filePath);
-                            var newFilePath = Path.Combine(newImageFolderPath, fileName);
-                            System.IO.File.Move(filePath, newFilePath);
-                        }
+                        var fileName = Path.GetFileName(oldImageFilePath);
+                        var newImageFilePath = Path.Combine(_environment.WebRootPath, newImageFolderPath, fileName);
+                        System.IO.File.Move(oldImageFilePath, newImageFilePath);
+
+                        manguphap.ImageUrl = Path.Combine("adminn", "upload", "grammar", "bai " + viewModel.Ten_bai, "imageGra", fileName).Replace("\\", "/");
 
                         // Xóa thư mục cũ
-                        Directory.Delete(oldImageFolderPath, true);
+                        var oldFolderBasePath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "grammar", "bai " + manguphap.Ten_bai);
+                        if (Directory.Exists(oldFolderBasePath))
+                        {
+                            Directory.Delete(oldFolderBasePath, true);
+                        }
+
                     }
 
                     manguphap.Ten_bai = viewModel.Ten_bai;
@@ -199,7 +201,7 @@ namespace ToeicWeb.Areas.Admin.Controllers
                 var allowedImageExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
                 if (imageChanged)
                 {
-                    var folderBasePath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "grammar", "bai " + manguphap.Ten_bai, "imageGra");
+                    var folderBasePath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "grammar", "bai " + viewModel.Ten_bai, "imageGra");
                     Directory.CreateDirectory(folderBasePath);
 
                     // Xóa ảnh cũ nếu tồn tại

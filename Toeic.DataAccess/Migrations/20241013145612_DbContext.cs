@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Toeic.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class Data : Migration
+    public partial class DbContext : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -320,8 +320,7 @@ namespace Toeic.DataAccess.Migrations
                     Dap_an_4 = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Dap_an_dung = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Transcript = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Giai_thich = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Giai_thich_bai_doc = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Giai_thich_dap_an = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Ma_bai_thiId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -330,6 +329,37 @@ namespace Toeic.DataAccess.Migrations
                     table.ForeignKey(
                         name: "FK_Cauhoibaithis_Mabaithis_Ma_bai_thiId",
                         column: x => x.Ma_bai_thiId,
+                        principalTable: "Mabaithis",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TestResults",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CorrectAnswers = table.Column<int>(type: "int", nullable: false),
+                    IncorrectAnswers = table.Column<int>(type: "int", nullable: false),
+                    SkippedQuestions = table.Column<int>(type: "int", nullable: false),
+                    CompletionDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    MabaithiId = table.Column<int>(type: "int", nullable: false),
+                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Duration = table.Column<TimeSpan>(type: "time", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TestResults", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TestResults_AspNetUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TestResults_Mabaithis_MabaithiId",
+                        column: x => x.MabaithiId,
                         principalTable: "Mabaithis",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -361,6 +391,34 @@ namespace Toeic.DataAccess.Migrations
                         principalTable: "Mabaituvungs",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserAnswers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TestResultId = table.Column<int>(type: "int", nullable: false),
+                    CauHoiId = table.Column<int>(type: "int", nullable: false),
+                    Answer = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsCorrect = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserAnswers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserAnswers_Cauhoibaithis_CauHoiId",
+                        column: x => x.CauHoiId,
+                        principalTable: "Cauhoibaithis",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_UserAnswers_TestResults_TestResultId",
+                        column: x => x.TestResultId,
+                        principalTable: "TestResults",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -421,6 +479,26 @@ namespace Toeic.DataAccess.Migrations
                 name: "IX_Noidungbaituvungs_Ma_bai_tu_vungId",
                 table: "Noidungbaituvungs",
                 column: "Ma_bai_tu_vungId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TestResults_ApplicationUserId",
+                table: "TestResults",
+                column: "ApplicationUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TestResults_MabaithiId",
+                table: "TestResults",
+                column: "MabaithiId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserAnswers_CauHoiId",
+                table: "UserAnswers",
+                column: "CauHoiId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserAnswers_TestResultId",
+                table: "UserAnswers",
+                column: "TestResultId");
         }
 
         /// <inheritdoc />
@@ -448,19 +526,16 @@ namespace Toeic.DataAccess.Migrations
                 name: "Cauhoibaitapnges");
 
             migrationBuilder.DropTable(
-                name: "Cauhoibaithis");
-
-            migrationBuilder.DropTable(
                 name: "Mabainguphaps");
 
             migrationBuilder.DropTable(
                 name: "Noidungbaituvungs");
 
             migrationBuilder.DropTable(
-                name: "AspNetRoles");
+                name: "UserAnswers");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "Mabaitapdocs");
@@ -469,10 +544,19 @@ namespace Toeic.DataAccess.Migrations
                 name: "Mabaitapnges");
 
             migrationBuilder.DropTable(
-                name: "Mabaithis");
+                name: "Mabaituvungs");
 
             migrationBuilder.DropTable(
-                name: "Mabaituvungs");
+                name: "Cauhoibaithis");
+
+            migrationBuilder.DropTable(
+                name: "TestResults");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Mabaithis");
         }
     }
 }
