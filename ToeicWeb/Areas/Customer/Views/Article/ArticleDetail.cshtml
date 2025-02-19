@@ -1,0 +1,12 @@
+﻿@model ArticleVM
+
+
+<div class="container py-4 article-container">
+    <h1 class="fw-bold">@Model.Ten_bai</h1>  <!-- Tiêu đề bài viết -->
+    <img src="~/@Model.ImageUrl" alt="@Model.Ten_bai" class="article-image mt-3 mb-4"> <!-- Hình ảnh -->
+   
+    <p>
+        @Html.Raw(Model.Noi_dung)
+    </p>
+
+</div>

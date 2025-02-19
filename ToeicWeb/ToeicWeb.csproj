@@ -25,7 +25,6 @@
   <ItemGroup>
     <Folder Include="wwwroot\adminn\upload\voca\" />
     <Folder Include="wwwroot\customer\css\" />
-    <Folder Include="wwwroot\customer\images\" />
   </ItemGroup>
 
   <ItemGroup>

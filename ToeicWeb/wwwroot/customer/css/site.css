@@ -1,22 +1,112 @@
-html {
-  font-size: 14px;
+﻿html {
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+}
+
+/*Index article*/
+.news-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+    .news-item img {
+        width: 120px; /* Đặt chiều ngang cố định */
+        height: 80px; /* Đặt chiều cao cố định */
+        object-fit: cover; /* Đảm bảo ảnh lấp đầy khung mà không bị méo */
+        border-radius: 10px;
+        align-self: flex-start;
+    }
+
+.news-link {
+    text-decoration: none; /* Bỏ gạch chân */
+    color: inherit; /* Giữ màu chữ */
+    display: block;
+}
+
+    .news-link:hover .news-item {
+        opacity: 0.9; /* Hiệu ứng hover */
+    }
+
+/*article details*/
+.article-container {
+    max-width: 900px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 15px;
+}
+
+.article-image {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+
+.article-container h1,
+.article-container p {
+    text-align: left;
+}
+
+.article-container p {
+    font-size: 26px; /* Tăng kích thước chữ */
+    text-align: justify; /* Căn đều hai bên */
+    line-height: 1.6; /* Giãn dòng để dễ đọc */
+    word-wrap: break-word; /* Đảm bảo từ dài sẽ xuống dòng */
+    overflow-wrap: break-word;
+}
+.article-container div {
+    font-size: 26px; /* Tăng kích thước chữ */
+    text-align: justify; /*     Căn đều hai bên */
+    line-height: 1.6; /* Giãn dòng để dễ đọc */
+    word-wrap: break-word; /* Đảm bảo từ dài sẽ xuống dòng */
+    overflow-wrap: break-word;
+}
+
+/* Mobile (dưới 768px) */
+@media (max-width: 768px) {
+    .article-container {
+        max-width: 100%;
+        padding: 10px;
+    }
+
+        .article-container h1 {
+            font-size: 22px;
+        }
+
+        .article-container p {
+            font-size: 16px;
+        }
+}
+
+/* iPad (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .article-container {
+        max-width: 90%;
+    }
+
+        .article-container h1 {
+            font-size: 26px;
+        }
+
+        .article-container p {
+            font-size: 18px;
+        }
 }
