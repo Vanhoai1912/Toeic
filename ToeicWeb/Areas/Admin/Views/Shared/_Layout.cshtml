@@ -317,6 +317,24 @@
                             </a>
                             <!--end:Menu item-->
                             <!--begin:Menu item-->
+                            <a href="#" class="nav-link nav-linkH menu-item" id="articleLink">
+                                <!--begin:Menu link-->
+                                <span class="menu-link">
+                                    <span class="menu-icon">
+                                        <i class="bi bi-backpack4" style="font-size: 18px">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                            <span class="path3"></span>
+                                            <span class="path4"></span>
+                                        </i>
+                                    </span>
+                                    <span class="menu-title">Quản lý bài báo</span>
+                                </span>
+                                <!--end:Menu link-->
+                            </a>
+                            <!--end:Menu item-->
+
+                            <!--begin:Menu item-->
                             <a href="#" class="nav-link nav-linkH menu-item" id="userLink">
                                 <!--begin:Menu link-->
                                 <span class="menu-link">
@@ -466,6 +484,9 @@
                     case 'gramLink':
                         url = '/Admin/Grammar/Index';
                         break;
+                    case 'articleLink':
+                        url = '/Admin/Article/Index';
+                        break;
                     case 'userLink':
                         url = '/Admin/User/Index';
                         break;
@@ -550,6 +571,12 @@
                             initTinyMCE();
                         });
                         break;
+                    case '/Admin/Article/Index':
+                        $.getScript('@Url.Content("~/adminn/js/article.js")', function () {
+                            loadDataTable();
+                            initTinyMCE();
+                        });
+                        break;
                     case '/Admin/User/Index':
                         $.getScript('@Url.Content("~/adminn/js/user.js")', function () {
                             loadDataTable();
@@ -589,6 +616,8 @@
                         return 'gramLink';
                     case '/Admin/Voca/Index':
                         return 'vocaLink';
+                    case '/Admin/Article/Index':
+                        return 'articleLink';
                     case '/Admin/User/Index':
                         return 'userLink';
                     case '/Admin/BThi/Index':
