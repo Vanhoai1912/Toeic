@@ -67,6 +67,8 @@ body {
     font-size: 20px; /* Tăng kích thước chữ */
     text-align: justify; /* Căn đều hai bên */
     line-height: 1.6; /* Giãn dòng để dễ đọc */
+    word-wrap: break-word; /* Đảm bảo từ dài sẽ xuống dòng */
+    overflow-wrap: break-word;
 }
 
 

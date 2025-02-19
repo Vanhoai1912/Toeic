@@ -1,28 +1,25 @@
-﻿<div class="container py-4">
+﻿@model List<Article>
+<div class="container py-4">
     <div class="row row-cols-1 row-cols-md-2 g-4">
+        @for (int i = 0; i < Model.Count; i++)
+        {
         <div class="col">
-            <a asp-area="Customer" asp-controller="Article" asp-action="ArticleDetail" class="news-link">
+                <a asp-area="Customer" asp-controller="Article" asp-action="ArticleDetail" asp-route-articleId="@Model[i].Id" class="news-link">
                 <div class="news-item">
-                    <img src="/customer/images/images.jpg" alt="Thumbnail">
+                        <img src="~/@Model[i].ImageUrl" alt="Thumbnail">
                     <div class="flex-grow-1">
-                        <h5 class="fw-bold">Tiêu đề tin tức</h5>
-                        <p class="text-muted">Editor's Choice • Hôm nay</p>
-                        <p>Mô tả ngắn gọn về tin tức để thu hút người đọc.</p>
+                        <h5 class="fw-bold">@Model[i].Ten_bai</h5>
+                            <p class="text-muted mb-0">Ngày cập nhật @Model[i].UpdatedAt.ToString("dd/MM/yyyy")</p>
+
+                        <p>@Model[i].Description</p>
                     </div>
                 </div>
             </a>
         </div>
-        <div class="col">
-            <a asp-area="Customer" asp-controller="Article" asp-action="ArticleDetail" class="news-link">
-                <div class="news-item">
-                    <img src="/customer/images/images.jpg" alt="Thumbnail">
-                    <div class="flex-grow-1">
-                        <h5 class="fw-bold">Tiêu đề tin tức</h5>
-                        <p class="text-muted">Editor's Choice • Hôm nay</p>
-                        <p>Mô tả ngắn gọn về tin tức để thu hút người đọc.</p>
-                    </div>
-                </div>
-            </a>
-        </div>
+       
+        }
     </div>
 </div>
+
+
+
