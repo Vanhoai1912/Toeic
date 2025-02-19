@@ -11,6 +11,8 @@
             url = '/Customer/Voca/Index';
         } else if (linkId === 'grammarLink') {
             url = '/Customer/Grammar/Index';
+        } else if (linkId === 'articleLink') {
+            url = '/Customer/Article/Index';
         } else if (linkId === 'adminLink') {
             window.location.href = '/Admin/HomeAdmin/Index'; // Điều hướng trực tiếp đến Admin
             return;
@@ -72,6 +74,8 @@
                 return 'vocabularyLink';
             case '/Customer/Grammar/Index':
                 return 'grammarLink';
+            case '/Customer/Article/Index':
+                return 'articleLink';
             case '/Identity/Account/Login':
                 return 'login';
             case '/Identity/Account/Register':
