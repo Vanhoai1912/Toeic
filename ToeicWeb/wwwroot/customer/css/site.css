@@ -29,11 +29,13 @@ body {
 }
 
     .news-item img {
-        height: 80px;
-        object-fit: contain;
+        width: 120px; /* Đặt chiều ngang cố định */
+        height: 80px; /* Đặt chiều cao cố định */
+        object-fit: cover; /* Đảm bảo ảnh lấp đầy khung mà không bị méo */
         border-radius: 10px;
         align-self: flex-start;
     }
+
 .news-link {
     text-decoration: none; /* Bỏ gạch chân */
     color: inherit; /* Giữ màu chữ */
@@ -64,13 +66,19 @@ body {
 }
 
 .article-container p {
-    font-size: 20px; /* Tăng kích thước chữ */
+    font-size: 26px; /* Tăng kích thước chữ */
     text-align: justify; /* Căn đều hai bên */
     line-height: 1.6; /* Giãn dòng để dễ đọc */
     word-wrap: break-word; /* Đảm bảo từ dài sẽ xuống dòng */
     overflow-wrap: break-word;
 }
-
+.article-container div {
+    font-size: 26px; /* Tăng kích thước chữ */
+    text-align: justify; /*     Căn đều hai bên */
+    line-height: 1.6; /* Giãn dòng để dễ đọc */
+    word-wrap: break-word; /* Đảm bảo từ dài sẽ xuống dòng */
+    overflow-wrap: break-word;
+}
 
 /* Mobile (dưới 768px) */
 @media (max-width: 768px) {
