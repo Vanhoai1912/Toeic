@@ -31,6 +31,34 @@ namespace ToeicWeb.Areas.Admin.Controllers
         {
             return View();
         }
+        public JsonResult GetUsersByTestResult(int maBaiThiId)
+        {
+            try
+            {
+                // Lấy danh sách TestResults và UserAnswers liên kết với MaBaiThiId
+                var testResults = _db.TestResults
+                    .Where(tr => tr.MabaithiId == maBaiThiId)
+                    .Include(tr => tr.UserAnswers)
+                    .Include(tr => tr.ApplicationUser) // Kết nối với bảng AspNetUsers
+                    .ToList();
+
+                // Tạo danh sách các người dùng và kết quả của họ
+                var userResults = testResults.Select(tr => new {
+                    UserName = tr.ApplicationUser.Name,
+                    Email = tr.ApplicationUser.Email,
+                    CorrectAnswers = tr.CorrectAnswers,
+                    IncorrectAnswers = tr.IncorrectAnswers,
+                    CompletionDate = tr.CompletionDate,
+                    SkippedQuestions = tr.SkippedQuestions
+                }).ToList();
+
+                return Json(new { success = true, data = userResults });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Có lỗi xảy ra: " + ex.Message });
+            }
+        }
         [HttpGet]
         public IActionResult Create()
         {
@@ -743,25 +771,52 @@ namespace ToeicWeb.Areas.Admin.Controllers
             return Json(new { data = objBThiList });
         }
 
-        [HttpDelete]
         public JsonResult Delete(int? id)
         {
             var mabaithi = _db.Mabaithis.Find(id);
             if (mabaithi != null)
             {
+                // Xóa thư mục liên quan (nếu có)
                 var oldFolderBasePath = Path.Combine(_environment.WebRootPath, "adminn", "upload", "bài thi " + mabaithi.ExamType.ToString(), mabaithi.Tieu_de.ToString());
                 if (Directory.Exists(oldFolderBasePath))
                 {
                     Directory.Delete(oldFolderBasePath, true);
                 }
 
+                // Lấy tất cả các bản ghi trong TestResults liên quan tới mabaithi
+                var testResults = _db.TestResults.Where(t => t.MabaithiId == id).ToList();
+                if (testResults.Any())
+                {
+                    foreach (var testResult in testResults)
+                    {
+                        // Lấy các bản ghi UserAnswers liên quan tới testResult
+                        var userAnswers = _db.UserAnswers.Where(u => u.TestResultId == testResult.Id).ToList();
+
+                        // Xóa các bản ghi trong bảng UserAnswers
+                        _db.UserAnswers.RemoveRange(userAnswers);
+
+                        // Xóa bản ghi trong bảng TestResults
+                        _db.TestResults.Remove(testResult);
+                    }
+                }
+
+                // Lấy các câu hỏi trong Cauhoibaithis liên quan tới mabaithi
+                var questions = _db.Cauhoibaithis.Where(c => c.Ma_bai_thiId == id).ToList();
+
+                // Xóa các bản ghi trong bảng Cauhoibaithis
+                _db.Cauhoibaithis.RemoveRange(questions);
+
+                // Xóa bản ghi trong Mabaithis
                 _db.Mabaithis.Remove(mabaithi);
+
+                // Lưu thay đổi
                 _db.SaveChanges();
+
                 return Json(new { success = true, message = "Xóa thành công" });
             }
+
             return Json(new { success = false, message = "Có lỗi khi xóa" });
         }
-
         #endregion
     }
 

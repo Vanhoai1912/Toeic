@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Toeic.DataAccess;
@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-//Sql
+// Cấu hình Sql
 builder.Services.AddDbContext<ApplicationDbContext>(o => 
        o.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 

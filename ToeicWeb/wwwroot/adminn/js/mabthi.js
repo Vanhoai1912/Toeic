@@ -264,6 +264,7 @@ function Delete(url) {
 }
 
 // Read data
+// Read data
 function loadDataTable() {
     if ($.fn.dataTable.isDataTable('#tblData')) {
         $('#tblData').DataTable().destroy();
@@ -282,6 +283,10 @@ function loadDataTable() {
                 "render": function (data) {
                     return `
                         <div class="w-75 btn-group" role="group">
+
+                        <a href="#" onclick="GetUserbyTestResult(${data})"
+                        class="btn btn-primary ms-2"> View User</a>
+
                         <a href="#" onclick="Edit(${data})"
                         class="btn btn-primary ms-2"> <i class="bi bi-pencil-square"></i> Edit</a>
                         <a onClick=Delete('/Admin/BThi/Delete/${data}')
@@ -333,7 +338,7 @@ function Validate() {
 
 $('#btnAdd').click(function () {
     $('#BaithiModal').modal('show');
-    $('#modalTitle').text('Thêm bài tập nghe mới');
+    $('#modalTitle').text('Thêm bài thi mới');
     $('#Save').css('display', 'block');
     $('#Update').css('display', 'none');
     //handleExamTypeChange(); // Đảm bảo xử lý lại khi mở modal
@@ -399,3 +404,51 @@ $('#NewAudioFile').on('change', function () {
         $('#AudioFileError').text('').hide();
     }
 });
+function GetUserbyTestResult(id) {
+    // Gọi API để lấy dữ liệu người dùng đã làm bài thi
+    $.ajax({
+        url: '/Admin/BThi/GetUsersByTestResult?maBaiThiId=' + id,
+        type: 'GET',
+        contentType: 'application/json; charset=utf-8',
+        datatype: 'json',
+        success: function (response) {
+            if (response.success) {
+                // Hiển thị dữ liệu người dùng trong modal hoặc một vị trí nào đó
+                var totalUsers = response.data.length;
+                $('#totalUsers').text('Tổng số người đã làm bài thi: ' + totalUsers);
+                ShowUserResults(response.data);
+            } else {
+                toastr.error(response.message);
+            }
+
+        },
+        error: function () {
+            toastr.error("Có lỗi xảy ra khi lấy dữ liệu.");
+        }
+    });
+}
+function ShowUserResults(data) {
+    var tableBody = $('#userResultsBody');
+    tableBody.empty(); // Xóa dữ liệu cũ
+
+
+    data.forEach(function (userResult) {
+        var completionDate = new Date(userResult.completionDate);
+
+        // Định dạng ngày tháng theo dd/MM/yyyy
+        var formattedDate = completionDate.toLocaleDateString('vi-VN');
+        var row = '<tr>' +
+            '<td>' + (userResult.userName) + '</td>' + // Kiểm tra xem UserName có tồn tại không
+            '<td>' + (userResult.email) + '</td>' +
+            '<td>' + (userResult.correctAnswers) + '</td>' +
+            '<td>' + (userResult.incorrectAnswers) + '</td>' +
+            '<td>' + (userResult.skippedQuestions) + '</td>' +
+            '<td>' + (formattedDate) + '</td>' +
+            '</tr>';
+        tableBody.append(row);
+    });
+
+
+    // Hiển thị modal
+    $('#UserResultsModal').modal('show');
+}

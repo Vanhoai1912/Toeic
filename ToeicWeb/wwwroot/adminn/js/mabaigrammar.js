@@ -155,7 +155,7 @@ function Edit(id) {
                 };
 
                 $('#BaigrammarModal').modal('show');
-                $('#modalTitle').text('Sửa bài từ vựng');
+                $('#modalTitle').text('Sửa bài ngữ pháp');
                 $('#Save').css('display', 'none');
                 $('#Update').css('display', 'block');
 

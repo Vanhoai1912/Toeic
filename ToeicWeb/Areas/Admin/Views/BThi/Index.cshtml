@@ -112,7 +112,35 @@
     </div>
 </div>
 
-
+<!-- Modal hiển thị kết quả người dùng -->
+<div class="modal fade" id="UserResultsModal" tabindex="-1" aria-labelledby="UserResultsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="UserResultsModalLabel">Thông tin người dùng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table id="userResultsTable" class="table table-bordered">
+                    <p id="totalUsers"></p>
+                    <thead>
+                        <tr>
+                            <th>Tên người dùng</th>
+                            <th>Email</th>
+                            <th>Câu đúng</th>
+                            <th>Câu sai</th>
+                            <th>Câu bỏ qua</th>
+                            <th>Ngày hoàn thành</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userResultsBody">
+                        <!-- Nội dung sẽ được điền bởi Javascript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <script src="~/adminn/js/mabthi.js"></script>

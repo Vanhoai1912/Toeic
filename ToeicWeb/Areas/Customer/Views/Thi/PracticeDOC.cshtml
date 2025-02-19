@@ -7,6 +7,18 @@
     <div class="row">
         <p class="mt-xxl-3">
             <span class="badge rounded-4 bg-primary">
+                Part 1
+            </span>
+            <span class="badge rounded-4 bg-primary">
+                Part 2
+            </span>
+            <span class="badge rounded-4 bg-primary">
+                Part 3
+            </span>
+            <span class="badge rounded-4 bg-primary">
+                Part 4
+            </span>
+            <span class="badge rounded-4 bg-primary">
                 Part 5
             </span>
             <span class="badge rounded-4 bg-primary">
@@ -38,12 +50,7 @@
                                 </audio>
                             </div>
                         }
-                       @*  @if (!string.IsNullOrEmpty(Model.CauHoiBaiThiList[i].Image))
-                        {
-                            <div class="box-image w-75 h-50">
-                                <img src="~/@Model.CauHoiBaiThiList[i].Image" alt="Question Image" />
-                            </div>
-                        } *@
+
                         @* Hiển thị hình ảnh nếu có và nếu chưa được hiển thị *@
                         @if (!string.IsNullOrEmpty(Model.CauHoiBaiThiList[i].Image) && !displayedImages.Contains(Model.CauHoiBaiThiList[i].Image))
                         {
@@ -107,7 +114,7 @@
         <div style="display: flex; flex-wrap: wrap;">
             @for (int i = 0; i < Model.CauHoiBaiThiList.Count; i++)
             {
-                <button id="btn_@Model.CauHoiBaiThiList[i].Id" class="m-1 rounded-3" style="background-color: #fff;font-size: 0.75rem;" onclick="scrollToQuestion(@Model.CauHoiBaiThiList[i].Id)">
+                <button id="btn_@Model.CauHoiBaiThiList[i].Id" class="m-1 rounded-3" style="background-color: #fff;font-size: 0.75rem;width:1.75rem" onclick="scrollToQuestion(@Model.CauHoiBaiThiList[i].Id)">
                     @Model.CauHoiBaiThiList[i].Thu_tu_cau
                 </button>
             }
@@ -116,37 +123,37 @@
 </div>
 
 <script>
-        var remainingTime = 75 * 60; // 120 phút = 7200 giây
-        var timerElement = document.getElementById('timer');
-        var totalTime = 0;
+    var remainingTime = 75 * 60; // 75 phút = 7200 giây
+    var timerElement = document.getElementById('timer');
+    var totalTime = 0;
 
-        function startTimer() {
-            var countdown = setInterval(function () {
-                var minutes = Math.floor(remainingTime / 60);
-                var seconds = remainingTime % 60;
-                seconds = seconds < 10 ? "0" + seconds : seconds;
-                minutes = minutes < 10 ? "0" + minutes : minutes;
-                timerElement.textContent = minutes + ":" + seconds;
+    function startTimer() {
+        var countdown = setInterval(function () {
+            var minutes = Math.floor(remainingTime / 60);
+            var seconds = remainingTime % 60;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            timerElement.textContent = minutes + ":" + seconds;
 
-                // Tăng tổng thời gian làm bài
-                totalTime++;
+            // Tăng tổng thời gian làm bài
+            totalTime++;
 
-                // Giảm thời gian
-                remainingTime--;
+            // Giảm thời gian
+            remainingTime--;
 
-                // Khi hết giờ, tự động nộp bài
-                if (remainingTime < 0) {
-                    clearInterval(countdown);
-                    autoSubmit();
-                }
-            }, 1000);
-        }
+            // Khi hết giờ, tự động nộp bài
+            if (remainingTime < 0) {
+                clearInterval(countdown);
+                autoSubmit();
+            }
+        }, 1000);
+    }
 
-        window.onload = function () {
-            startTimer();
-        };
+    window.onload = function () {
+        startTimer();
+    };
 
-        // Khi nộp bài tự động
+    // Khi nộp bài tự động
     function autoSubmit() {
         Swal.fire({
             title: "Hết thời gian!",
@@ -155,41 +162,43 @@
             timer: 3000,
             timerProgressBar: true,
             didClose: () => {
-                showTotalTime(); // Hiển thị tổng thời gian đã làm
-
-                // Lấy thời gian làm bài
-                var minutes = Math.floor(totalTime / 60);
-                var seconds = totalTime % 60;
-                var formattedTime = minutes + ":" + (seconds < 10 ? "0" + seconds : seconds);
-
-                // Tạo input ẩn để lưu tổng thời gian vào form trước khi nộp
-                var totalTimeInput = document.createElement('input');
-                totalTimeInput.type = 'hidden';
-                totalTimeInput.name = 'TotalTime';  // Tên này phải trùng với key trong controller
-                totalTimeInput.value = formattedTime;
-
-                var form = document.getElementById('tracNghiemForm');
-                form.appendChild(totalTimeInput); // Thêm input vào form
-                form.submit();
+                submitFormWithTime(); // Gửi bài với thời gian làm
             }
         });
     }
 
-
-
-        // Hiển thị tổng thời gian đã làm bài
-        function showTotalTime() {
-            var minutes = Math.floor(totalTime / 60);
-            var seconds = totalTime % 60;
-            seconds = seconds < 10 ? "0" + seconds : seconds;
-            minutes = minutes < 10 ? "0" + minutes : minutes;
-            var totalTimeElement = document.getElementById('totalTime');
-            if (totalTimeElement) {
-                totalTimeElement.textContent = minutes + ":" + seconds;
-            }
+    // Hiển thị tổng thời gian đã làm bài
+    function showTotalTime() {
+        var minutes = Math.floor(totalTime / 60);
+        var seconds = totalTime % 60;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        var totalTimeElement = document.getElementById('totalTime');
+        if (totalTimeElement) {
+            totalTimeElement.textContent = minutes + ":" + seconds;
         }
+    }
 
-      function confirmSubmission() {
+    // Thêm thời gian làm bài vào form và submit
+    function submitFormWithTime() {
+        // Lấy thời gian làm bài
+        var minutes = Math.floor(totalTime / 60);
+        var seconds = totalTime % 60;
+        var formattedTime = minutes + ":" + (seconds < 10 ? "0" + seconds : seconds);
+
+        // Tạo input ẩn để lưu tổng thời gian vào form trước khi nộp
+        var totalTimeInput = document.createElement('input');
+        totalTimeInput.type = 'hidden';
+        totalTimeInput.name = 'TotalTime';  // Tên này phải trùng với key trong controller
+        totalTimeInput.value = formattedTime;
+
+        var form = document.getElementById('tracNghiemForm');
+        form.appendChild(totalTimeInput); // Thêm input vào form
+        form.submit();
+    }
+
+    // Xác nhận nộp bài thủ công
+    function confirmSubmission() {
         Swal.fire({
             title: "Bạn có chắc muốn nộp bài?",
             text: "Bài làm sẽ không thể thay đổi!",
@@ -208,41 +217,29 @@
                     timer: 3000,
                     timerProgressBar: true,
                     didClose: () => {
-                        showTotalTime(); // Hiển thị tổng thời gian đã làm
-
-                        // Lấy thời gian làm bài
-                        var minutes = Math.floor(totalTime / 60);
-                        var seconds = totalTime % 60;
-                        var formattedTime = minutes + ":" + (seconds < 10 ? "0" + seconds : seconds);
-
-                        // Tạo input ẩn để lưu tổng thời gian vào form trước khi nộp
-                        var totalTimeInput = document.createElement('input');
-                        totalTimeInput.type = 'hidden';
-                        totalTimeInput.name = 'TotalTime';  // Tên này phải trùng với key trong controller
-                        totalTimeInput.value = formattedTime;
-
-                        var form = document.getElementById('tracNghiemForm');
-                        form.appendChild(totalTimeInput); // Thêm input vào form
-                        form.submit();
+                        submitFormWithTime(); // Gửi bài với thời gian làm
                     }
                 });
             }
         });
     }
 
-        function markAsSelected(questionId) {
-            var button = document.getElementById('btn_' + questionId);
-            if (button.style.backgroundColor === '#3b4f95') {
-                button.style.backgroundColor = '#fff';
-            } else {
-                button.style.backgroundColor = '#3b4f95';
-                button.style.color = '#fff';
-            }
+    // Đánh dấu câu hỏi đã chọn
+    function markAsSelected(questionId) {
+        var button = document.getElementById('btn_' + questionId);
+        if (button.style.backgroundColor === '#3b4f95') {
+            button.style.backgroundColor = '#fff';
+            button.style.color = '#000'; // Đổi lại màu chữ mặc định
+        } else {
+            button.style.backgroundColor = '#3b4f95';
+            button.style.color = '#fff';
         }
-        // Scroll tới câu hỏi khi nhấn vào nút
-        function scrollToQuestion(questionId) {
-            document.getElementById('question_' + questionId).scrollIntoView({ behavior: 'smooth' });
-        }
+    }
+
+    // Scroll tới câu hỏi khi nhấn vào nút
+    function scrollToQuestion(questionId) {
+        document.getElementById('question_' + questionId).scrollIntoView({ behavior: 'smooth' });
+    }
 
 </script>
 
