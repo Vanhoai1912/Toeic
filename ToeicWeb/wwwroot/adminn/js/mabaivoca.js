@@ -1,6 +1,9 @@
 ﻿var dataTable;
 
 
+
+
+
 $(document).ready(function () {
     $('#BaivocaModal').on('hide.bs.modal', function () {
         HideModal();
