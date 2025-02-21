@@ -1,30 +1,31 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
+using Toeic.Models;
 
-namespace Toeic.Models
+public class Message
 {
-    public class Message
-    {
-        [Key]
-        public int Id { get; set; }
+    [Key]
+    public int Id { get; set; }
 
-        [Required]
-        public string Sender { get; set; }
+    [Required(ErrorMessage = "Tin nhắn không được để trống.")]
+    public string MessageText { get; set; }
 
-        [Required]
-        public string Receiver { get; set; }
+    public bool IsFromAI { get; set; }
 
-        [Required]
-        public string MessageText { get; set; }
+    public DateTime Timestamp { get; set; } = DateTime.UtcNow;
 
-        public DateTime Timestamp { get; set; } = DateTime.Now;
+    [Required(ErrorMessage = "SenderId là bắt buộc.")]
+    public string SenderId { get; set; }
 
-        public bool IsFromAI { get; set; }
-    }
+    [ForeignKey("SenderId")]
+    [JsonIgnore] // Ngăn vòng lặp JSON khi lấy dữ liệu người gửi
+    public virtual ApplicationUser Sender { get; set; }
 
+    public string? ReceiverId { get; set; } // ✅ Cho phép null khi chat với AI
+
+    [ForeignKey("ReceiverId")]
+    [JsonIgnore] // Ngăn vòng lặp JSON khi lấy dữ liệu người nhận
+    public virtual ApplicationUser? Receiver { get; set; }
 }

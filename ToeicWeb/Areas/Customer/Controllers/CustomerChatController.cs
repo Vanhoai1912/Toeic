@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Toeic.DataAccess;
 using Toeic.Models;
@@ -21,72 +24,118 @@ namespace ToeicWeb.Areas.Customer.Controllers
             _geminiService = geminiService;
         }
 
-        [HttpPost("{chatType}")]
-        public async Task<IActionResult> SendMessage(string chatType, [FromBody] Message request)
+        public class SendMessageDto
+        {
+            public string MessageText { get; set; }
+        }
+        [HttpPost("send/{chatType}")]
+        public async Task<IActionResult> SendMessage(string chatType, [FromBody] SendMessageDto request)
         {
             if (request == null || string.IsNullOrWhiteSpace(request.MessageText))
             {
-                return BadRequest("Tin nhắn không hợp lệ.");
+                return BadRequest(new { error = "Tin nhắn không hợp lệ." });
             }
 
-            Console.WriteLine($"Nhận request từ {request.Sender} -> {request.Receiver}: {request.MessageText}");
-
-            // Lưu tin nhắn của người dùng vào DB
-            var userMessage = new Message
+            var senderId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(senderId))
             {
-                Sender = request.Sender,
-                Receiver = request.Receiver,
-                MessageText = request.MessageText,
-                IsFromAI = false,
-                Timestamp = DateTime.UtcNow
-            };
-
-            _context.Messages.Add(userMessage);
-            await _context.SaveChangesAsync();
-
-            if (chatType == "admin")
-            {
-                // Kiểm tra xem user đã từng gửi tin nhắn cho admin chưa
-                bool hasPreviousMessages = _context.Messages
-                    .Any(m => m.Sender == request.Sender && m.Receiver == "Admin");
-
-                // Nếu đã gửi tin nhắn trước đó, không trả về phản hồi nữa
-                if (hasPreviousMessages)
-                {
-                    return Ok(new { reply = "" }); // Trả về chuỗi rỗng, không hiển thị tin nhắn mới
-                }
-
-                // Nếu đây là lần đầu, trả về thông báo mặc định
-                return Ok(new { reply = "Admin sẽ trả lời tin nhắn của bạn sớm nhất." });
+                return Unauthorized(new { error = "Bạn cần đăng nhập để gửi tin nhắn." });
             }
 
             try
             {
-                // Nếu chat với AI, gọi API Gemini
-                string botReply = await _geminiService.GetChatbotResponse(request.MessageText);
+                string? receiverId = null;
+                string? aiReply = null;
 
-                var botMessage = new Message
+                if (chatType == "admin")
                 {
-                    Sender = "Chatbot",
-                    Receiver = request.Sender,
-                    MessageText = botReply,
-                    IsFromAI = true,
+                    var adminUser = await _context.Users
+                        .Join(_context.UserRoles, user => user.Id, userRole => userRole.UserId, (user, userRole) => new { user, userRole })
+                        .Join(_context.Roles, ur => ur.userRole.RoleId, role => role.Id, (ur, role) => new { ur.user, role })
+                        .Where(x => x.role.Name == "Admin")
+                        .Select(x => x.user)
+                        .FirstOrDefaultAsync();
+
+                    if (adminUser == null)
+                    {
+                        return NotFound(new { error = "Không tìm thấy Admin." });
+                    }
+
+                    receiverId = adminUser.Id;
+                }
+                else if (chatType == "ai")
+                {
+                    aiReply = await _geminiService.GetChatbotResponse(request.MessageText);
+
+                    if (string.IsNullOrWhiteSpace(aiReply))
+                    {
+                        return StatusCode(500, new { error = "AI không trả lời." });
+                    }
+
+                    // Đảm bảo SenderId không bị null khi lưu tin nhắn AI
+                    receiverId = senderId;
+                }
+                else
+                {
+                    return BadRequest(new { error = "Loại chat không hợp lệ. Chọn 'admin' hoặc 'ai'." });
+                }
+
+                var userMessage = new Message
+                {
+                    SenderId = senderId,
+                    ReceiverId = receiverId, // Đảm bảo luôn có giá trị khi lưu
+                    MessageText = request.MessageText,
+                    IsFromAI = false,
                     Timestamp = DateTime.UtcNow
                 };
 
-                _context.Messages.Add(botMessage);
-                await _context.SaveChangesAsync();
+                await _context.Messages.AddAsync(userMessage);
 
-                return Ok(new { reply = botReply });
+                if (chatType == "ai")
+                {
+                    var aiMessage = new Message
+                    {
+                        SenderId = senderId, // Gán senderId để tránh lỗi NULL
+                        ReceiverId = senderId, // AI trả lời trực tiếp cho người dùng
+                        MessageText = aiReply,
+                        IsFromAI = true,
+                        Timestamp = DateTime.UtcNow
+                    };
+
+                    await _context.Messages.AddAsync(aiMessage);
+                }
+
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateException dbEx)
+                {
+                    var detailedError = dbEx.InnerException?.InnerException?.Message
+                                        ?? dbEx.InnerException?.Message
+                                        ?? dbEx.Message;
+
+                    return StatusCode(500, new
+                    {
+                        error = "Lỗi khi lưu thay đổi vào cơ sở dữ liệu.",
+                        details = detailedError
+                    });
+                }
+
+                if (chatType == "ai")
+                {
+                    return Ok(new { reply = aiReply });
+                }
+
+                return Ok(new { success = true });
+                // Không trả về tin nhắn mặc định khi gửi đến admin
+
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Lỗi hệ thống: {ex.Message}");
+                return StatusCode(500, new { error = "Đã xảy ra lỗi nội bộ.", details = ex.Message });
             }
         }
 
-
-
     }
 }
-

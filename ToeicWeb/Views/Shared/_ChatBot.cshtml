@@ -55,111 +55,112 @@
         cursor: pointer;
     }
 </style>
-
 <script>
-    let chatType = "ai"; // Mặc định chat với AI
-    let hasAdminMessageShown = false; // Kiểm tra đã hiển thị thông báo admin chưa
+    let chatType = "ai";
+    let hasAdminMessageShown = false;
 
-    // Lưu trữ tin nhắn của từng chế độ chat
     let aiMessages = [];
     let adminMessages = [];
 
+    const chatHeader = document.getElementById("chat-header");
+    const chatBody = document.getElementById("chat-body");
+    const chatInput = document.getElementById("chat-input");
+    const sendBtn = document.getElementById("send-btn");
+
+    const scrollToBottom = () => chatBody.scrollTop = chatBody.scrollHeight;
+
+    const showMessage = (sender, message, color = "black") => {
+        const messageHtml = `<div style="color: ${color};"><strong>${sender}:</strong> ${message}</div>`;
+        chatBody.insertAdjacentHTML("beforeend", messageHtml);
+
+        if (chatType === "ai") {
+            aiMessages.push(messageHtml);
+        } else {
+            adminMessages.push(messageHtml);
+        }
+
+        scrollToBottom();
+    };
+
+    const showError = (message) => {
+        showMessage("Lỗi", message, "red");
+    };
+
     document.querySelectorAll(".chat-option").forEach(button => {
-        button.addEventListener("click", function() {
+        button.addEventListener("click", function () {
             chatType = this.dataset.chat;
-            console.log("Chế độ chat:", chatType);
+            chatHeader.textContent = chatType === "admin" ? "Chat với Admin" : "Chatbot AI";
+            chatHeader.style.backgroundColor = chatType === "admin" ? "#dc3545" : "#007bff";
 
-            let chatHeader = document.getElementById("chat-header");
-            let chatBody = document.getElementById("chat-body");
+            chatBody.innerHTML = `<p style='color: gray; text-align: center;'>Bạn đang chat với ${chatType === "admin" ? "Admin" : "AI"}.</p>`;
+            const messages = chatType === "admin" ? adminMessages : aiMessages;
+            messages.forEach(msg => chatBody.insertAdjacentHTML("beforeend", msg));
 
-            // Cập nhật giao diện dựa trên chế độ chat
-            if (chatType === "admin") {
-                chatHeader.textContent = "Chat với Admin";
-                chatHeader.style.backgroundColor = "#dc3545"; // Màu đỏ
-                chatBody.innerHTML = "<p style='color: gray; text-align: center;'>Bạn đang chat với Admin.</p>";
-
-                // Hiển thị lại tin nhắn trước đó
-                adminMessages.forEach(msg => {
-                    chatBody.innerHTML += msg;
-                });
-
-                // Nếu chưa hiển thị thông báo admin, thêm vào
-                if (!hasAdminMessageShown) {
-                    let adminNotification = "<div style='color: red; font-style: italic;'>Admin sẽ trả lời bạn trong vài giờ.</div>";
-                    chatBody.innerHTML += adminNotification;
-                    adminMessages.push(adminNotification);
-                    hasAdminMessageShown = true;
-                }
-            } else {
-                chatHeader.textContent = "Chatbot AI";
-                chatHeader.style.backgroundColor = "#007bff"; // Màu xanh
-                chatBody.innerHTML = "<p style='color: gray; text-align: center;'>Bạn đang chat với AI.</p>";
-
-                // Hiển thị lại tin nhắn trước đó
-                aiMessages.forEach(msg => {
-                    chatBody.innerHTML += msg;
-                });
+            if (chatType === "admin" && !hasAdminMessageShown) {
+                const adminNotification = "<div style='color: green; font-style: italic;'>Hãy để lại tin nhắn, Admin sẽ trả lời bạn trong vài giờ.</div>";
+                chatBody.insertAdjacentHTML("beforeend", adminNotification);
+                adminMessages.push(adminNotification);
+                hasAdminMessageShown = true;
             }
+
+            scrollToBottom();
         });
     });
 
-    document.getElementById("send-btn").addEventListener("click", function() {
-        let input = document.getElementById("chat-input").value.trim();
+    const sendMessage = async () => {
+        const input = chatInput.value.trim();
         if (input === "") return;
 
-        let chatBody = document.getElementById("chat-body");
-        let messageDiv = `<div>Bạn: ${input}</div>`;
-        chatBody.innerHTML += messageDiv;
+        showMessage("Bạn", input);
+        chatInput.value = "";
 
-        // Lưu tin nhắn vào mảng tương ứng
-        if (chatType === "ai") {
-            aiMessages.push(messageDiv);
-        } else {
-            adminMessages.push(messageDiv);
+        try {
+            const response = await fetch(`/customer/api/chat/send/${chatType}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ messageText: input })
+            });
+
+            const body = await response.json();
+
+            if (!response.ok) {
+                const errorMessage = body?.error || "Đã xảy ra lỗi không xác định.";
+                showError(errorMessage);
+                return;
+            }
+
+            if (chatType === "admin" && !hasAdminMessageShown) {
+                const adminNotification = "<div style='color: red; font-style: italic;'>Admin sẽ trả lời bạn trong vài giờ.</div>";
+                chatBody.insertAdjacentHTML("beforeend", adminNotification);
+                adminMessages.push(adminNotification);
+                hasAdminMessageShown = true;
+            }
+
+            if (body.reply?.trim()) {
+    showMessage(chatType === "ai" ? "Chatbot" : "Admin", body.reply);
+} else if (body.success) {
+    setTimeout(() => {
+    showMessage("Hệ thống", "Tin nhắn đã gửi thành công.", "gray");
+}, 1000); // Chậm 1 giây
+
+} else {
+    showError("Không nhận được phản hồi.");
+}
+
+        } catch (error) {
+            showError("Không thể kết nối đến server. Vui lòng kiểm tra mạng.");
         }
+    };
 
-        let apiUrl = `/customer/api/chat/${chatType}`;
-        let requestData = {
-            sender: "User",
-            receiver: chatType === "ai" ? "Chatbot" : "Admin",
-            messageText: input
-        };
-
-        console.log("Gửi request:", JSON.stringify(requestData));
-
-        fetch(apiUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(requestData)
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log("Phản hồi API:", data);
-
-                if (chatType === "admin" && !hasAdminMessageShown) {
-                    let adminNotification = "<div style='color: red; font-style: italic;'>Admin sẽ trả lời bạn trong vài giờ.</div>";
-                    chatBody.innerHTML += adminNotification;
-                    adminMessages.push(adminNotification);
-                    hasAdminMessageShown = true;
-                }
-
-                if (data.reply && data.reply.trim() !== "") {
-                    let botResponse = `<div>${chatType === "ai" ? "Chatbot" : "Admin"}: ${data.reply}</div>`;
-                    chatBody.innerHTML += botResponse;
-
-                    if (chatType === "ai") {
-                        aiMessages.push(botResponse);
-                    } else {
-                        adminMessages.push(botResponse);
-                    }
-                }
-            })
-            .catch(error => console.error("Lỗi khi gửi tin nhắn:", error));
-
-        document.getElementById("chat-input").value = "";
+    sendBtn.addEventListener("click", sendMessage);
+    chatInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") sendMessage();
     });
-
-
-
 </script>
+
+
+
+
+
+
 

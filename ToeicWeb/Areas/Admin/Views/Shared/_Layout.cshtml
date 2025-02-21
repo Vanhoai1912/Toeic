@@ -333,6 +333,23 @@
                                 <!--end:Menu link-->
                             </a>
                             <!--end:Menu item-->
+                            <!--begin:Menu item-->
+                            <a href="#" class="nav-link nav-linkH menu-item" id="chatLink">
+                                <!--begin:Menu link-->
+                                <span class="menu-link">
+                                    <span class="menu-icon">
+                                        <i class="bi bi-backpack4" style="font-size: 18px">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                            <span class="path3"></span>
+                                            <span class="path4"></span>
+                                        </i>
+                                    </span>
+                                    <span class="menu-title">Quản lý tin nhắn</span>
+                                </span>
+                                <!--end:Menu link-->
+                            </a>
+                            <!--end:Menu item-->
 
                             <!--begin:Menu item-->
                             <a href="#" class="nav-link nav-linkH menu-item" id="userLink">
@@ -487,6 +504,9 @@
                     case 'articleLink':
                         url = '/Admin/Article/Index';
                         break;
+                    case 'chatLink':
+                        url = '/Admin/AdminChat/Index';
+                        break;
                     case 'userLink':
                         url = '/Admin/User/Index';
                         break;
@@ -577,6 +597,11 @@
                             initTinyMCE();
                         });
                         break;
+                    case '/Admin/AdminChat/Index':
+                        $.getScript('@Url.Content("~/adminn/js/chat.js")', function() {
+                            loadDataTable();
+                        });
+                        break;
                     case '/Admin/User/Index':
                         $.getScript('@Url.Content("~/adminn/js/user.js")', function () {
                             loadDataTable();
@@ -620,6 +645,8 @@
                         return 'articleLink';
                     case '/Admin/User/Index':
                         return 'userLink';
+                    case '/Admin/AdminChat/Index':
+                        return 'chatLink';
                     case '/Admin/BThi/Index':
                         return 'dethiLink';
                     default:

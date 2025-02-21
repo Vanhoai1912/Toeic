@@ -44,9 +44,10 @@ builder.Services.AddCors(options =>
 });
 builder.Services.AddSignalR();
 
-builder.Services.AddSingleton<GeminiService>();
+builder.Services.AddScoped<GeminiService>();
 
 builder.Services.AddHttpClient();
+
 
 
 var app = builder.Build();

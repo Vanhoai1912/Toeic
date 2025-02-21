@@ -68,6 +68,19 @@ namespace Toeic.DataAccess
                 .WithMany(t => t.UserAnswers)
                 .HasForeignKey(u => u.TestResultId)
                 .OnDelete(DeleteBehavior.Cascade); // Cho phép xóa cascade
+
+
+            modelBuilder.Entity<Message>()
+          .HasOne(m => m.Sender)
+          .WithMany()
+          .HasForeignKey(m => m.SenderId)
+          .OnDelete(DeleteBehavior.Restrict); // Không xóa tin nhắn nếu xóa User
+
+            modelBuilder.Entity<Message>()
+                .HasOne(m => m.Receiver)
+                .WithMany()
+                .HasForeignKey(m => m.ReceiverId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
     }
