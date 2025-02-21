@@ -26,6 +26,7 @@ namespace Toeic.DataAccess
         public virtual DbSet<Cau_hoi_bai_thi> Cauhoibaithis { get; set; }
         public virtual DbSet<TestResult> TestResults { get; set; }
         public virtual DbSet<UserAnswer> UserAnswers { get; set; }
+        public virtual DbSet<Message> Messages { get; set; }
 
 
 
