@@ -26,16 +26,22 @@ function loadUserList() {
     });
 }
 
-// 🟢 Load tin nhắn giữa Admin và User
 function loadChat(userId, userName) {
-    $("#chat-container").show();  // Hiển thị khung chat
-    $("#chat-container").attr("data-user-id", userId);  // Lưu userId để gửi tin nhắn sau này
-    $("#chat-title").text(`Đang chat với ${userName}`);  // Cập nhật tiêu đề chat
+    console.log("📌 Đang tải tin nhắn của User ID:", userId);
+
+    $("#chat-container").show();
+    $("#chat-container").attr("data-user-id", userId);
+    $("#chat-title").text(`Đang chat với ${userName}`);
+
+    let url = `/Admin/AdminChat/GetMessages?userId=${userId}`;  // 🛠 Sửa lại URL
+
+    console.log("📌 Gọi API:", url);
 
     $.ajax({
-        url: `/Admin/AdminChat/messages/${userId}`,
+        url: url,
         type: "GET",
         success: function (data) {
+            console.log("📌 Tin nhắn nhận được:", data);
             let chatHtml = "";
             data.forEach(msg => {
                 let sender = msg.senderId === userId ? "Người dùng" : "Admin";
@@ -43,11 +49,13 @@ function loadChat(userId, userName) {
             });
             $("#chat-box").html(chatHtml);
         },
-        error: function () {
+        error: function (xhr) {
+            console.error("❌ Lỗi khi tải tin nhắn:", xhr.responseText);
             alert("Lỗi khi tải tin nhắn.");
         }
     });
 }
+
 
 // 🟢 Gửi tin nhắn từ Admin đến User
 function sendMessage() {

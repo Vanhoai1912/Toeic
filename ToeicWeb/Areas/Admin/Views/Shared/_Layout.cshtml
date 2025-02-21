@@ -597,11 +597,18 @@
                             initTinyMCE();
                         });
                         break;
-                    case '/Admin/AdminChat/Index':
-                        $.getScript('@Url.Content("~/adminn/js/chat.js")', function() {
-                            loadDataTable();
-                        });
-                        break;
+                   case '/Admin/AdminChat/Index':
+    console.log("📌 Đang load script chat.js...");
+    $.getScript('/adminn/js/chat.js')
+        .done(function () {
+            console.log("✅ chat.js đã load thành công!");
+            loadUserList(); // 🟢 Chỉ cần load danh sách User
+        })
+        .fail(function () {
+            console.error("❌ Lỗi load chat.js");
+        });
+    break;
+
                     case '/Admin/User/Index':
                         $.getScript('@Url.Content("~/adminn/js/user.js")', function () {
                             loadDataTable();

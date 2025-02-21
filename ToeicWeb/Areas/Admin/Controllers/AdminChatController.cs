@@ -27,9 +27,12 @@ namespace ToeicWeb.Areas.Admin.Controllers
             return View(); // ✅ Trả về giao diện
         }
 
-        [HttpGet("messages/{userId}")]
+        [HttpGet]
         public async Task<IActionResult> GetMessages(string userId)
         {
+            if (string.IsNullOrEmpty(userId))
+                return BadRequest("UserId không hợp lệ.");
+
             var messages = await _context.Messages
                 .Where(m => m.SenderId == userId || m.ReceiverId == userId)
                 .OrderBy(m => m.Timestamp)
@@ -45,6 +48,8 @@ namespace ToeicWeb.Areas.Admin.Controllers
 
             return Json(messages);
         }
+
+
 
 
         [HttpPost("send")]
