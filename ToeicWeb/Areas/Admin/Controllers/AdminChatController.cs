@@ -74,6 +74,7 @@ namespace ToeicWeb.Areas.Admin.Controllers
             try
             {
                 var users = _context.ApplicationUsers
+                    .Where(u => _context.Messages.Any(m => m.SenderId == u.Id)) // Chỉ lấy user có tin nhắn
                     .Select(u => new {
                         id = u.Id,
                         name = u.Name ?? "Người dùng ẩn danh",
@@ -88,6 +89,7 @@ namespace ToeicWeb.Areas.Admin.Controllers
                 return BadRequest($"Lỗi lấy danh sách user: {ex.Message}");
             }
         }
+
         #endregion
 
 

@@ -37,10 +37,11 @@ namespace ToeicWeb.Areas.Customer.Controllers
             }
 
             var senderId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(senderId))
+            if (chatType == "admin" && string.IsNullOrEmpty(senderId))
             {
-                return Unauthorized(new { error = "Bạn cần đăng nhập để gửi tin nhắn." });
+                return Unauthorized(new { error = "Bạn cần đăng nhập để gửi tin nhắn cho Admin." });
             }
+
 
             try
             {
@@ -62,6 +63,21 @@ namespace ToeicWeb.Areas.Customer.Controllers
                     }
 
                     receiverId = adminUser.Id;
+
+                    // ✅ Chỉ lưu tin nhắn gửi Admin
+                    var userMessage = new Message
+                    {
+                        SenderId = senderId,
+                        ReceiverId = receiverId,
+                        MessageText = request.MessageText,
+                        IsFromAI = false,
+                        Timestamp = DateTime.UtcNow
+                    };
+
+                    await _context.Messages.AddAsync(userMessage);
+                    await _context.SaveChangesAsync();
+
+                    return Ok(new { success = true });
                 }
                 else if (chatType == "ai")
                 {
@@ -72,69 +88,61 @@ namespace ToeicWeb.Areas.Customer.Controllers
                         return StatusCode(500, new { error = "AI không trả lời." });
                     }
 
-                    // Đảm bảo SenderId không bị null khi lưu tin nhắn AI
-                    receiverId = senderId;
+                    // ❌ Không lưu tin nhắn vào database khi chat với AI
+                    return Ok(new { reply = aiReply });
                 }
                 else
                 {
                     return BadRequest(new { error = "Loại chat không hợp lệ. Chọn 'admin' hoặc 'ai'." });
                 }
-
-                var userMessage = new Message
-                {
-                    SenderId = senderId,
-                    ReceiverId = receiverId, // Đảm bảo luôn có giá trị khi lưu
-                    MessageText = request.MessageText,
-                    IsFromAI = false,
-                    Timestamp = DateTime.UtcNow
-                };
-
-                await _context.Messages.AddAsync(userMessage);
-
-                if (chatType == "ai")
-                {
-                    var aiMessage = new Message
-                    {
-                        SenderId = senderId, // Gán senderId để tránh lỗi NULL
-                        ReceiverId = senderId, // AI trả lời trực tiếp cho người dùng
-                        MessageText = aiReply,
-                        IsFromAI = true,
-                        Timestamp = DateTime.UtcNow
-                    };
-
-                    await _context.Messages.AddAsync(aiMessage);
-                }
-
-                try
-                {
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateException dbEx)
-                {
-                    var detailedError = dbEx.InnerException?.InnerException?.Message
-                                        ?? dbEx.InnerException?.Message
-                                        ?? dbEx.Message;
-
-                    return StatusCode(500, new
-                    {
-                        error = "Lỗi khi lưu thay đổi vào cơ sở dữ liệu.",
-                        details = detailedError
-                    });
-                }
-
-                if (chatType == "ai")
-                {
-                    return Ok(new { reply = aiReply });
-                }
-
-                return Ok(new { success = true });
-                // Không trả về tin nhắn mặc định khi gửi đến admin
-
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new { error = "Đã xảy ra lỗi nội bộ.", details = ex.Message });
             }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetUserMessages()
+        {
+            try
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized(new { error = "Bạn cần đăng nhập." });
+                }
+
+                var messages = await _context.Messages
+                    .Where(m => (m.SenderId == userId || m.ReceiverId == userId) && !m.IsFromAI)
+                    .OrderBy(m => m.Timestamp)
+                    .Select(m => new
+                    {
+                        id = m.Id,
+                        senderId = m.SenderId,
+                        receiverId = m.ReceiverId,
+                        messageText = m.MessageText,
+                        timestamp = m.Timestamp
+                    })
+                    .ToListAsync();
+
+                return Ok(new { userId, messages });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "Lỗi máy chủ nội bộ.", details = ex.Message });
+            }
+        }
+
+        [HttpGet("current-user")] // Tạo API lấy userId
+        public IActionResult GetCurrentUserId()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized(new { error = "Bạn chưa đăng nhập." });
+            }
+            return Ok(new { userId });
         }
 
     }

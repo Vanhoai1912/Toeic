@@ -56,107 +56,163 @@
     }
 </style>
 <script>
-    let chatType = "ai";
-    let hasAdminMessageShown = false;
+    let chatType = "ai"; // Mặc định chat với AI
+let userId = null;
+let adminMessages = [];
+let aiMessages = [];
 
-    let aiMessages = [];
-    let adminMessages = [];
+const chatHeader = document.getElementById("chat-header");
+const chatBody = document.getElementById("chat-body");
+const chatInput = document.getElementById("chat-input");
+const sendBtn = document.getElementById("send-btn");
 
-    const chatHeader = document.getElementById("chat-header");
-    const chatBody = document.getElementById("chat-body");
-    const chatInput = document.getElementById("chat-input");
-    const sendBtn = document.getElementById("send-btn");
+// Cuộn xuống cuối chat
+const scrollToBottom = () => chatBody.scrollTop = chatBody.scrollHeight;
 
-    const scrollToBottom = () => chatBody.scrollTop = chatBody.scrollHeight;
+// Hiển thị tin nhắn trên giao diện
+const showMessage = (sender, message, color = "black") => {
+    const messageHtml = `<div style="color: ${color};"><strong>${sender}:</strong> ${message}</div>`;
 
-    const showMessage = (sender, message, color = "black") => {
-        const messageHtml = `<div style="color: ${color};"><strong>${sender}:</strong> ${message}</div>`;
+    if (chatType === "admin") {
+        adminMessages.push(messageHtml);
+    } else {
+        aiMessages.push(messageHtml);
+    }
+
+    if (chatBody.dataset.chatType === chatType) {
         chatBody.insertAdjacentHTML("beforeend", messageHtml);
-
-        if (chatType === "ai") {
-            aiMessages.push(messageHtml);
-        } else {
-            adminMessages.push(messageHtml);
-        }
-
         scrollToBottom();
-    };
+    }
+};
 
-    const showError = (message) => {
-        showMessage("Lỗi", message, "red");
-    };
+// Hiển thị lỗi
+const showError = (message) => showMessage("Lỗi", message, "red");
 
-    document.querySelectorAll(".chat-option").forEach(button => {
-        button.addEventListener("click", function () {
-            chatType = this.dataset.chat;
-            chatHeader.textContent = chatType === "admin" ? "Chat với Admin" : "Chatbot AI";
-            chatHeader.style.backgroundColor = chatType === "admin" ? "#dc3545" : "#007bff";
+// Hiển thị tin nhắn đúng loại chat
+const showChatMessages = () => {
+    chatBody.innerHTML = "";
+    chatBody.dataset.chatType = chatType;
 
-            chatBody.innerHTML = `<p style='color: gray; text-align: center;'>Bạn đang chat với ${chatType === "admin" ? "Admin" : "AI"}.</p>`;
-            const messages = chatType === "admin" ? adminMessages : aiMessages;
-            messages.forEach(msg => chatBody.insertAdjacentHTML("beforeend", msg));
+    chatBody.insertAdjacentHTML(
+        "beforeend",
+        `<p style='color: gray; text-align: center;'>Bạn đang chat với ${chatType === "admin" ? "Admin" : "AI"}.</p>`
+    );
 
-            if (chatType === "admin" && !hasAdminMessageShown) {
-                const adminNotification = "<div style='color: green; font-style: italic;'>Hãy để lại tin nhắn, Admin sẽ trả lời bạn trong vài giờ.</div>";
-                chatBody.insertAdjacentHTML("beforeend", adminNotification);
-                adminMessages.push(adminNotification);
-                hasAdminMessageShown = true;
-            }
+    const messages = chatType === "admin" ? adminMessages : aiMessages;
+    messages.forEach(msg => chatBody.insertAdjacentHTML("beforeend", msg));
 
-            scrollToBottom();
-        });
-    });
+    scrollToBottom();
+};
 
-    const sendMessage = async () => {
-        const input = chatInput.value.trim();
-        if (input === "") return;
+// Xử lý khi chuyển giữa AI/Admin
+document.querySelectorAll(".chat-option").forEach(button => {
+    button.addEventListener("click", async function () {
+        chatType = this.dataset.chat;
+        chatHeader.textContent = chatType === "admin" ? "Chat với Admin" : "Chatbot AI";
+        chatHeader.style.backgroundColor = chatType === "admin" ? "#dc3545" : "#007bff";
 
-        showMessage("Bạn", input);
-        chatInput.value = "";
-
-        try {
-            const response = await fetch(`/customer/api/chat/send/${chatType}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ messageText: input })
-            });
-
-            const body = await response.json();
-
-            if (!response.ok) {
-                const errorMessage = body?.error || "Đã xảy ra lỗi không xác định.";
-                showError(errorMessage);
+        if (chatType === "admin") {
+            await getUserId();
+            if (!userId) {
+                showChatMessages(); // Hiển thị UI mà không load tin nhắn Admin
+                showError("Bạn cần đăng nhập để chat với Admin.");
                 return;
             }
-
-            if (chatType === "admin" && !hasAdminMessageShown) {
-                const adminNotification = "<div style='color: red; font-style: italic;'>Admin sẽ trả lời bạn trong vài giờ.</div>";
-                chatBody.insertAdjacentHTML("beforeend", adminNotification);
-                adminMessages.push(adminNotification);
-                hasAdminMessageShown = true;
-            }
-
-            if (body.reply?.trim()) {
-    showMessage(chatType === "ai" ? "Chatbot" : "Admin", body.reply);
-} else if (body.success) {
-    setTimeout(() => {
-    showMessage("Hệ thống", "Tin nhắn đã gửi thành công.", "gray");
-}, 1000); // Chậm 1 giây
-
-} else {
-    showError("Không nhận được phản hồi.");
-}
-
-        } catch (error) {
-            showError("Không thể kết nối đến server. Vui lòng kiểm tra mạng.");
+            await loadAdminMessages(); // Chỉ tải tin nhắn Admin nếu đã đăng nhập
         }
-    };
 
-    sendBtn.addEventListener("click", sendMessage);
-    chatInput.addEventListener("keypress", (e) => {
-        if (e.key === "Enter") sendMessage();
+        showChatMessages(); // Hiển thị tin nhắn phù hợp với loại chat
     });
+});
+
+// Gửi tin nhắn
+const sendMessage = async () => {
+    const input = chatInput.value.trim();
+    if (input === "") return;
+
+    showMessage("Bạn", input);
+    chatInput.value = "";
+
+    try {
+        const response = await fetch(`/customer/api/chat/send/${chatType}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ messageText: input })
+        });
+
+        const body = await response.json();
+
+        if (!response.ok) {
+            showError(body?.error || "Đã xảy ra lỗi.");
+            return;
+        }
+
+        if (body.reply?.trim()) {
+            showMessage(chatType === "admin" ? "Admin" : "AI", body.reply);
+        } else if (body.success) {
+            setTimeout(() => showMessage("Hệ thống", "Tin nhắn đã gửi thành công.", "gray"), 1000);
+        } else {
+            showError("Không nhận được phản hồi.");
+        }
+    } catch (error) {
+        showError("Không thể kết nối đến server.");
+    }
+};
+
+// Lấy userId
+const getUserId = async () => {
+    try {
+        const response = await fetch("/customer/api/chat");
+        const data = await response.json();
+
+        if (response.status === 401) throw new Error("Bạn chưa đăng nhập.");
+        if (!data.userId) throw new Error("Không lấy được userId.");
+
+        userId = data.userId;
+    } catch (error) {
+        userId = null; // Reset userId nếu có lỗi
+    }
+};
+
+// Tải tin nhắn với Admin
+const loadAdminMessages = async () => {
+    try {
+        const response = await fetch("/customer/api/chat");
+        if (response.status === 401) {
+            showError("Bạn cần đăng nhập để xem tin nhắn với Admin.");
+            return;
+        }
+
+        const data = await response.json();
+        if (!data.userId) throw new Error("Không lấy được userId.");
+        userId = data.userId;
+
+        if (!Array.isArray(data.messages)) return;
+
+        adminMessages = data.messages.map(msg => {
+            const sender = msg.senderId === userId ? "Bạn" : "Admin";
+            return `<div style="color: black;"><strong>${sender}:</strong> ${msg.messageText}</div>`;
+        });
+
+        if (chatType === "admin") {
+            showChatMessages();
+        }
+    } catch (error) {
+        showError(error.message);
+    }
+};
+
+// Xử lý khi bấm gửi
+sendBtn.addEventListener("click", sendMessage);
+chatInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") sendMessage();
+});
+
+// Tự động tải tin nhắn AI khi trang load
+window.onload = showChatMessages;
+
 </script>
+
 
 
 
