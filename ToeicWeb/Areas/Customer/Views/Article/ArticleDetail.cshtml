@@ -1,12 +1,358 @@
 ﻿@model ArticleVM
 
+<style>
+    .selected-word {
+        text-decoration: underline;
+        text-decoration-color: #20b035; /* Màu underline */
+        background-color: #d6ffd2;       /* Màu highlight */
+    }
+
+
+    .toggle-switch {
+        display: inline-block;
+        background: #ccc;
+        border-radius: 9999px;
+        padding: 1px;
+        position: relative;
+    }
+    .toggle-switch input[type="radio"] {
+        display: none;
+    }
+    .toggle-switch label {
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 9999px;
+        cursor: pointer;
+        transition: background-color;
+        color: #666;
+    }
+    .toggle-switch input[type="radio"]#lang-en:checked + label[for="lang-en"] {
+        background: #20b035;
+        color: #fff;
+    }
+    .toggle-switch input[type="radio"]#lang-vi:checked + label[for="lang-vi"] {
+        background: #20b035;
+        color: #fff;
+    }
+</style>
+
+<!-- HỘP HIỂN THỊ ĐỊNH NGHĨA / PHIÊN ÂM / DỊCH -->
+<div id="definition-box" style="display: none; position: absolute; z-index: 9999; width: 400px; max-height: 400px; border: 1px solid #ccc; box-shadow: 0 2px 6px rgba(0,0,0,0.2); background: #fff; overflow: hidden;">
+    <div style="background-color: #ebebeb; padding: 8px; border-bottom: 1px solid #ccc; display: flex; align-items: center; justify-content: space-between;">
+        <div>
+            <div class="toggle-switch">
+                <!-- Radio cho EN -->
+                <input type="radio" name="language" id="lang-en">
+                <label for="lang-en">EN</label>
+                <!-- Radio cho VI -->
+                <input type="radio" name="language" id="lang-vi" checked>
+                <label for="lang-vi">VI</label>
+            </div>
+        </div>
+        <div>
+            <button style="background-color: #20b035; border: 1px solid #ccc; border-radius:9999px; padding: 2px 10px; font-weight: bold; cursor: pointer; color: #fff">LƯU</button>
+        </div>
+    </div>
+    <!-- Nội dung có thể cuộn -->
+    <div style="padding: 10px; overflow-y: auto; max-height: 350px; word-wrap: break-word;">
+        <h3 id="definition-title" style="margin-top: 0; font-size: 1.25rem; margin-bottom: 5px; font-weight:bold"></h3>
+        <!-- Phát âm (từ điển Anh-Anh) -->
+        <div class="pronunciation">
+            <span class="uk">
+                <b>UK</b>
+                <button onclick="speak('en-GB')" style="border: none; background: none; box-shadow: none; cursor: pointer;">🔊</button>
+            </span>
+            <span class="us">
+                <b>US</b>
+                <button onclick="speak('en-US')" style="border: none; background: none; box-shadow: none; cursor: pointer;">🔊</button>
+            </span>
+        </div>
+
+        <div id="meanings-container" style="margin-top: 10px;"></div>
+    </div>
+</div>
 
 <div class="container py-4 article-container">
-    <h1 class="fw-bold">@Model.Ten_bai</h1>  <!-- Tiêu đề bài viết -->
-    <img src="~/@Model.ImageUrl" alt="@Model.Ten_bai" class="article-image mt-3 mb-4"> <!-- Hình ảnh -->
-   
-    <p>
+    <h1 class="fw-bold example">@Model.Ten_bai</h1>
+    <img src="~/@Model.ImageUrl" alt="@Model.Ten_bai" class="article-image mt-3 mb-4">
+    <div class="example">
         @Html.Raw(Model.Noi_dung)
-    </p>
-
+    </div>
 </div>
+
+@section Scripts {
+    <script>
+        var result = { globalUkAudioURL: "", globalUsAudioURL: "", ukIpa: "", usIpa: "", englishDefinitionHtml: "" };
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const definitionBox = document.getElementById("definition-box");
+            const definitionTitle = document.getElementById("definition-title");
+            const meaningsContainer = document.getElementById("meanings-container");
+
+            let currentWord = ""; // Từ đang được tra
+            let currentLang = "vi"; // Mặc định là VI
+
+            // Cập nhật currentLang khi chuyển toggle
+            document.getElementById('lang-en').addEventListener('change', () => {
+                currentLang = "en";
+                if (currentWord) refreshDefinition(currentWord);
+                document.querySelector('.pronunciation').style.display = "block";
+            });
+            document.getElementById('lang-vi').addEventListener('change', () => {
+                currentLang = "vi";
+                if (currentWord) refreshDefinition(currentWord);
+                document.querySelector('.pronunciation').style.display = "block";
+            });
+
+            // Hàm làm mới: gọi đồng thời các API, sau đó cập nhật giao diện
+            async function refreshDefinition(word) {
+                const [englishData, vietnameseHtml] = await Promise.all([
+                    fetchEnglishData(word),
+                    currentLang === "vi" ? fetchVietnameseData(word) : Promise.resolve("")
+                ]);
+                // Cập nhật UI cho phát âm từ Dictionary API (Anh-Anh)
+                updatePronunciationUI(englishData);
+                // Cập nhật nội dung định nghĩa
+                if (currentLang === "vi") {
+                    meaningsContainer.innerHTML = vietnameseHtml;
+                } else {
+                    meaningsContainer.innerHTML = englishData.englishDefinitionHtml;
+                }
+            }
+
+            // Hàm fetch dữ liệu từ Dictionary API (Anh-Anh), trả về object
+            async function fetchEnglishData(word) {
+                try {
+                    const dictRes = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`);
+                    const dictData = await dictRes.json();
+                    
+                    if (Array.isArray(dictData) && dictData.length > 0 && !dictData.title) {
+                        const phonetics = dictData[0].phonetics || [];
+                        phonetics.forEach(item => {
+                            if (!item.audio) return;
+                            const audioLink = item.audio.toLowerCase();
+                            if (audioLink.includes("uk.mp3") || audioLink.includes("uk.ogg")) {
+                                result.ukIpa = item.text || result.ukIpa;
+                                result.globalUkAudioURL = item.audio;
+                            }
+                            if (audioLink.includes("us.mp3") || audioLink.includes("us.ogg")) {
+                                result.usIpa = item.text || result.usIpa;
+                                result.globalUsAudioURL = item.audio;
+                            }
+                        });
+                        if (!result.ukIpa && phonetics.length > 0) {
+                            result.ukIpa = phonetics[0].text || "";
+                        }
+                        if (currentLang !== "vi") {
+                            let html = "";
+                            const allMeanings = dictData[0].meanings || [];
+                            allMeanings.forEach(meaning => {
+                                const pos = meaning.partOfSpeech || "N/A";
+                                html += `<div style="margin-bottom: 6px;"><strong>${pos}:</strong><ul>`;
+                                meaning.definitions.forEach(def => {
+                                    html += `<li>${def.definition}</li>`;
+                                });
+                                html += `</ul></div>`;
+                            });
+                            result.englishDefinitionHtml = html;
+                        }
+
+                        return result;
+                    }
+                    else {
+                        result.englishDefinitionHtml = "<em>No definition found</em>";
+                        return result;
+                    }
+                } catch (err) {
+                    console.error("Lỗi DictionaryAPI:", err);
+                    return {};
+                }
+            }
+
+            // Hàm fetch định nghĩa Anh–Việt từ Wiktionary, trả về HTML string
+            async function fetchVietnameseData(word) {
+                try {
+                    const res = await fetch(`https://vi.wiktionary.org/w/rest.php/v1/page/${encodeURIComponent(word)}/html`);
+                    const html = await res.text();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, "text/html");
+                    // Loại bỏ các phần chứa IPA:
+                    doc.querySelectorAll("li").forEach(li => {
+                        if (li.innerText.trim().startsWith("IPA")) {
+                            li.remove();
+                        }
+                    });
+                    doc.querySelectorAll("h3").forEach(h3 => {
+                        if (h3.innerText.trim().includes("Cách phát âm")) {
+                            if (h3.parentElement) {
+                                h3.parentElement.remove();
+                            }
+                        }
+                    });
+                    const section = doc.getElementById("Tiếng_Anh")?.parentElement;
+                    if (!section) {
+                        return "<em>Không tìm thấy định nghĩa</em>";
+                    }
+                    const listItems = section.querySelectorAll("ol li, ul li");
+                    if (listItems.length === 0) return "<em>Không có định nghĩa</em>";
+                    let vietnameseHtml = "<ul>";
+                    listItems.forEach(item => {
+                        vietnameseHtml += `<li>${item.innerHTML.replace(/<sup.*?<\/sup>/g, "")}</li>`;
+                    });
+                    vietnameseHtml += "</ul>";
+                    return vietnameseHtml;
+                } catch (err) {
+                    console.error("Lỗi Wiktionary API:", err);
+                    return "<em>Lỗi tải dữ liệu</em>";
+                }
+            }
+
+            
+
+            // Cập nhật giao diện phần phát âm dựa trên dữ liệu từ Dictionary API
+            function updatePronunciationUI(englishData) {
+                const ukSpan = document.querySelector('.pronunciation .uk');
+                const usSpan = document.querySelector('.pronunciation .us');
+                if (englishData) {
+                    if (ukSpan) {
+                        if (englishData.globalUkAudioURL) {
+                            ukSpan.innerHTML = `<b>UK:</b> <button onclick="speak('en-GB')" style="border: none; background: none; box-shadow: none; cursor: pointer;">🔊</button> ${englishData.ukIpa || 'N/A'}`;
+                        } else {
+                            ukSpan.innerHTML = `<b>UK:</b> ${englishData.ukIpa || 'N/A'}`;
+                        }
+                    }
+                    if (usSpan) {
+                        if (englishData.globalUsAudioURL) {
+                            usSpan.innerHTML = `<b>US:</b> <button onclick="speak('en-US')" style="border: none; background: none; box-shadow: none; cursor: pointer;">🔊</button> ${englishData.usIpa || 'N/A'}`;
+                        } else {
+                            usSpan.innerHTML = `<b>US:</b> ${englishData.usIpa || 'N/A'}`;
+                        }
+                    }
+                }
+            }
+
+            // Đặt vị trí hộp nghĩa ngay bên dưới từ được click
+            function adjustBoxPosition(targetElement) {
+                const rect = targetElement.getBoundingClientRect();
+                let left = rect.left + window.scrollX;
+                let top = rect.bottom + window.scrollY + 5; // 5px offset
+                const boxWidth = definitionBox.offsetWidth;
+                const boxHeight = definitionBox.offsetHeight;
+                if (left + boxWidth > window.innerWidth + window.scrollX) {
+                    left = window.innerWidth + window.scrollX - boxWidth - 10;
+                }
+                if (top + boxHeight > window.innerHeight + window.scrollY) {
+                    top = rect.top + window.scrollY - boxHeight - 5;
+                }
+                definitionBox.style.left = left + "px";
+                definitionBox.style.top = top + "px";
+            }
+
+
+             
+            function clearDefinitionContent() {
+                definitionTitle.innerHTML = "";
+                meaningsContainer.innerHTML = "";
+                result.globalUkAudioURL = "";
+                result.globalUsAudioURL = "";
+                result.ukIpa = "";
+                result.usIpa = "";
+                const ukSpan = document.querySelector('.pronunciation .uk');
+                const usSpan = document.querySelector('.pronunciation .us');
+                if (ukSpan) ukSpan.innerHTML = "<b>UK:</b> N/A";
+                if (usSpan) usSpan.innerHTML = "<b>US:</b> N/A";
+            }
+
+            function showDefinitionBox(clickedWord, event) {
+                clearDefinitionContent();
+                definitionTitle.innerText = clickedWord;
+                meaningsContainer.innerHTML = "<em>Đang tải dữ liệu...</em>";
+                definitionBox.style.display = "block";
+                adjustBoxPosition(event.target);
+            }
+
+            async function fetchAndDisplayInfo(clickedWord, event) {
+                currentWord = clickedWord;
+                showDefinitionBox(clickedWord, event);
+                await refreshDefinition(clickedWord);
+            }
+
+            // Xử lý click vào từ: thêm lớp highlight và hiển thị hộp nghĩa
+            document.addEventListener('click', function(event) {
+
+                if (event.target.classList.contains('clickable-word')) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    document.querySelectorAll('.clickable-word').forEach(span => {
+                        span.classList.remove('selected-word');
+                    });
+                    event.target.classList.add('selected-word');
+                    let clickedWord = event.target.innerText.trim();
+
+                    // Loại bỏ ký tự không phải chữ ở đầu và cuối
+                    clickedWord = clickedWord.replace(/^[^a-zA-Z0-9À-ÖØ-öø-ÿ]+|[^a-zA-Z0-9À-ÖØ-öø-ÿ]+$/g, "");
+
+
+                    if (!clickedWord) return;
+
+                    currentLang = "vi";
+                    langVibutton = document.getElementById("lang-vi");
+                    if (langVibutton) {
+                        langVibutton.checked = true;
+                    }
+                    clearDefinitionContent();
+
+                    fetchAndDisplayInfo(clickedWord, event);
+                }
+            });
+
+            // Ẩn hộp nghĩa khi click ra ngoài
+            document.addEventListener("click", function(event) {
+                if (!event.target.closest(".vocab-word") &&
+                    !event.target.closest(".clickable-word") &&
+                    !event.target.closest("#definition-box")) {
+                    definitionBox.style.display = "none";
+                    document.querySelectorAll('.clickable-word').forEach(span => {
+                        span.classList.remove('selected-word');
+                    });
+                }
+            });
+
+            // Hàm phát âm sử dụng audio từ dữ liệu Anh-Anh
+            function speak(lang) {
+                
+                let audioURL = "";
+                if (lang === "en-GB") {
+                    audioURL = result.globalUkAudioURL;
+                } else if (lang === "en-US") {
+                    audioURL = result.globalUsAudioURL;
+                }
+                if (audioURL) {
+                    let audio = new Audio(audioURL);
+                    audio.play();
+                } else {
+                    console.error("Không có audio URL cho giọng " + lang);
+                }
+            }
+            window.speak = speak;
+
+            // Tách nội dung thành từng từ trong .example và gán sự kiện click
+            document.querySelectorAll('.example').forEach(exampleEl => {
+                const text = exampleEl.innerText;
+                exampleEl.innerHTML = "";
+                const words = text.split(/\s+/);
+                words.forEach((word, idx) => {
+                    const span = document.createElement("span");
+                    span.innerText = word;
+                    span.style.cursor = "pointer";
+                    span.style.marginRight = "4px";
+                    span.classList.add("clickable-word");
+                    exampleEl.appendChild(span);
+                    if (idx < words.length - 1) {
+                        exampleEl.appendChild(document.createTextNode(" "));
+                    }
+                });
+            });
+        });
+    </script>
+}

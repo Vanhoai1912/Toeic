@@ -1,35 +1,5 @@
 ﻿@model Toeic.Models.ViewModels.BaituvungVM
 
-<!-- HỘP HIỂN THỊ ĐỊNH NGHĨA / PHIÊN ÂM / DỊCH -->
-<div id="definition-box" style="display: none; position: absolute; z-index: 9999; width: 350px; max-height: 400px; border: 1px solid #ccc; box-shadow: 0 2px 6px rgba(0,0,0,0.2); background: #fff;">
-    <!-- Thanh trên cùng mô phỏng ảnh -->
-    <div style="background-color: #f8f9fa; padding: 8px; border-bottom: 1px solid #ccc; display: flex; align-items: center; justify-content: space-between;">
-        <div>
-            <span id="btn-en" style="margin-right: 10px; font-weight: bold; cursor: pointer; color: #007bff;">EN</span>
-            <span id="btn-vi" style="margin-right: 10px; font-weight: bold; cursor: pointer; color: #999;">VI</span>
-            <span style="margin-right: 10px;">Tìm kiếm</span>
-            <span>Google</span>
-        </div>
-        <div>
-            <button style="background: none; border: none; font-weight: bold; cursor: pointer;">LƯU</button>
-        </div>
-    </div>
-
-
-    <!-- Nội dung chính bên trong hộp có chiều cao cố định và cuộn dọc -->
-    <div style="padding: 10px; max-height: 340px; overflow-y: auto; word-wrap: break-word;">
-        <!-- Từ -->
-        <h5 id="definition-title" style="margin-top: 0; font-size: 1.25rem; margin-bottom: 5px;"></h5>
-
-        <!-- Phiên âm UK/US kèm nút phát âm -->
-        <p id="phonetics" style="margin: 0; color: #555; font-style: italic;"></p>
-
-        <!-- Danh sách nghĩa (theo từ loại) -->
-        <div id="meanings-container" style="margin-top: 10px;"></div>
-
-    </div>
-</div>
-
 <!-- TIÊU ĐỀ BÀI -->
 <div class="col-12 text-center">
     <h2 style="color:#b10021;">@Model.Mabaituvung.Ten_bai</h2>
@@ -37,276 +7,58 @@
 
 <div class="container my-5">
     <div class="row">
-        @if (Model.Noidungbaituvungs != null && Model.Noidungbaituvungs.Any())
+        @for (int i = 0; i < Model.Noidungbaituvungs.Count; i++)
         {
-            for (int i = 0; i < Model.Noidungbaituvungs.Count; i++)
-            {
-                <div class="col-12 mb-4">
-                    <div class="card p-3 shadow-sm">
-                        <div class="row text-dark">
-                            <!-- Bên trái: Số thứ tự và hình ảnh -->
-                            <div class="col-md-2 text-center d-flex flex-column align-items-center justify-content-center">
-                                <div class="circle bg-warning text-white rounded-circle mb-3" style="width: 50px; height: 50px;">
-                                    <span class="fs-4 d-inline-block pt-2">@Model.Noidungbaituvungs[i].So_thu_tu</span>
-                                </div>
-                                <img src="~/@Model.Noidungbaituvungs[i].ImageUrl" alt="Vocabulary Image" class="img-fluid rounded" style="max-height: 120px; object-fit: cover;">
+            <div class="col-12 mb-4">
+                <div class="card p-3 shadow-sm">
+                    <div class="row text-dark">
+                        <!-- Phần bên trái: Số thứ tự và hình ảnh -->
+                        <div class="col-md-2 text-center d-flex flex-column align-items-center justify-content-center">
+                            <div class="circle bg-warning text-white rounded-circle mb-3" style="width: 50px; height: 50px;">
+                                <span class="fs-4 d-inline-block pt-2">@Model.Noidungbaituvungs[i].So_thu_tu</span>
                             </div>
+                            <img src="~/@Model.Noidungbaituvungs[i].ImageUrl" alt="Vocabulary Image" class="img-fluid rounded" style="max-height: 120px; object-fit: cover;">
+                        </div>
 
-                            <!-- Bên phải: Nội dung -->
-                            <div class="col-md-10">
-                                <div class="d-flex flex-column">
-                                    <!-- Từ và phiên âm gốc -->
-                                    <div class="mb-2">
-                                        <a href="#" class="vocab-word text-decoration-none text-primary fs-5 fw-bold">
-                                            @Model.Noidungbaituvungs[i].Tu_vung
-                                        </a>
-                                        <span class="text-danger">@Model.Noidungbaituvungs[i].Phien_am</span>
-                                    </div>
+                        <!-- Phần bên phải: Nội dung -->
+                        <div class="col-md-10">
+                            <div class="d-flex flex-column">
+                                <!-- Từ và phiên âm gốc -->
+                                <div class="mb-2">
+                                    <!-- Gán class "vocab-word" cho từ vựng chính -->
+                                    <a href="#" class="vocab-word text-decoration-none text-primary fs-5 fw-bold">
+                                        @Model.Noidungbaituvungs[i].Tu_vung
+                                    </a>
+                                    <span class="text-danger">@Model.Noidungbaituvungs[i].Phien_am</span>
+                                </div>
 
-                                    <p class="mb-1">
-                                        <strong>@Model.Noidungbaituvungs[i].Nghia</strong>
-                                    </p>
+                                <p class="mb-1">
+                                    <strong>@Model.Noidungbaituvungs[i].Nghia</strong>
+                                </p>
 
-                                    <!-- Phần ví dụ chứa nhiều từ -->
-                                    <p class="mb-1 example">
-                                        <strong>@Model.Noidungbaituvungs[i].Vi_du</strong>
-                                    </p>
+                                <!-- Phần ví dụ chứa nhiều từ -->
+                                <p class="mb-1">
+                                    <strong>@Model.Noidungbaituvungs[i].Vi_du</strong>
+                                </p>
 
-                                    <p class="mb-1">
-                                        <strong>@Model.Noidungbaituvungs[i].Tu_dong_nghia</strong>
-                                    </p>
-                                    <p class="mb-1">
-                                        <strong>@Model.Noidungbaituvungs[i].Tu_trai_nghia</strong>
-                                    </p>
+                                <p class="mb-1">
+                                    <strong>@Model.Noidungbaituvungs[i].Tu_dong_nghia</strong>
+                                </p>
+                                <p class="mb-1">
+                                    <strong>@Model.Noidungbaituvungs[i].Tu_trai_nghia</strong>
+                                </p>
 
-                                    <!-- Audio Player (cho nội dung của bài học) -->
-                                    <div class="d-flex align-items-center">
-                                        <audio controls class="me-3">
-                                            <source src="@Url.Content("~/" + Model.Noidungbaituvungs[i].Audio)" type="audio/mpeg" />
-                                        </audio>
-                                    </div>
+                                <!-- Audio Player (cho nội dung của bài học) -->
+                                <div class="d-flex align-items-center">
+                                    <audio controls class="me-3">
+                                        <source src="@Url.Content("~/" + Model.Noidungbaituvungs[i].Audio)" type="audio/mpeg" />
+                                    </audio>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            }
-        }
-        else
-        {
-            <p>Không có dữ liệu từ vựng.</p>
+            </div>
         }
     </div>
 </div>
-
-@section Scripts {
-    <script>
-        let currentDictionary = "en-en";
-
-        document.getElementById("btn-en").addEventListener("click", function () {
-            currentDictionary = "en-en";
-            this.style.color = "#007bff";
-            document.getElementById("btn-vi").style.color = "#999";
-        });
-        document.getElementById("btn-vi").addEventListener("click", function () {
-            currentDictionary = "en-vi";
-            this.style.color = "#007bff";
-            document.getElementById("btn-en").style.color("click", function ())
-        });
-
-
-        document.addEventListener("DOMContentLoaded", function () {
-            const definitionBox = document.getElementById("definition-box");
-            const definitionTitle = document.getElementById("definition-title");
-            const phoneticsEl = document.getElementById("phonetics");
-            const meaningsContainer = document.getElementById("meanings-container");
-            
-
-            // Map từ loại (English -> Vietnamese)
-            function mapPartOfSpeech(pos) {
-                switch (pos.toLowerCase()) {
-                    case "noun": return "Noun";
-                    case "verb": return "Verb";
-                    case "adjective": return "Adjective";
-                    case "adverb": return "Adverb";
-                    case "pronoun": return "Pronoun";
-                    case "preposition": return "Preposition";
-                    case "conjunction": return "Conjunction";
-                    case "interjection": return "Interjection";
-                    case "exclamation": return "Exclamation";
-                    case "article": return "Article";
-                    case "determiner": return "Determiner";
-                    default: return pos;
-                }
-            }
-
-            // Hàm điều chỉnh vị trí hộp định nghĩa để không bị tràn ngoài màn hình
-            function adjustBoxPosition(event) {
-                let left = event.pageX;
-                let top = event.pageY;
-                const boxWidth = definitionBox.offsetWidth;
-                const boxHeight = definitionBox.offsetHeight;
-
-                if (left + boxWidth > window.innerWidth) {
-                    left = window.innerWidth - boxWidth - 10;
-                }
-                if (top + boxHeight > window.innerHeight) {
-                    top = window.innerHeight - boxHeight - 10;
-                }
-                definitionBox.style.left = left + "px";
-                definitionBox.style.top = top + "px";
-            }
-
-            // Hàm xóa nội dung cũ trước khi hiển thị
-            function clearDefinitionContent() {
-                definitionTitle.innerHTML = "";
-                phoneticsEl.innerHTML = "";
-                meaningsContainer.innerHTML = "";
-            }
-
-            // Hàm hiển thị hộp với nội dung tạm thời (tránh cảm giác "trống" khi đang load)
-            function showDefinitionBox(clickedWord, event) {
-                clearDefinitionContent();
-                definitionTitle.innerText = clickedWord;
-                phoneticsEl.innerHTML = "<em>Đang tải IPA...</em>";
-                definitionBox.style.display = "block";
-                adjustBoxPosition(event);
-            }
-
-            // Hàm chính: Gọi DictionaryAPI + Google Translate
-            async function fetchAndDisplayInfo(clickedWord, event) {
-                // Bước 1: Mở hộp, hiển thị tạm
-                showDefinitionBox(clickedWord, event);
-
-                try {
-                    // Bước 2: Gọi DictionaryAPI để lấy IPA + nghĩa tiếng Anh
-                    const dictRes = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(clickedWord)}`);
-                    const dictData = await dictRes.json();
-
-                    if (Array.isArray(dictData) && dictData.length > 0 && !dictData.title) {
-                        // Lấy phonetics
-                        const phonetics = dictData[0].phonetics || [];
-                        let ukIpa = "", usIpa = "";
-                        let ukAudio = "", usAudio = "";
-
-                        // Thử dò audio link chứa "uk" hoặc "us"
-                        phonetics.forEach(item => {
-                            if (!item.audio) return;
-                            const audioLink = item.audio.toLowerCase();
-                            if (audioLink.includes("uk.mp3") || audioLink.includes("uk.ogg")) {
-                                ukIpa = item.text || ukIpa;
-                                ukAudio = item.audio;
-                            }
-                            if (audioLink.includes("us.mp3") || audioLink.includes("us.ogg")) {
-                                usIpa = item.text || usIpa;
-                                usAudio = item.audio;
-                            }
-                        });
-
-                        // Nếu không tìm thấy UK/US thì lấy phần tử đầu tiên
-                        if (!ukIpa && !usIpa && phonetics.length > 0) {
-                            ukIpa = phonetics[0].text || "";
-                            ukAudio = phonetics[0].audio || "";
-                        }
-
-                        // Tạo giao diện kiểu "UK )) /IPA/   US )) /IPA/"
-                        if (ukIpa || usIpa) {
-                            // HTML cho UK
-                            let ukHTML = `UK <span class="speaker-icon" data-audio="${ukAudio}" style="cursor: pointer; color: #666;">))</span> <strong>${ukIpa || "N/A"}</strong>`;
-                            // HTML cho US
-                            let usHTML = `US <span class="speaker-icon" data-audio="${usAudio}" style="cursor: pointer; color: #666;">))</span> <strong>${usIpa || "N/A"}</strong>`;
-
-                            phoneticsEl.innerHTML = `${ukHTML} &nbsp;&nbsp; ${usHTML}`;
-                        } else {
-                            phoneticsEl.innerHTML = "<em>Không có IPA</em>";
-                        }
-
-                        // Lấy meanings
-                        const allMeanings = dictData[0].meanings || [];
-                        meaningsContainer.innerHTML = "";
-                        allMeanings.forEach(meaning => {
-                            const pos = mapPartOfSpeech(meaning.partOfSpeech || "");
-                            const block = document.createElement("div");
-                            block.style.marginBottom = "6px";
-                            block.innerHTML = `<strong>${pos}:</strong>`;
-                            const ul = document.createElement("ul");
-                            meaning.definitions.forEach(def => {
-                                const li = document.createElement("li");
-                                li.textContent = def.definition;
-                                ul.appendChild(li);
-                            });
-                            block.appendChild(ul);
-                            meaningsContainer.appendChild(block);
-                        });
-                    } else {
-                        phoneticsEl.innerHTML = "<em>Không tìm thấy dữ liệu từ điển</em>";
-                    }
-                } catch (err) {
-                    console.error("Lỗi DictionaryAPI:", err);
-                    phoneticsEl.innerHTML = "<em>Lỗi lấy dữ liệu từ điển</em>";
-                }
-            }
-
-            // Gán sự kiện cho từ vựng chính
-            document.querySelectorAll(".vocab-word").forEach(element => {
-                element.addEventListener("click", function (event) {
-                    event.preventDefault();
-                    const word = this.innerText.trim();
-                    if (!word) return;
-                    fetchAndDisplayInfo(word, event);
-                });
-            });
-
-            // Tách nội dung phần "example" thành các từ có thể click
-            document.querySelectorAll('.example').forEach(exampleEl => {
-                const text = exampleEl.innerText;
-                exampleEl.innerHTML = "";
-                const words = text.split(/\s+/);
-                words.forEach((word, idx) => {
-                    const span = document.createElement("span");
-                    span.innerText = word;
-                    span.style.cursor = "pointer";
-                    span.style.marginRight = "4px";
-                    span.classList.add("clickable-word");
-                    exampleEl.appendChild(span);
-                    if (idx < words.length - 1) {
-                        exampleEl.appendChild(document.createTextNode(" "));
-                    }
-                });
-            });
-
-            // Event Delegation cho các từ trong ví dụ
-            document.addEventListener('click', function (event) {
-                // Click vào từ trong ví dụ
-                if (event.target.classList.contains('clickable-word')) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    const clickedWord = event.target.innerText.trim();
-                    if (!clickedWord) return;
-                    fetchAndDisplayInfo(clickedWord, event);
-                }
-                // Click vào nút phát âm (speaker-icon)
-                else if (event.target.classList.contains('speaker-icon')) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    const audioUrl = event.target.getAttribute('data-audio');
-                    if (audioUrl) {
-                        const audio = new Audio(audioUrl);
-                        audio.play();
-                    }
-                }
-            });
-
-            // Ẩn hộp khi click ra ngoài
-            document.addEventListener("click", function (event) {
-                if (!event.target.closest(".vocab-word") &&
-                    !event.target.closest(".clickable-word") &&
-                    !event.target.closest("#definition-box") &&
-                    !event.target.classList.contains('speaker-icon')) {
-                    definitionBox.style.display = "none";
-                }
-            });
-        });
-
-    </script>
-}
