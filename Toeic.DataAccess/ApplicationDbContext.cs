@@ -26,6 +26,7 @@ namespace Toeic.DataAccess
         public virtual DbSet<Cau_hoi_bai_thi> Cauhoibaithis { get; set; }
         public virtual DbSet<TestResult> TestResults { get; set; }
         public virtual DbSet<UserAnswer> UserAnswers { get; set; }
+        public virtual DbSet<Message> Messages { get; set; }
 
 
 
@@ -67,6 +68,19 @@ namespace Toeic.DataAccess
                 .WithMany(t => t.UserAnswers)
                 .HasForeignKey(u => u.TestResultId)
                 .OnDelete(DeleteBehavior.Cascade); // Cho phép xóa cascade
+
+
+            modelBuilder.Entity<Message>()
+          .HasOne(m => m.Sender)
+          .WithMany()
+          .HasForeignKey(m => m.SenderId)
+          .OnDelete(DeleteBehavior.Restrict); // Không xóa tin nhắn nếu xóa User
+
+            modelBuilder.Entity<Message>()
+                .HasOne(m => m.Receiver)
+                .WithMany()
+                .HasForeignKey(m => m.ReceiverId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
     }

@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Toeic.DataAccess;
 using Toeic.Utility;
+using ToeicWeb.Hubs;
+using ToeicWeb.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +34,21 @@ builder.Services.AddSession(options => {
     options.Cookie.IsEssential = true;
 });
 
+// Cho phép CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        policy => policy.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
+});
+builder.Services.AddSignalR();
+
+builder.Services.AddScoped<GeminiService>();
+
+builder.Services.AddHttpClient();
+
+
 
 var app = builder.Build();
 
@@ -42,6 +59,10 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+app.UseCors("AllowAll");
+
+app.MapHub<ChatHub>("/chatHub");
+
 app.UseStaticFiles();
 app.UseHttpsRedirection();
 app.UseRouting();
@@ -51,6 +72,11 @@ app.UseSession();
 app.MapRazorPages();
 app.MapStaticAssets();
 
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers(); // ✅ Đảm bảo API có thể hoạt động
+});
 app.MapControllerRoute(
     name: "default",
     pattern: "{area=Customer}/{controller=Home}/{action=Index}/{id?}")
