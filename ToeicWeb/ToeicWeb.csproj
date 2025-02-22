@@ -26,10 +26,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\customer\css\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Toeic.DataAccess\Toeic.DataAccess.csproj" />
     <ProjectReference Include="..\Toeic.Models\Toeic.Models.csproj" />
     <ProjectReference Include="..\Toeic.Utility\Toeic.Utility.csproj" />

@@ -6,6 +6,7 @@ using Toeic.Models;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Toeic.Utility;
+using Microsoft.AspNetCore.Identity;
 
 namespace ToeicWeb.Areas.Admin.Controllers
 {
@@ -52,20 +53,39 @@ namespace ToeicWeb.Areas.Admin.Controllers
 
 
 
-        [HttpPost("send")]
+
+        [HttpPost]
         public async Task<IActionResult> SendMessage([FromBody] Message message)
         {
-            if (string.IsNullOrWhiteSpace(message.MessageText))
-                return BadRequest("Tin nhắn không hợp lệ.");
+            try
+            {
+                var sender = _context.Users.FirstOrDefault(u => u.UserName == User.Identity.Name);
+                if (sender == null)
+                {
+                    return BadRequest("Người gửi không tồn tại trong hệ thống.");
+                }
 
-            message.SenderId = User.Identity.Name; // ✅ Lưu tin nhắn của Admin
-            message.Timestamp = DateTime.UtcNow;
+                if (string.IsNullOrWhiteSpace(message.MessageText) || string.IsNullOrWhiteSpace(message.ReceiverId))
+                {
+                    return BadRequest("Tin nhắn hoặc ID người nhận không hợp lệ.");
+                }
 
-            _context.Messages.Add(message);
-            await _context.SaveChangesAsync();
+                // Gán SenderId là ID thật trong bảng AspNetUsers
+                message.SenderId = sender.Id;
+                message.Timestamp = DateTime.UtcNow;
 
-            return Ok(new { success = true });
+                _context.Messages.Add(message);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Lỗi server: {ex.Message}");
+            }
         }
+
+
 
         #region API CALLS
         [HttpGet]
@@ -73,8 +93,20 @@ namespace ToeicWeb.Areas.Admin.Controllers
         {
             try
             {
+                // Lấy danh sách ID của Admin từ bảng UserRoles
+                var adminRoleId = _context.Roles
+                    .Where(r => r.Name == "Admin") // Tìm Role có tên "Admin"
+                    .Select(r => r.Id)
+                    .FirstOrDefault();
+
+                var adminUserIds = _context.UserRoles
+                    .Where(ur => ur.RoleId == adminRoleId)
+                    .Select(ur => ur.UserId)
+                    .ToList();
+
+                // Lọc người dùng có tin nhắn nhưng không phải Admin
                 var users = _context.ApplicationUsers
-                    .Where(u => _context.Messages.Any(m => m.SenderId == u.Id)) // Chỉ lấy user có tin nhắn
+                    .Where(u => _context.Messages.Any(m => m.SenderId == u.Id) && !adminUserIds.Contains(u.Id))
                     .Select(u => new {
                         id = u.Id,
                         name = u.Name ?? "Người dùng ẩn danh",
@@ -86,9 +118,10 @@ namespace ToeicWeb.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest($"Lỗi lấy danh sách user: {ex.Message}");
+                return StatusCode(500, new { error = ex.Message, stackTrace = ex.StackTrace });
             }
         }
+
 
         #endregion
 
