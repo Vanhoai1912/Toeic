@@ -1,4 +1,5 @@
-﻿document.addEventListener("DOMContentLoaded", function () {
+﻿
+document.addEventListener("DOMContentLoaded", function () {
     const chatIcon = document.getElementById("chat-icon");
     const chatContainer = document.getElementById("chat-container");
     const chatHeader = document.getElementById("chat-header");
@@ -30,17 +31,39 @@
     const showMessage = (sender, message, isUser = false) => {
         const msgDiv = document.createElement("div");
         msgDiv.classList.add("message", isUser ? "user" : "bot");
-        msgDiv.innerHTML = `<strong>${sender}:</strong> ${message}`;
 
-        if (chatType === "admin") {
-            adminMessages.push(msgDiv.outerHTML);
-        } else {
-            aiMessages.push(msgDiv.outerHTML);
+        let formattedMessage = message;
+
+        try {
+            // Kiểm tra nếu message là chuỗi JSON, parse nó
+            const data = typeof message === "string" ? JSON.parse(message) : message;
+
+            if (data.ten_thi) {
+                formattedMessage = `
+                <strong>${data.ten_thi}</strong><br>
+                ${data.cach_dung}<br>
+                <strong>Công thức:</strong> ${data.cong_thuc}<br>
+                <strong>Ví dụ:</strong>
+                <ul>
+            `;
+
+                if (Array.isArray(data.vi_du)) {
+                    data.vi_du.forEach(example => {
+                        formattedMessage += `<li>${example}</li>`;
+                    });
+                }
+
+                formattedMessage += `</ul>`;
+            }
+        } catch (e) {
         }
 
+        msgDiv.innerHTML = formattedMessage;
         chatBody.appendChild(msgDiv);
         scrollToBottom();
     };
+
+
 
     // Hiển thị lỗi
     const showError = (message) => showMessage("Lỗi", message, false);

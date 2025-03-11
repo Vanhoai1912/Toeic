@@ -44,7 +44,8 @@ builder.Services.AddCors(options =>
 });
 builder.Services.AddSignalR();
 
-builder.Services.AddScoped<GeminiService>();
+builder.Services.AddScoped<ChatbotService>();
+builder.Services.AddSingleton<ChatbotService>();
 
 builder.Services.AddHttpClient();
 

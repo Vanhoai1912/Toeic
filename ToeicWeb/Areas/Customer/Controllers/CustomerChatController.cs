@@ -16,18 +16,19 @@ namespace ToeicWeb.Areas.Customer.Controllers
     public class CustomerChatController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        private readonly GeminiService _geminiService;
+        private readonly ChatbotService _chatbotService; // 🔹 Đổi từ GeminiService sang ChatbotService
 
-        public CustomerChatController(ApplicationDbContext context, GeminiService geminiService)
+        public CustomerChatController(ApplicationDbContext context, ChatbotService chatbotService)
         {
             _context = context;
-            _geminiService = geminiService;
+            _chatbotService = chatbotService;
         }
 
         public class SendMessageDto
         {
             public string MessageText { get; set; }
         }
+
         [HttpPost("send/{chatType}")]
         public async Task<IActionResult> SendMessage(string chatType, [FromBody] SendMessageDto request)
         {
@@ -41,7 +42,6 @@ namespace ToeicWeb.Areas.Customer.Controllers
             {
                 return Unauthorized(new { error = "Bạn cần đăng nhập để gửi tin nhắn cho Admin." });
             }
-
 
             try
             {
@@ -81,7 +81,7 @@ namespace ToeicWeb.Areas.Customer.Controllers
                 }
                 else if (chatType == "ai")
                 {
-                    aiReply = await _geminiService.GetChatbotResponse(request.MessageText);
+                    aiReply = await _chatbotService.GetChatbotResponse(request.MessageText); // 🔹 Gọi API Flask
 
                     if (string.IsNullOrWhiteSpace(aiReply))
                     {
@@ -134,7 +134,7 @@ namespace ToeicWeb.Areas.Customer.Controllers
             }
         }
 
-        [HttpGet("current-user")] // Tạo API lấy userId
+        [HttpGet("current-user")]
         public IActionResult GetCurrentUserId()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -144,6 +144,5 @@ namespace ToeicWeb.Areas.Customer.Controllers
             }
             return Ok(new { userId });
         }
-
     }
 }
