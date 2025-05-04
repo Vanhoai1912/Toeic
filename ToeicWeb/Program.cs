@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Toeic.DataAccess;
 using Toeic.Utility;
-using ToeicWeb.Hubs;
 using ToeicWeb.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -62,7 +61,6 @@ if (!app.Environment.IsDevelopment())
 }
 app.UseCors("AllowAll");
 
-app.MapHub<ChatHub>("/chatHub");
 
 app.UseStaticFiles();
 app.UseHttpsRedirection();

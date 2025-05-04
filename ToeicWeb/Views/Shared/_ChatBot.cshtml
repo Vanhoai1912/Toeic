@@ -1,23 +1,46 @@
 ﻿<div id="chat-icon">
-    <img src="~/customer/images/beee.png" alt="Chatbot">
+    <img src="~/customer/images/beee.png" alt="Chatbot" />
 </div>
+
 <div id="chat-container">
     <div id="chat-header">
-        <span>Chatbot</span>
-        <button id="close-chat">&times;</button>
+        <div class="chat-header d-flex justify-content-between">
+            <div class="d-flex align-items-center">
+                <img src="/customer/images/HI.gif" style="height: 30px;" class="rounded me-2 mb-1" />
+                <strong>TOEIC CHAT</strong>
+            </div>
+        </div>
+        <button id="close-chat"><i class="bi bi-x-lg"></i></button>
     </div>
-    <div id="chat-body"></div>
 
-    <div id="chat-options">
-        <button class="chat-option" data-chat="ai"><i class="bi bi-robot"></i> Chat AI</button>
-        <button class="chat-option" data-chat="admin"><i class="bi bi-person-workspace"></i> Chat Admin</button>
+    <!-- PHẦN CHỌN AI/ADMIN & TRẠNG THÁI -->
+    <div id="chat-top" class="p-2">
+       
+
+        <div id="chat-options" class="text-center">
+            <button class="chat-option-btn active" data-chat="ai">
+                <i class="bi bi-robot"></i> Trí tuệ nhân tạo
+            </button>
+            <button class="chat-option-btn" data-chat="admin">
+                <i class="bi bi-person-video3"></i> Nhân viên hỗ trợ
+            </button>
+        </div>
+        
+        
     </div>
 
+    <!-- KHUNG TIN NHẮN -->
+    <div id="chat-body">
+        <!-- Tin nhắn sẽ được thêm tại đây -->
+    </div>
+
+    <!-- NHẬP TIN -->
     <div id="chat-footer">
-        <input type="text" id="chat-input" placeholder="Nhập tin nhắn...">
-        <button id="send-btn"><i class="bi bi-arrow-right-circle-fill"></i> Gửi</button>
+        <input type="text" id="chat-input" placeholder="Nhập tin nhắn của bạn..." />
+        <button id="send-btn"><i class="bi bi-send-fill"></i></button>
     </div>
 </div>
+
 
 
 <link href="~/customer/css/chat.css" rel="stylesheet" />

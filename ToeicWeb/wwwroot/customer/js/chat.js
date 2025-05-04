@@ -1,5 +1,4 @@
-﻿
-document.addEventListener("DOMContentLoaded", function () {
+﻿document.addEventListener("DOMContentLoaded", function () {
     const chatIcon = document.getElementById("chat-icon");
     const chatContainer = document.getElementById("chat-container");
     const chatHeader = document.getElementById("chat-header");
@@ -12,22 +11,22 @@ document.addEventListener("DOMContentLoaded", function () {
     let adminMessages = [];
     let aiMessages = [];
 
+    // Escape nội dung HTML
+    function escapeHtml(text) {
+        const div = document.createElement("div");
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
     // Hiệu ứng mở chat
     chatIcon.addEventListener("click", function () {
         chatContainer.classList.toggle("show");
     });
 
-    // Ẩn chatbox khi bấm ngoài
-    document.addEventListener("click", function (e) {
-        if (!chatContainer.contains(e.target) && !chatIcon.contains(e.target)) {
-            chatContainer.classList.remove("show");
-        }
-    });
-
     // Cuộn xuống cuối chat
     const scrollToBottom = () => chatBody.scrollTo({ top: chatBody.scrollHeight, behavior: "smooth" });
 
-    // Hiển thị tin nhắn trên giao diện
+    // Hiển thị tin nhắn
     const showMessage = (sender, message, isUser = false) => {
         const msgDiv = document.createElement("div");
         msgDiv.classList.add("message", isUser ? "user" : "bot");
@@ -35,7 +34,6 @@ document.addEventListener("DOMContentLoaded", function () {
         let formattedMessage = message;
 
         try {
-            // Kiểm tra nếu message là chuỗi JSON, parse nó
             const data = typeof message === "string" ? JSON.parse(message) : message;
 
             if (data.ten_thi) {
@@ -56,6 +54,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 formattedMessage += `</ul>`;
             }
         } catch (e) {
+            formattedMessage = escapeHtml(formattedMessage); // Escape nếu không phải JSON
         }
 
         msgDiv.innerHTML = formattedMessage;
@@ -63,32 +62,27 @@ document.addEventListener("DOMContentLoaded", function () {
         scrollToBottom();
     };
 
-
-
-    // Hiển thị lỗi
     const showError = (message) => showMessage("Lỗi", message, false);
 
-    // Hiển thị lại tin nhắn khi chuyển đổi
     const showChatMessages = () => {
-        chatBody.innerHTML = `<p class="chat-notice">Bạn đang chat với ${chatType === "admin" ? "Admin" : "AI"}.</p>`;
-
+        chatBody.innerHTML = ""; // Xóa hiển thị cũ
         const messages = chatType === "admin" ? adminMessages : aiMessages;
         messages.forEach(msg => chatBody.insertAdjacentHTML("beforeend", msg));
-
         scrollToBottom();
     };
 
-    // Chuyển giữa AI/Admin
-    document.querySelectorAll(".chat-option").forEach(button => {
+
+    document.querySelectorAll(".chat-option-btn").forEach(button => {
         button.addEventListener("click", async function () {
+            document.querySelectorAll(".chat-option-btn").forEach(btn => btn.classList.remove("active"));
+            this.classList.add("active");
+
             chatType = this.dataset.chat;
-            chatHeader.textContent = chatType === "admin" ? "Chat với Admin" : "Chat với AI";
-            chatHeader.style.backgroundColor = chatType === "admin" ? "#dc3545" : "#007bff";
 
             if (chatType === "admin") {
                 await getUserId();
                 if (!userId) {
-                    showChatMessages();
+                    chatBody.innerHTML = "";
                     showError("Bạn cần đăng nhập để chat với Admin.");
                     return;
                 }
@@ -99,12 +93,28 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    // Gửi tin nhắn
+
     const sendMessage = async () => {
         const input = chatInput.value.trim();
         if (!input) return;
 
-        showMessage("Bạn", input, true);
+        // Giao diện đẹp hơn: user avatar + bong bóng
+        const wrapper = document.createElement("div");
+        wrapper.className = "chat-message user mb-2 flex items-start justify-end gap-2";
+
+        const avatar = document.createElement("img");
+        avatar.src = "/customer/images/user-avatar.png" // Thay bằng link avatar của bạn
+        avatar.alt = "Bạn";
+        avatar.className = "avatar w-8 h-8 rounded-full mx-0";
+
+        const bubble = document.createElement("div");
+        bubble.className = "chat-bubble user px-4 py-2 rounded-xl";
+        bubble.textContent = input;
+
+        wrapper.appendChild(bubble);
+        wrapper.appendChild(avatar);
+        chatBody.appendChild(wrapper);
+        scrollToBottom();
         chatInput.value = "";
 
         try {
@@ -122,16 +132,38 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             if (body.reply?.trim()) {
-                showMessage(chatType === "admin" ? "Admin" : "AI", body.reply, false);
+                const wrapper = document.createElement("div");
+                wrapper.className = "chat-message bot mb-2 flex items-start gap-2";
+
+                const avatar = document.createElement("img");
+                avatar.src = "/customer/images/admin-avatar.png";
+                avatar.alt = chatType === "admin" ? "Admin" : "AI";
+                avatar.className = "avatar w-8 h-8 rounded-full mx-0";
+
+                const bubble = document.createElement("div");
+                bubble.className = "chat-bubble bot px-4 py-2 rounded-xl";
+                bubble.textContent = body.reply;
+
+                wrapper.appendChild(avatar);
+                wrapper.appendChild(bubble);
+                chatBody.appendChild(wrapper);
+                scrollToBottom();
             } else {
-                setTimeout(() => showMessage("Hệ thống", "Tin nhắn đã gửi thành công.", false), 1000);
+                setTimeout(() => {
+                    const bubble = document.createElement("div");
+                    bubble.className = "chat-bubble bot mb-2";
+                    bubble.textContent = "Hệ thống: Tin nhắn đã gửi thành công.";
+                    chatBody.appendChild(bubble);
+                    scrollToBottom();
+                }, 1000);
             }
         } catch (error) {
             showError("Không thể kết nối đến server.");
         }
     };
 
-    // Lấy userId
+
+
     const getUserId = async () => {
         try {
             const response = await fetch("/customer/api/chat");
@@ -146,7 +178,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     };
 
-    // Tải tin nhắn với Admin
     const loadAdminMessages = async () => {
         try {
             const response = await fetch("/customer/api/chat");
@@ -161,25 +192,79 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (!Array.isArray(data.messages)) return;
 
-            adminMessages = data.messages.map(msg => {
-                const sender = msg.senderId === userId ? "Bạn" : "Admin";
-                return `<div class="message ${msg.senderId === userId ? "user" : "bot"}"><strong>${sender}:</strong> ${msg.messageText}</div>`;
+            adminMessages = [];
+            chatBody.innerHTML = "";
+
+            data.messages.forEach(msg => {
+                const isUser = msg.senderId === userId;
+
+                const wrapper = document.createElement("div");
+                wrapper.className = `chat-message ${isUser ? "user justify-end" : "bot"} mb-2 flex items-start gap-2`;
+
+                const avatar = document.createElement("img");
+                avatar.src = isUser ? "/customer/images/user-avatar.png" : "/customer/images/admin-avatar.png";
+                avatar.alt = isUser ? "Bạn" : "Admin";
+                avatar.className = "avatar w-8 h-8 rounded-full mx-0";
+
+                const bubble = document.createElement("div");
+                bubble.className = `chat-bubble ${isUser ? "user" : "bot"} px-4 py-2 rounded-xl`;
+                bubble.textContent = msg.messageText;
+
+                if (isUser) {
+                    wrapper.appendChild(bubble);
+                    wrapper.appendChild(avatar);
+                } else {
+                    wrapper.appendChild(avatar);
+                    wrapper.appendChild(bubble);
+                }
+
+                chatBody.appendChild(wrapper);
+                adminMessages.push(wrapper.outerHTML);
             });
 
-            if (chatType === "admin") {
-                showChatMessages();
-            }
+            scrollToBottom();
         } catch (error) {
             showError(error.message);
         }
     };
 
-    // Bấm gửi hoặc nhấn Enter
+
+
+
     sendBtn.addEventListener("click", sendMessage);
     chatInput.addEventListener("keypress", (e) => {
         if (e.key === "Enter") sendMessage();
     });
 
-    // Load tin nhắn AI mặc định
     window.onload = showChatMessages;
 });
+
+// Toggle khung chat khi nhấn icon
+document.getElementById("chat-icon").addEventListener("click", (e) => {
+    e.stopPropagation(); // Ngăn sự kiện click lan ra ngoài
+    const chatContainer = document.getElementById("chat-container");
+    chatContainer.style.display = (chatContainer.style.display === "flex") ? "none" : "flex";
+});
+
+// Đóng chat khi nhấn nút close
+document.getElementById("close-chat").addEventListener("click", (e) => {
+    e.stopPropagation();
+    document.getElementById("chat-container").style.display = "none";
+});
+
+// Đóng chat khi click ra ngoài
+document.addEventListener("click", (e) => {
+    const chatContainer = document.getElementById("chat-container");
+    const chatIcon = document.getElementById("chat-icon");
+
+    if (!chatContainer.contains(e.target) && !chatIcon.contains(e.target)) {
+        chatContainer.style.display = "none";
+    }
+});
+
+// Ngăn click bên trong khung chat bị lan ra ngoài
+document.getElementById("chat-container").addEventListener("click", (e) => {
+    e.stopPropagation();
+});
+
+
